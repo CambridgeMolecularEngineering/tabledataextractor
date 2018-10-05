@@ -14,7 +14,7 @@ __version__ = '1.0.0'
 __author__ = 'Juraj Mavračić'
 __email__ = 'jm2111@cam.ac.uk'
 __license__ = 'MIT'  # ?
-__copyright__ = 'Copyright 2019 Juraj Mavracic'
+__copyright__ = 'Copyright 2018 Juraj Mavracic'
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
