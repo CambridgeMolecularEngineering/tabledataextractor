@@ -62,16 +62,53 @@ print(df.to_string(), "\n")
 df = pd.read_csv('./data/table_example.csv', delimiter=',', header=[0, 1], na_values='–',index_col=[0,1])
 print(df, "\n")
 
+# Conversion of DataFrame into Category Table, brute force
+#index = df.index      # these are the levels and labels of the index
+#columns = df.columns  # these are the levels and labels of the columns
+def find_multiindex_level(row_number,column_number,df):
+    result_index = []
+    for i,labels in enumerate(df.index.labels):
+        result_index.append(df.index.levels[i][labels[row_number]])
+    result_column = []
+    for i,labels in enumerate(df.columns.labels):
+        result_column.append(df.columns.levels[i][labels[column_number]])
+    return result_index,result_column
+
+
+def print_category_table(df):
+    values = df.values  # data is converted to numpy array
+    print("{:9s} {:7s} {:35s} {:20s}".format("Cell_ID","Data","Row Categories","Column Categories"))
+    for i,row in enumerate(values):
+        for j,cell in enumerate(row):
+            categories = find_multiindex_level(i,j,df)
+            print("{:3} {:3} {:7.3f}  ".format(i,j,cell),*categories[0],"{:10}".format(""),*categories[1])
+
+
+print_category_table(df)
+print("")
+
+
+# TODO Try the main primary Embley et Al table --> try the indexing from the "raw" table, without the factorization, if first todo works
+
+
+
+# TODO Building a category table from the DataFrame, using loops over columns and row indexes, should be easier
+
+
+
+
 # A complicated example from Embley et. Al., Figure 11
 # once the headers and data is separated the indexing is automatic:
 df = pd.read_csv('./data/table_example2.csv', delimiter=',', header=[0, 1, 2])
 print(df.to_string(), "\n")
 
-# TODO Convert above DataFrame into database that can be queried -> into a category table
-# TODO Try the main primary Embley et Al table --> try the indexing from the "raw" table, without the factorization, if first todo works
 
-# engine = create_engine('sqlite:///:memory:')
-# df.to_sql('test', engine)
+
+
+
+
+
+
 
 
 
