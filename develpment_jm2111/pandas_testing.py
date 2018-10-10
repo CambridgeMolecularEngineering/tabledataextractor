@@ -116,7 +116,18 @@ print(df.to_string(), "\n")
 print_category_table(df); print("\n")
 
 
-# TODO Try Callum'd duplicate table
+# Two tables in one will not work, not even if indexes are specified separately, because the data will not
+# be separate
+# Two tables need to be created from one
+df = pd.read_csv('./data/table_example6.csv', delimiter=',', index_col=[0],usecols=[0,1])
+print(df.to_string(), "\n")
+print_category_table(df); print("\n")
+# when the second table is input, Pandas will still automatically add a suffix to the duplicate column labels
+df = pd.read_csv('./data/table_example6.csv', delimiter=',', index_col=[0],usecols=[2,3])
+print(df.to_string(), "\n")
+print_category_table(df); print("\n")
+
+
 
 # TODO Building a category table from the DataFrame, using loops over columns and row indexes, should be easier
 
