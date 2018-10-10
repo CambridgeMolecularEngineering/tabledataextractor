@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""
+tabledataextractor.output.print.py
+
+Reads a csv formatted table.
+
+jm2111@cam.ac.uk
+~~~~~~~~~~~~~~~~~
+"""
+
+import logging
+import numpy as np
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+
+def print_table(table):
+    """
+    Accepts Table() instance and prints the raw table
+    :param table:
+    :return:
+    """
+    n_columns = table.shape[1]
+    cell_width = np.zeros(n_columns, dtype=int)
+
+    # find the maximum cell width for each column
+    for i,column in enumerate(table.T):
+        for cell in column:
+            if len(cell) > cell_width[i]:
+                cell_width[i] = len(cell)
+
+    # print each row
+    for row in table:
+        for i,cell in enumerate(row):
+            print("{:{cell_width}} ".format(cell,cell_width=cell_width[i]+1),end='',flush=True)
+        print("\n",end='',flush=True)
+    print("\n",flush=True)

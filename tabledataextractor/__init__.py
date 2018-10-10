@@ -25,3 +25,5 @@ log.addHandler(logging.NullHandler())
 #     log.setLevel(logging.DEBUG)
 # to change the effective level of the module logger
 logging.basicConfig(format='%(levelname)-10s in %(filename)-20s--> %(message)s', level=logging.WARNING)
+
+from tabledataextractor.table.table import Table
