@@ -17,8 +17,10 @@ log.setLevel(logging.DEBUG)
 
 def print_table(table):
     """
-    Accepts Table() instance and prints the raw table
-    :param table:
+    Prints a table to screen.
+
+    :param table: input numpy array for printing
+    :type table: str
     :return:
     """
     n_columns = table.shape[1]
