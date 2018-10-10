@@ -128,7 +128,6 @@ print(df.to_string(), "\n")
 print_category_table(df); print("\n")
 
 
-
 # TODO Building a category table from the DataFrame, using loops over columns and row indexes, should be easier
 
 # TODO Make the print_category_table() function output better formatting
