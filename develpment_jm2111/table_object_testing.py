@@ -37,6 +37,7 @@ print("Main Table Input")
 print("================")
 table.print()
 
-
+n_columns = 5
+print (int(n_columns/2))
 
 

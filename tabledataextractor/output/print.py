@@ -26,7 +26,7 @@ def print_table(table):
     n_columns = table.shape[1]
     cell_width = np.zeros(n_columns, dtype=int)
 
-    # find the maximum cell width for each column
+    # find the maximum cell width for each column i
     for i,column in enumerate(table.T):
         for cell in column:
             if len(cell) > cell_width[i]:
