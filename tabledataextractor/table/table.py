@@ -14,7 +14,7 @@ from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 class Table:
@@ -33,7 +33,6 @@ class Table:
         # mask, cell = True if cell is empty
         self.empty = np.empty_like(self.raw_table, dtype=bool)
         self.empty_cells()
-        log.debug("Empty cells in {}:\n{}".format(file_path, self.empty))
 
         # pre-cleaned table
         self.pre_cleaned_table = np.copy(self.raw_table)
@@ -137,6 +136,7 @@ class Table:
                     self.empty[i, j] = True
                 else:
                     self.empty[i, j] = False
+        log.debug("Empty cells in {}:\n{}".format(self.file_path, self.empty))
 
 
 
@@ -152,7 +152,7 @@ class Table:
         for row_index,row in enumerate(self.empty):
             if False not in row:
                 empty_rows.append(row_index)
-        log.debug("Empty rows {} deleted.".format(empty_rows))
+        log.info("Empty rows {} deleted.".format(empty_rows))
         self.pre_cleaned_table = np.delete(self.pre_cleaned_table,empty_rows, axis=0)
 
         # find empty columns and delete them
@@ -160,15 +160,31 @@ class Table:
         for column_index,column in enumerate(self.empty.T):
             if False not in column:
                 empty_columns.append(column_index)
-        log.debug("Empty columns {} deleted.".format(empty_columns))
+        log.info("Empty columns {} deleted.".format(empty_columns))
         self.pre_cleaned_table = np.delete(self.pre_cleaned_table,empty_columns, axis=1)
 
-        # TODO Finish removing duplicated rows and columns
         # delete duplicate rows that extend over the whole table
-        self.pre_cleaned_table,indices = np.unique(self.pre_cleaned_table,axis=0,return_index=True)
-        log.debug("Indices are: {}".format(indices))
+        _, indices = np.unique(self.pre_cleaned_table,axis=0,return_index=True)
+        # for logging only, which rows have been removed
+        removed_rows = []
+        for row_index in range(0,len(self.pre_cleaned_table)):
+            if row_index not in indices:
+                removed_rows.append(row_index)
+        log.info("Duplicate rows {} removed.".format(removed_rows))
+        # deletion:
+        self.pre_cleaned_table = self.pre_cleaned_table[np.sort(indices)]
 
-
+        # delete duplicate columns that extend over the whole table
+        _, indices = np.unique(self.pre_cleaned_table, axis=1, return_index=True)
+        # for logging only, which rows have been removed
+        removed_columns = []
+        for column_index in range(0, len(self.pre_cleaned_table.T)):
+            if column_index not in indices:
+                removed_columns.append(column_index)
+        log.info("Duplicate columns {} removed.".format(removed_columns))
+        # deletion:
+        self.pre_cleaned_table = self.pre_cleaned_table[:,np.sort(indices)]
+        log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
 
 
 
@@ -178,11 +194,11 @@ class Table:
         """
 
         cc4 = self.find_cc4()
-        log.debug("Table Cell CC4 = {}".format(cc4))
+        log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
 
         cc2,cc3 = self.find_cc2_cc3(cc4)
-        log.debug("Table Cell CC2 = {}; Table Cell CC3 = {}".format(cc2,cc3))
+        log.info("Table Cell CC2 = {}; Table Cell CC3 = {}".format(cc2,cc3))
         self.labels[cc2] = 'CC2'
         self.labels[cc3] = 'CC3'
 
