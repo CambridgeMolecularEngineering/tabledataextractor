@@ -96,49 +96,83 @@ class Table:
         # help function to cut the correct slice out of array
         def table_slice(table,r2,r_max,c1,c2):
 
+            # if r2+1 == r_max and c1 == c2:
+            #     temp_section_1 = table[r2+1, c1]
+            # elif r2+1 == r_max and c1 != c2:
+            #     temp_section_1 = table[r2+1, c1:c2]
+            # elif r2+1 != r_max and c1 != c2:
+            #     temp_section_1 = table[r2+1:r_max, c1:c2]
+            # elif r2 + 1 != r_max and c1 == c2:
+            #     temp_section_1 = table[r2 + 1:r_max, c1]
+            # else:
+            #     print("Not defined 1. r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
+            #
+            # if r1 == r2-1 and c2+1 == c_max:
+            #     temp_section_2 = table[r1, c2+1]
+            # elif r1 == r2-1 and c2+1 != c_max:
+            #     temp_section_2 = table[r1, c2+1 : c_max]
+            # elif r1 != r2-1 and c2+1 != c_max:
+            #     temp_section_2 = table[r1 : r2-1, c2+1 : c_max]
+            # elif r1 != r2-1 and c2+1 == c_max:
+            #     temp_section_2 = table[r1 : r2-1, c2+1]
+            # else:
+            #     print("Not defined 1. r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
+
+            # what I need is one more row and column, the a:b notation in python doesn't include b
             if r2+1 == r_max and c1 == c2:
                 temp_section_1 = table[r2+1, c1]
             elif r2+1 == r_max and c1 != c2:
-                temp_section_1 = table[r2+1, c1:c2]
+                temp_section_1 = table[r2+1, c1:c2+1]
             elif r2+1 != r_max and c1 != c2:
-                temp_section_1 = table[r2+1:r_max, c1:c2]
+                temp_section_1 = table[r2+1:r_max+1, c1:c2+1]
             elif r2 + 1 != r_max and c1 == c2:
-                temp_section_1 = table[r2 + 1:r_max, c1]
+                temp_section_1 = table[r2 + 1:r_max+1, c1]
             else:
                 print("Not defined 1. r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
 
             if r1 == r2-1 and c2+1 == c_max:
                 temp_section_2 = table[r1, c2+1]
             elif r1 == r2-1 and c2+1 != c_max:
-                temp_section_2 = table[r1, c2+1 : c_max]
+                temp_section_2 = table[r1, c2+1 : c_max+1]
             elif r1 != r2-1 and c2+1 != c_max:
-                temp_section_2 = table[r1 : r2-1, c2+1 : c_max]
+                temp_section_2 = table[r1 : r2-1+1, c2+1 : c_max+1]
             elif r1 != r2-1 and c2+1 == c_max:
-                temp_section_2 = table[r1 : r2-1, c2+1]
+                temp_section_2 = table[r1 : r2-1+1, c2+1]
             else:
                 print("Not defined 1. r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
 
+
             return temp_section_1,temp_section_2
+
 
         i = 0
         # Locate candidate MIPs by finding the minimum indexing headers:
         while c2 < c_max  and r2 >= r1:
             i = i + 1
 
-            print("Entering loop: c2= {}, c_max= {}, r2= {}, r1= {}".format(c2,c_max,r2,r1))
+            print("Entering loop: c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}".format(c2,c_max,c1,r2,r1))
 
             temp_section_1, temp_section_2 = table_slice(self.pre_cleaned_table,r2,r_max,c1,c2)
 
+            print(temp_section_1)
+            print("__________________________________________________")
+            print(temp_section_2)
+
+
+
+
             # check if there are duplicate rows in temp_section_1
             duplicate_rows = False
-            if temp_section_1.ndim > 0:
+            # array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
+            if temp_section_1.ndim > 0 and temp_section_1.size:
                 _, indices = np.unique(temp_section_1, axis=0, return_index=True)
                 if len(temp_section_1) > len(indices):
                     duplicate_rows = True
 
             # check if there are duplicate columns in temp_section_2
             duplicate_columns = False
-            if temp_section_2.T.ndim > 0:
+            # array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
+            if temp_section_2.T.ndim > 0 and temp_section_2.T.size:
                 _, indices = np.unique(temp_section_2.T, axis=0, return_index=True)
                 if len(temp_section_2.T) > len(indices):
                     duplicate_columns = True
@@ -148,18 +182,38 @@ class Table:
                 upflag = 1
                 rightflag = 0
             else:
+
+                # =====================================================================
+                # This part is added to the algorithm by me
+                # re-initialize max_area if still 0 but we are about to change column
+                # remember this cc2 as the first candidate
+                if max_area == 0:
+                    data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
+                    max_area = data_area
+                    cc2 = (r2,c2)
+                # ======================================================================
+
                 c2 = c2 + 1
+
+                print("C2 was now increased from {} to {}".format(c2 - 1, c2))
+                print("duplicate_rows = {}".format(duplicate_rows))
+                print("duplicate_columns = {}".format(duplicate_columns))
+
+
                 rightflag = 1
                 if upflag == 1 and rightflag == 1:
                     # TODO Is this wrong?
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
+                    print("The data area of the new C2 is: {}".format(data_area))
                     if data_area > max_area:
                         max_area = data_area
                         cc2 = (r2,c2)
                         print("i= {}, CC2 = {}".format(i, cc2))
                     upflag = 0
 
-            print("  End of loop: c2= {}, c_max= {}, r2= {}, r1= {}".format(c2, c_max, r2, r1))
+
+
+            print("End of loop:   c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}\n\n\n\n".format(c2,c_max,c1,r2,r1))
 
         # This is the CC1 part
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing
@@ -297,4 +351,5 @@ class Table:
         log.info("Printing table: {}".format(self.file_path))
         #print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
+        np.savetxt("pre_cleaned_table.csv", self.pre_cleaned_table, delimiter=",",fmt='%20s')
         print_table(self.labels)
