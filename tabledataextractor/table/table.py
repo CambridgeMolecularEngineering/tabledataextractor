@@ -86,10 +86,39 @@ class Table:
         upflag = 0
         max_area = 0
 
-
-        def table_slice(table,r2,r_max,c1,c2):
+        def duplicate_rows(table):
             """
-            Function to cut the correct slice out of array for in find_cc1_cc2()
+            Returns True if there are duplicate rows in the table and False if there are no duplicate rows
+            :param table:
+            :return: True or False
+            """
+            if table.ndim > 0 and table.size:
+                _, indices = np.unique(table, axis=0, return_index=True)
+                if len(table) > len(indices):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        def duplicate_columns(table):
+            """
+            Returns True if there are duplicate columns in the table and False if there are no duplicate columns
+            :param table:
+            :return: True or False
+            """
+            if table.T.ndim > 0 and table.T.size:
+                _, indices = np.unique(table.T, axis=0, return_index=True)
+                if len(table.T) > len(indices):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        def table_slice_cc2(table,r2,r_max,c1,c2):
+            """
+            Function to cut the correct slices out of array for CC2 in find_cc1_cc2()
             :param table:
             :param r2:
             :param r_max:
@@ -124,32 +153,53 @@ class Table:
 
             return section_1,section_2
 
+        def table_slice_1_cc1(table, r1, r2, c2, c_max):
+            """
+            Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
+            """
+            # one more row and column index than in the published pseudocode is needed,
+            # since the a:b notation in python doesn't include b
+            if r1 + 1 == r2 and c2+1 == c_max:
+                section = table[r1 + 1, c2+1]
+            elif r1 + 1 == r2 and c2+1 != c_max:
+                section = table[r1 + 1, c2+1:c_max+1]
+            elif r1 + 1 != r2 and c2+1 != c_max:
+                section = table[r1 + 1 : r2+1, c2 + 1:c_max+1]
+            elif r1 + 1 != r2 and c2+1 == c_max:
+                section = table[r1 + 1 : r2+1, c2 + 1]
+            else:
+                log.critical("Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1+1, r2, c2+1, c_max))
+            return section
+
+        def table_slice_2_cc1(table, r2, r_max, c1, c2):
+            """
+            Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
+            """
+            # one more row and column index than in the published pseudocode is needed,
+            # since the a:b notation in python doesn't include b
+            if r2 + 1 == c2 and c1+1 == r_max:
+                section = table[r2 + 1, c1 + 1]
+            elif r2 + 1 == c2 and c1+1 != r_max:
+                section = table[r2 + 1, c1+1 : r_max+1 ]
+            elif r2 + 1 != c2 and c1+1 != r_max:
+                section = table[r2+1 : c2+1, c1+1 : r_max+1 ]
+            elif r2 + 1 != c2 and c1+1 == r_max:
+                section = table[r2+1 : c2+1, c1+1]
+            else:
+                log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
+            return section
+
+        # MAIN MIPS algorithm
         # Locate candidate MIPs by finding the minimum indexing headers:
         while c2 < c_max  and r2 >= r1:
 
             log.debug("Entering loop: c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}".format(c2,c_max,c1,r2,r1))
 
-            temp_section_1, temp_section_2 = table_slice(self.pre_cleaned_table,r2,r_max,c1,c2)
+            temp_section_1, temp_section_2 = table_slice_cc2(self.pre_cleaned_table,r2,r_max,c1,c2)
 
             log.debug("\ntemp_section_1:\n{}\n\t{: <40}\ntemp_section_2:\n{}".format(temp_section_1,"",temp_section_2))
 
-            # check if there are duplicate rows in temp_section_1
-            duplicate_rows = False
-            # section array has to have a dimension of >0 and be non-empty for duplicate testing to make sense:
-            if temp_section_1.ndim > 0 and temp_section_1.size:
-                _, indices = np.unique(temp_section_1, axis=0, return_index=True)
-                if len(temp_section_1) > len(indices):
-                    duplicate_rows = True
-
-            # check if there are duplicate columns in temp_section_2
-            duplicate_columns = False
-            # section array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
-            if temp_section_2.T.ndim > 0 and temp_section_2.T.size:
-                _, indices = np.unique(temp_section_2.T, axis=0, return_index=True)
-                if len(temp_section_2.T) > len(indices):
-                    duplicate_columns = True
-
-            if not duplicate_rows and not duplicate_columns:
+            if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 r2 = r2 - 1
                 upflag = 1
             else:
@@ -159,6 +209,8 @@ class Table:
                 # remember this cc2 as the first candidate
                 # The 'if upflag == 1' check is uncertain, it needs to be tested on example tables, when there is no
                 # header present etc.
+                # It might be that, if there is no cc2 at all that due to the 'upflag == 1' check
+                # nothing will be returned by the function, which would cause a crash
                 if max_area == 0 and upflag == 1:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
                     log.debug("The data area of the FIRST C2 is: {}".format(data_area))
@@ -167,9 +219,6 @@ class Table:
                 # ====================================================================================================
 
                 c2 = c2 + 1
-
-                log.debug("duplicate_rows = {}".format(duplicate_rows))
-                log.debug("duplicate_columns = {}".format(duplicate_columns))
 
                 if upflag == 1:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
@@ -182,26 +231,21 @@ class Table:
 
             log.debug("End of loop:   c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}\n\n\n\n".format(c2,c_max,c1,r2,r1))
 
-        # This is the CC1 part
-        # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing
-        # r1 = 1; c1 = 1
-        # unique_columns = True; unique_rows = True
-        # temp_section_1 = self.pre_cleaned_table[ r1+1 : r2, c2+1 : c_max ]
-        # temp_section_2 = self.pre_cleaned_table[ r2+1 : c2, c1+1 : r_max ] # strange
-        # while unique_columns == True:
-        #     _, indices = np.unique(temp_section_1, axis=1, return_index=True)
-        #     if len(temp_section_1.T) != len(indices):
-        #         unique_columns = False
-        #     r1 += 1
-        # while unique_rows == True:
-        #     _, indices = np.unique(temp_section_2, axis=0, return_index=True)
-        #     if len(temp_section_2) != len(indices):
-        #         unique_rows = False
-        #     c1 += 1
-        # cc1 = (r1,c1)
-        #return cc1,cc2
+        # re-initialization of r2 and c2 from cc2, added by me; missing in the pseudocode
+        r2 = cc2[0]
+        c2 = cc2[1]
 
-        return cc2
+        # Locate CC1 at intersection of the top row and the leftmost aolumn necessary for indexing:
+        # test 'r1 < r2' added by me, missing in the pseudocode
+        while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 < r2:
+            r1 = r1 + 1
+        # test 'c1 < c2' added by me, missing in the pseudocode
+        while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 < c2:
+            c1 = c1 + 1
+
+        cc1 = (r1,c1)
+
+        return cc1,cc2
 
 
     def empty_cells(self,table):
@@ -271,13 +315,9 @@ class Table:
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
 
-        # cc2,cc3 = self.find_cc1_cc2(cc4)
-        # log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1,cc2))
-        # self.labels[cc1] = 'CC1'
-        # self.labels[cc2] = 'CC2'
-
-        cc2 = self.find_cc1_cc2(cc4)
-        log.info("Table Cell CC2 = {}".format(cc2))
+        cc1,cc2 = self.find_cc1_cc2(cc4)
+        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1,cc2))
+        self.labels[cc1] = 'CC1'
         self.labels[cc2] = 'CC2'
 
 
