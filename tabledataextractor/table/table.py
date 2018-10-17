@@ -14,7 +14,7 @@ from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 
 class Table:
@@ -43,9 +43,6 @@ class Table:
         self.labels[:,:] = 'Not labeled.'
         self.label_sections()
 
-        # test = self.pre_cleaned_table[1:1,2:3]
-        # print(test)
-        # _, indices = np.unique(test,axis=0,return_index=True)
 
     def find_cc4(self):
         """
@@ -71,15 +68,12 @@ class Table:
                     return row_index, n_columns - 1
 
 
-    # TODO Finish this, CC2 is wrong at the moment, the correct value is (2,0)
-    # Now I get (3,1) --> is that due to different indexing?
-    # check how often r2 and c2 change, if they change the same number of times, check how they change each step
-    # something wrong with the while loop? executed once too often or not enough times?
-
     def find_cc1_cc2(self,cc4):
         """
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm.
 
+        :param cc4: Tuple, position of CC4 cell found with find_cc4()
+        :type cc4: int
         """
 
         # Initialize
@@ -89,81 +83,59 @@ class Table:
         c1 = 0
         r2 = r_max - 1
         c2 = 0
-        rightflag = 0
         upflag = 0
         max_area = 0
 
-        # help function to cut the correct slice out of array
+
         def table_slice(table,r2,r_max,c1,c2):
+            """
+            Function to cut the correct slice out of array for in find_cc1_cc2()
+            :param table:
+            :param r2:
+            :param r_max:
+            :param c1:
+            :param c2:
+            :return: (section_1, section_2)
+            """
 
-            # if r2+1 == r_max and c1 == c2:
-            #     temp_section_1 = table[r2+1, c1]
-            # elif r2+1 == r_max and c1 != c2:
-            #     temp_section_1 = table[r2+1, c1:c2]
-            # elif r2+1 != r_max and c1 != c2:
-            #     temp_section_1 = table[r2+1:r_max, c1:c2]
-            # elif r2 + 1 != r_max and c1 == c2:
-            #     temp_section_1 = table[r2 + 1:r_max, c1]
-            # else:
-            #     print("Not defined 1. r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
-            #
-            # if r1 == r2-1 and c2+1 == c_max:
-            #     temp_section_2 = table[r1, c2+1]
-            # elif r1 == r2-1 and c2+1 != c_max:
-            #     temp_section_2 = table[r1, c2+1 : c_max]
-            # elif r1 != r2-1 and c2+1 != c_max:
-            #     temp_section_2 = table[r1 : r2-1, c2+1 : c_max]
-            # elif r1 != r2-1 and c2+1 == c_max:
-            #     temp_section_2 = table[r1 : r2-1, c2+1]
-            # else:
-            #     print("Not defined 1. r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
-
-            # what I need is one more row and column, the a:b notation in python doesn't include b
+            # one more row and column index than in the published pseudocode is needed,
+            # since the a:b notation in python doesn't include b
             if r2+1 == r_max and c1 == c2:
-                temp_section_1 = table[r2+1, c1]
+                section_1 = table[r2+1, c1]
             elif r2+1 == r_max and c1 != c2:
-                temp_section_1 = table[r2+1, c1:c2+1]
+                section_1 = table[r2+1, c1:c2+1]
             elif r2+1 != r_max and c1 != c2:
-                temp_section_1 = table[r2+1:r_max+1, c1:c2+1]
+                section_1 = table[r2+1:r_max+1, c1:c2+1]
             elif r2 + 1 != r_max and c1 == c2:
-                temp_section_1 = table[r2 + 1:r_max+1, c1]
+                section_1 = table[r2 + 1:r_max+1, c1]
             else:
-                print("Not defined 1. r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
+                log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
 
             if r1 == r2-1 and c2+1 == c_max:
-                temp_section_2 = table[r1, c2+1]
+                section_2 = table[r1, c2+1]
             elif r1 == r2-1 and c2+1 != c_max:
-                temp_section_2 = table[r1, c2+1 : c_max+1]
+                section_2 = table[r1, c2+1 : c_max+1]
             elif r1 != r2-1 and c2+1 != c_max:
-                temp_section_2 = table[r1 : r2-1+1, c2+1 : c_max+1]
+                section_2 = table[r1 : r2-1+1, c2+1 : c_max+1]
             elif r1 != r2-1 and c2+1 == c_max:
-                temp_section_2 = table[r1 : r2-1+1, c2+1]
+                section_2 = table[r1 : r2-1+1, c2+1]
             else:
-                print("Not defined 1. r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
+                log.critical("Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
 
+            return section_1,section_2
 
-            return temp_section_1,temp_section_2
-
-
-        i = 0
         # Locate candidate MIPs by finding the minimum indexing headers:
         while c2 < c_max  and r2 >= r1:
-            i = i + 1
 
-            print("Entering loop: c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}".format(c2,c_max,c1,r2,r1))
+            log.debug("Entering loop: c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}".format(c2,c_max,c1,r2,r1))
 
             temp_section_1, temp_section_2 = table_slice(self.pre_cleaned_table,r2,r_max,c1,c2)
 
-            print(temp_section_1)
-            print("__________________________________________________")
-            print(temp_section_2)
-
-
-
+            log.debug("\ntemp_section_1:\n{}\n\t{: <40}\ntemp_section_2:\n{}".format(temp_section_1,"",temp_section_2))
 
             # check if there are duplicate rows in temp_section_1
             duplicate_rows = False
-            # array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
+            # section array has to have a dimension of >0 and be non-empty for duplicate testing to make sense:
             if temp_section_1.ndim > 0 and temp_section_1.size:
                 _, indices = np.unique(temp_section_1, axis=0, return_index=True)
                 if len(temp_section_1) > len(indices):
@@ -171,7 +143,7 @@ class Table:
 
             # check if there are duplicate columns in temp_section_2
             duplicate_columns = False
-            # array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
+            # section array has to have a dimension of >0 and be non-empty for duplicate testing to make any sense:
             if temp_section_2.T.ndim > 0 and temp_section_2.T.size:
                 _, indices = np.unique(temp_section_2.T, axis=0, return_index=True)
                 if len(temp_section_2.T) > len(indices):
@@ -180,40 +152,35 @@ class Table:
             if not duplicate_rows and not duplicate_columns:
                 r2 = r2 - 1
                 upflag = 1
-                rightflag = 0
             else:
-
-                # =====================================================================
+                # ====================================================================================================
                 # This part is added to the algorithm by me
                 # re-initialize max_area if still 0 but we are about to change column
                 # remember this cc2 as the first candidate
-                if max_area == 0:
+                # The 'if upflag == 1' check is uncertain, it needs to be tested on example tables, when there is no
+                # header present etc.
+                if max_area == 0 and upflag == 1:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
+                    log.debug("The data area of the FIRST C2 is: {}".format(data_area))
                     max_area = data_area
                     cc2 = (r2,c2)
-                # ======================================================================
+                # ====================================================================================================
 
                 c2 = c2 + 1
 
-                print("C2 was now increased from {} to {}".format(c2 - 1, c2))
-                print("duplicate_rows = {}".format(duplicate_rows))
-                print("duplicate_columns = {}".format(duplicate_columns))
+                log.debug("duplicate_rows = {}".format(duplicate_rows))
+                log.debug("duplicate_columns = {}".format(duplicate_columns))
 
-
-                rightflag = 1
-                if upflag == 1 and rightflag == 1:
-                    # TODO Is this wrong?
+                if upflag == 1:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
-                    print("The data area of the new C2 is: {}".format(data_area))
+                    log.debug("The data area of the NEW C2 is: {}".format(data_area))
                     if data_area > max_area:
                         max_area = data_area
                         cc2 = (r2,c2)
-                        print("i= {}, CC2 = {}".format(i, cc2))
+                        log.debug("CC2 = {}".format(cc2))
                     upflag = 0
 
-
-
-            print("End of loop:   c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}\n\n\n\n".format(c2,c_max,c1,r2,r1))
+            log.debug("End of loop:   c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}\n\n\n\n".format(c2,c_max,c1,r2,r1))
 
         # This is the CC1 part
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing
@@ -237,32 +204,6 @@ class Table:
         return cc2
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def empty_cells(self,table):
         empty = np.empty_like(table, dtype=bool)
         for i, row in enumerate(table):
@@ -274,10 +215,9 @@ class Table:
         return empty
 
 
-
     def pre_clean(self):
         """
-        Remove empty and duplicate rows and columns that extend over the whole table
+        Remove empty and duplicate rows and columns that extend over the whole table.
 
         :return:
         """
@@ -322,7 +262,6 @@ class Table:
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
 
 
-
     def label_sections(self):
         """
         Labelling of all classification table elements.
@@ -342,14 +281,8 @@ class Table:
         self.labels[cc2] = 'CC2'
 
 
-
-
-
-
-
     def print(self):
         log.info("Printing table: {}".format(self.file_path))
-        #print_table(self.raw_table)
+        print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
-        np.savetxt("pre_cleaned_table.csv", self.pre_cleaned_table, delimiter=",",fmt='%20s')
         print_table(self.labels)
