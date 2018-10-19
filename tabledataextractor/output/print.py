@@ -20,7 +20,7 @@ def print_table(table):
     Prints a table to screen.
 
     :param table: input numpy array for printing
-    :type table: str
+    :type table: ndarray
     :return:
     """
     n_columns = table.shape[1]

@@ -73,10 +73,11 @@ class Table:
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm.
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
-        :type cc4: int
+        :type cc4: Tuple
         """
 
         # Initialize
+        cc2 = None
         c_max = cc4[1]
         r_max = cc4[0]
         r1 = 0
@@ -139,6 +140,7 @@ class Table:
                 section_1 = table[r2 + 1:r_max+1, c1]
             else:
                 log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
+                section_1 = None
 
             if r1 == r2-1 and c2+1 == c_max:
                 section_2 = table[r1, c2+1]
@@ -150,6 +152,7 @@ class Table:
                 section_2 = table[r1 : r2-1+1, c2+1]
             else:
                 log.critical("Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
+                section_2 = None
 
             return section_1,section_2
 
@@ -169,6 +172,7 @@ class Table:
                 section = table[r1 + 1 : r2+1, c2 + 1]
             else:
                 log.critical("Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1+1, r2, c2+1, c_max))
+                section = None
             return section
 
         def table_slice_2_cc1(table, r2, r_max, c1, c2):
@@ -187,6 +191,7 @@ class Table:
                 section = table[r2+1 : c2+1, c1+1]
             else:
                 log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
+                section = None
             return section
 
         # MAIN MIPS algorithm
@@ -246,6 +251,41 @@ class Table:
         cc1 = (r1,c1)
 
         return cc1,cc2
+
+
+    def find_cc3(self,cc2):
+        """
+        Searches for cell 'CC3', as the leftmost cell of the first filled row of data region.
+
+        :param cc2: Tuple, position of CC2 cell found with find_cc4()
+        :type cc2: Tuple
+        :return: (int,int)
+        """
+
+        # Comment on implementation:
+        #   There are two options on how to implement the search for CC3:
+        #   1. With the possibility of 'Notes' rows directly below the header:
+        #       - the first half filled row below the header is considered as the start of the data region,
+        #         just like for the CC4 cell
+        #   2. Without the possibility of 'Notes' ros directly below the header:
+        #       - the first row below the header is considered as the start of the data region
+        #   Option 1 is implemented by Embley et. al. However, for scientific tables it might be more common
+        #   that the first data row has only 1 entry. Therefore we might have to choose option 2.
+
+        # OPTION 1
+        # searching from the top of table for first half-full row, starting with first row below the header:
+        n_rows = len(self.pre_cleaned_table[cc2[0]+1:])
+        for row_index in range(cc2[0]+1,n_rows, 1):
+            n_full = 0
+            n_columns = len(self.pre_cleaned_table[row_index,cc2[1]+1:])
+            for column_index in range(cc2[1]+1,n_columns,1):
+                empty = self.pre_cleaned_table_empty[row_index,column_index]
+                if not empty:
+                    n_full += 1
+                if n_full > int(n_columns / 2):
+                    return (row_index, cc2[1]+1)
+        # OPTION 2
+        # return (cc2[0]+1,cc2[1]+1)
 
 
     def empty_cells(self,table):
@@ -319,6 +359,10 @@ class Table:
         log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1,cc2))
         self.labels[cc1] = 'CC1'
         self.labels[cc2] = 'CC2'
+
+        cc3 = self.find_cc3(cc2)
+        log.info("Table Cell CC3 = {}".format(cc3))
+        self.labels[cc3] = 'CC3'
 
 
     def print(self):
