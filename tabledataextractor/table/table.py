@@ -40,7 +40,7 @@ class Table:
 
         # shadow table with labels
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U20")
-        self.labels[:,:] = 'Not labeled.'
+        self.labels[:,:] = '/'
         self.label_sections()
 
 
@@ -363,6 +363,11 @@ class Table:
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
+
+        self.labels[cc1[0]:cc2[0]+1, cc1[1]:cc2[1]+1] = 'StubHeader'
+        self.labels[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1] = 'RowHeader'
+        self.labels[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1] = 'ColHeader'
+        self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
 
 
     def print(self):
