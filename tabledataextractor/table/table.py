@@ -2,7 +2,7 @@
 """
 tabledataextractor.table.table
 
-Raw, processed and final table objects.
+Raw, processed and final labelled table.
 
 jm2111@cam.ac.uk
 ~~~~~~~~~~~~~~~~~
@@ -392,6 +392,13 @@ class Table:
         self.labels[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1] = 'RowHeader'
         self.labels[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1] = 'ColHeader'
         self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
+
+        # Footnotes
+        # For labelling footnotes I need a regex labeler class, which will be a cell parser
+        # so, to define fn_prefix, you will write:
+        # fn_prefix = CellParser(string,label)
+        # to then label the individual cells I would write fn_prefix.label(self.labels)
+        # the advantage of this is that CellParser will be general and enable me to parse anything I want, custom labels
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():

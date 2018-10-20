@@ -33,8 +33,6 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\Amo
 # table.print()
 
 table = Table(data_path+'table_official_development_assistance.csv')
-print("Main Table Input")
-print("================")
 table.print()
 
 
