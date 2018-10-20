@@ -288,6 +288,27 @@ class Table:
         # return (cc2[0]+1,cc2[1]+1)
 
 
+    def find_title_row(self):
+        """
+        Searches for the topmost non-empty row.
+        :return: int
+        """
+        for row_index, empty_row in enumerate(self.pre_cleaned_table_empty):
+            if not empty_row.all():
+                return row_index
+
+
+    def find_note_cells(self):
+        """
+        Searches for all non-empty cells that have not been labelled previously.
+        :return: Tuple
+        """
+        for row_index,row in enumerate(self.labels):
+            for column_index,cell in enumerate(row):
+                if cell == '/' and not self.pre_cleaned_table_empty[row_index,column_index]:
+                    yield row_index,column_index
+
+
     def empty_cells(self,table):
         empty = np.empty_like(table, dtype=bool)
         for i, row in enumerate(table):
@@ -351,6 +372,8 @@ class Table:
         Labelling of all classification table elements.
         """
 
+        title_row = self.find_title_row()
+
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
@@ -364,10 +387,15 @@ class Table:
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
 
+        self.labels[title_row, :] = 'TableTitle'
         self.labels[cc1[0]:cc2[0]+1, cc1[1]:cc2[1]+1] = 'StubHeader'
         self.labels[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1] = 'RowHeader'
         self.labels[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1] = 'ColHeader'
         self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
+
+        # all non-empty unlabelled cells at this point are labelled 'Note'
+        for note_cell in self.find_note_cells():
+            self.labels[note_cell] = 'Note'
 
 
     def print(self):
