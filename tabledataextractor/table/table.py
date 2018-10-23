@@ -12,6 +12,7 @@ import logging
 import numpy as np
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
+from tabledataextractor.table.parse import CellParser
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -308,6 +309,17 @@ class Table:
                 if cell == '/' and not self.pre_cleaned_table_empty[row_index,column_index]:
                     yield row_index,column_index
 
+    def find_FNprefix(self):
+        """
+        Returns a list of cell indexes that match the FNprefix (*, #, ., o, †)
+        :return:
+        """
+        result = []
+        fn_prefix_parser = CellParser('^[*#.o†\d]')
+        for fn_prefix in fn_prefix_parser.parse(self.pre_cleaned_table,method='match'):
+            result.append(fn_prefix)
+
+
 
     def empty_cells(self,table):
         empty = np.empty_like(table, dtype=bool)
@@ -396,9 +408,13 @@ class Table:
         # Footnotes
         # For labelling footnotes I need a regex labeler class, which will be a cell parser
         # so, to define fn_prefix, you will write:
-        # fn_prefix = CellParser(string,label)
-        # to then label the individual cells I would write fn_prefix.label(self.labels)
+        # fn_prefix = CellParser(string)
+        # CellParser has a method which inputs a table object and returns the index-es of the cells with the given
+        # match
         # the advantage of this is that CellParser will be general and enable me to parse anything I want, custom labels
+        fn_prefix = self.find_FNprefix()
+        log.info("FNPrefix Cells = {}".format(fn_prefix))
+
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
