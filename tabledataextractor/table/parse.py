@@ -2,14 +2,14 @@
 """
 tabledataextractor.table.parse
 
-Toold for parsing the table based on Regex expressions etc.
+Tools for parsing the table based on Regex expressions etc.
 
 jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
 """
 
 import logging
 import re
+import numpy as np
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -18,20 +18,27 @@ log.setLevel(logging.DEBUG)
 class CellParser:
 
     def __init__(self,pattern):
+        """
+        :param pattern: Regex pattern which defines the cell parser.
+        :type pattern: str
+        """
         log.info('Initialization of CellParser with regex pattern: "{}"'.format(pattern))
+        assert isinstance(pattern, str)
         self.pattern = pattern
 
     def parse(self,table,method='match'):
         """
         Inputs a Table object and yields a tuple with the index of the next matching cell.
-        Parameter 'method = search', 'method = match', 'method = fullmatch' (see python re manual)
 
-        :param:
+        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :type method: str
+        :param table: Input table to be parsed, of type 'numpy.ndarray'
+        :type table: numpy.ndarray
         :return: Tuple(int,int)
         """
 
         # check if table is of correct type
-        # assert isinstance(table, )
+        assert isinstance(table,np.ndarray)
 
         result = None
         prog = re.compile(self.pattern)

@@ -309,16 +309,17 @@ class Table:
                 if cell == '/' and not self.pre_cleaned_table_empty[row_index,column_index]:
                     yield row_index,column_index
 
-    def find_FNprefix(self):
+    def find_FNprefix(self,cc4):
         """
-        Returns a list of cell indexes that match the FNprefix (*, #, ., o, †)
+        Returns a list of cell indexes that match the FNprefix (*, #, ., o, †). Searches only below the data region.
         :return:
         """
-        result = []
-        fn_prefix_parser = CellParser('^[*#.o†\d]')
-        for fn_prefix in fn_prefix_parser.parse(self.pre_cleaned_table,method='match'):
-            result.append(fn_prefix)
-
+        fn_prefix = []
+        fn_prefix_parser = CellParser('^[*#.o†\d]$')
+        for fn_prefix_index in fn_prefix_parser.parse(self.pre_cleaned_table):
+            if fn_prefix_index[0] > cc4[0]:
+                fn_prefix.append(fn_prefix_index)
+        return fn_prefix
 
 
     def empty_cells(self,table):
@@ -412,7 +413,7 @@ class Table:
         # CellParser has a method which inputs a table object and returns the index-es of the cells with the given
         # match
         # the advantage of this is that CellParser will be general and enable me to parse anything I want, custom labels
-        fn_prefix = self.find_FNprefix()
+        fn_prefix = self.find_FNprefix(cc4)
         log.info("FNPrefix Cells = {}".format(fn_prefix))
 
 
