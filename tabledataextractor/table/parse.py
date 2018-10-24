@@ -28,13 +28,14 @@ class CellParser:
 
     def parse(self,table,method='match'):
         """
-        Inputs a Table object and yields a tuple with the index of the next matching cell.
+        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as the string that
+        was matched.
 
         :param method:  'search', 'match' or 'fullmatch'; see python re documentation
         :type method: str
         :param table: Input table to be parsed, of type 'numpy.ndarray'
         :type table: numpy.ndarray
-        :return: Tuple(int,int)
+        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
         """
 
         # check if table is of correct type
@@ -52,7 +53,7 @@ class CellParser:
                 elif method == 'search':
                     result = prog.search(cell)
                 if result:
-                    yield row_index,column_index
+                    yield row_index,column_index,result.groups()
 
 
 

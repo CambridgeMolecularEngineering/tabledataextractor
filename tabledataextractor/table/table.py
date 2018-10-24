@@ -10,6 +10,7 @@ jm2111@cam.ac.uk
 
 import logging
 import numpy as np
+import re
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
 from tabledataextractor.table.parse import CellParser
@@ -319,17 +320,16 @@ class Table:
         :return: List of cell indexes that match the FNprefix
         """
         fn_prefix = []
-        fn_prefix_parser = CellParser('^[*#.o†\da-z][.\)]?$')
+        fn_prefix_parser = CellParser('^([*#.o†\da-z][.\)]?)$')
         for fn_prefix_index in fn_prefix_parser.parse(self.pre_cleaned_table):
             if fn_prefix_index[0] > cc4[0]:
                 fn_prefix.append(fn_prefix_index)
         return fn_prefix
 
 
-    # TODO Fix this function, it doesn't work correctly
     def find_FNtext(self,fn_prefix):
         """
-        All the cells following a footnote marker in the same row as an fn_prefix cell
+        All the cells following a footnote marker in the same row as an fn_prefix cell.
 
         :param fn_prefix: List of FNprefix cells, indexes
         :type fn_prefix: list[(int,int)]
@@ -342,6 +342,64 @@ class Table:
                 if not self.pre_cleaned_table_empty[fn_prefix_cell[0],column_index]:
                     fn_text.append((fn_prefix_cell[0],column_index))
         return fn_text
+
+    def find_FNprefix_FNtext(self,cc4):
+        """
+        FNprefix  = *, #, ., o, †; possibly followed by a period or a parenthesis, followed by FNtext in the same cell.
+        FNtext can be started by any word character '\w', '[' or ']'
+        Searches only below the data region.
+
+        :param cc4: end of data region
+        :type cc4: (int,int)
+        :return: List of cell indexes that match the FNprefix+FNtext
+        """
+        fn_prefix_fn_text = []
+        fn_prefix_fn_text_parser = CellParser('^([*#.o†\da-z][.\)]?)\s([\w\[\]\s]+)$')
+        for fn_prefix_fn_text_index in fn_prefix_fn_text_parser.parse(self.pre_cleaned_table):
+            if fn_prefix_fn_text_index[0] > cc4[0]:
+                fn_prefix_fn_text.append(fn_prefix_fn_text_index)
+        return fn_prefix_fn_text
+
+
+# TODO Finish the FNref function
+    def find_FNref(self,fn_prefix,fn_prefix_fn_text):
+        """
+        Searches the entire table above each footnote for the previously detected and isolated footnote markers.
+
+        Rules for matching:
+            1. if prefix is number: matches if (anything)+space+prefix OR prefix(if not in data region)
+            2. if prefix is a-z:    matches if (anything)+space+prefix OR prefix
+            3. else:                matches if found anywhere in any cell
+
+        :param FNprefix:
+        :param FNprefix_FNtext:
+        :return: List((int,int))
+        """
+        fn_refs = []
+
+        for footnote in fn_prefix:
+
+            # case 1.
+            if re.fullmatch(pattern='[\d]{1,2}',string=footnote[2][0]):
+                log.debug("Footnote prefix {} is number".format(footnote[2][0]))
+
+                ################################## HERE I AM
+
+            # case 3.
+            fn_reference_parser = CellParser('('+re.escape(footnote[2][0])+')')
+            for fn_ref in fn_reference_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
+                fn_refs.append(fn_ref)
+
+        return fn_refs
+
+
+
+
+
+
+
+
+
 
 
     def empty_cells(self,table):
@@ -432,12 +490,25 @@ class Table:
         fn_prefix = self.find_FNprefix(cc4)
         log.info("FNPrefix Cells = {}".format(fn_prefix))
         for fn_prefix_index in fn_prefix:
-            self.labels[fn_prefix_index] = 'FNprefix'
+            self.labels[fn_prefix_index[0],fn_prefix_index[1]] = 'FNprefix'
 
         fn_text = self.find_FNtext(fn_prefix)
         log.info("FNtext Cells = {}".format(fn_text))
         for fn_text_index in fn_text:
-            self.labels[fn_text] = 'FNtext'
+            self.labels[fn_text_index] = 'FNtext'
+
+        fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
+        log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
+        for fn_prefix_fn_text_index in fn_prefix_fn_text:
+            self.labels[fn_prefix_fn_text_index[0],fn_prefix_fn_text_index[1]] = 'FNprefix&FNtext'
+
+        fn_ref = self.find_FNref(fn_prefix,fn_prefix_fn_text)
+        log.info("FNref Cells = {}".format(fn_ref))
+
+        # FNref labelling
+        # for every cell which was indentified as FNref, check if it already has a label and label it then,
+        # depending on if it already has a label or not, as FNref or OldLabel+FNref
+
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
