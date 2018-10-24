@@ -320,7 +320,7 @@ class Table:
         :return: List of cell indexes that match the FNprefix
         """
         fn_prefix = []
-        fn_prefix_parser = CellParser('^([*#.o†\da-z][.\)]?)$')
+        fn_prefix_parser = CellParser('^([*#\.o†\da-z][\.\)]?)$')
         for fn_prefix_index in fn_prefix_parser.parse(self.pre_cleaned_table):
             if fn_prefix_index[0] > cc4[0]:
                 fn_prefix.append(fn_prefix_index)
@@ -354,21 +354,20 @@ class Table:
         :return: List of cell indexes that match the FNprefix+FNtext
         """
         fn_prefix_fn_text = []
-        fn_prefix_fn_text_parser = CellParser('^([*#.o†\da-z][.\)]?)\s([\w\[\]\s]+)$')
+        fn_prefix_fn_text_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)$')
         for fn_prefix_fn_text_index in fn_prefix_fn_text_parser.parse(self.pre_cleaned_table):
             if fn_prefix_fn_text_index[0] > cc4[0]:
                 fn_prefix_fn_text.append(fn_prefix_fn_text_index)
         return fn_prefix_fn_text
 
 
-# TODO Finish the FNref function
     def find_FNref(self,fn_prefix,fn_prefix_fn_text):
         """
         Searches the entire table above each footnote for the previously detected and isolated footnote markers.
 
         Rules for matching:
-            1. if prefix is number: matches if (anything)+space+prefix OR prefix(if not in data region)
-            2. if prefix is a-z:    matches if (anything)+space+prefix OR prefix
+            1. if prefix is number: a) matches if (anything)+space+prefix OR b) prefix(if not in data region)
+            2. if prefix is a-z:    a) matches if (anything)+space+prefix OR b) prefix
             3. else:                matches if found anywhere in any cell
 
         :param FNprefix:
@@ -377,29 +376,41 @@ class Table:
         """
         fn_refs = []
 
-        for footnote in fn_prefix:
+        for footnote in fn_prefix+fn_prefix_fn_text:
 
-            # case 1.
+            # Case 1a If prefix is number, general
             if re.fullmatch(pattern='[\d]{1,2}',string=footnote[2][0]):
                 log.debug("Footnote prefix {} is number".format(footnote[2][0]))
+                fn_ref_parser_1a = CellParser('(^.+\s)('+footnote[2][0]+')(\s.+)?$')
+                for fn_ref in fn_ref_parser_1a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
+                    fn_refs.append(fn_ref)
 
-                ################################## HERE I AM
+            # Case 1b If prefix is number and not in 'Data' region
+                fn_ref_parser_1b = CellParser('^('+footnote[2][0]+')$')
+                for fn_ref in fn_ref_parser_1b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
+                     if self.labels[fn_ref[0],fn_ref[1]] != 'Data':
+                        log.debug("Footnote prefix {} is number, and is in {} region".format(footnote[2][0], self.labels[fn_ref[0],fn_ref[1]]))
+                        fn_refs.append(fn_ref)
 
-            # case 3.
-            fn_reference_parser = CellParser('('+re.escape(footnote[2][0])+')')
-            for fn_ref in fn_reference_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
-                fn_refs.append(fn_ref)
+            # Case 2a If prefix is a-z:
+            elif re.fullmatch(pattern='[a-zA-Z]',string=footnote[2][0]):
+                log.debug("Footnote prefix {} is letter".format(footnote[2][0]))
+                fn_ref_parser_2a = CellParser('(^.+\s)('+footnote[2][0]+')(\s.+)?$')
+                for fn_ref in fn_ref_parser_2a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
+                    fn_refs.append(fn_ref)
 
+            # Case 2b If prefix is a-z and alone in the cell
+                fn_ref_parser_2b = CellParser('^('+footnote[2][0]+')$')
+                for fn_ref in fn_ref_parser_2b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
+                    log.debug("Footnote prefix {} is letter and is alone in cell.".format(footnote[2][0]))
+                    fn_refs.append(fn_ref)
+
+            # Case 3, everything else
+            else:
+                fn_ref_parser = CellParser('('+re.escape(footnote[2][0])+')')
+                for fn_ref in fn_ref_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
+                    fn_refs.append(fn_ref)
         return fn_refs
-
-
-
-
-
-
-
-
-
 
 
     def empty_cells(self,table):

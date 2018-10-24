@@ -19,7 +19,8 @@ class CellParser:
 
     def __init__(self,pattern):
         """
-        :param pattern: Regex pattern which defines the cell parser.
+        :param pattern: Regex pattern which defines the cell parser. Use grouping, since matching strings will be returned
+            explicitly.
         :type pattern: str
         """
         log.info('Initialization of CellParser with regex pattern: "{}"'.format(pattern))
