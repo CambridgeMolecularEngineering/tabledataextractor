@@ -511,15 +511,15 @@ class Table:
         fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
         log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
         for fn_prefix_fn_text_index in fn_prefix_fn_text:
-            self.labels[fn_prefix_fn_text_index[0],fn_prefix_fn_text_index[1]] = 'FNprefix&FNtext'
+            self.labels[fn_prefix_fn_text_index[0],fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
 
-        fn_ref = self.find_FNref(fn_prefix,fn_prefix_fn_text)
-        log.info("FNref Cells = {}".format(fn_ref))
-
-        # FNref labelling
-        # for every cell which was indentified as FNref, check if it already has a label and label it then,
-        # depending on if it already has a label or not, as FNref or OldLabel+FNref
-
+        fn_refs = self.find_FNref(fn_prefix,fn_prefix_fn_text)
+        log.info("FNref Cells = {}".format(fn_refs))
+        for fn_ref in fn_refs:
+            if self.labels[fn_ref[0],fn_ref[1]] != '/':
+                self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
+            else:
+                self.labels[fn_ref[0], fn_ref[1]] = 'FNref'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
