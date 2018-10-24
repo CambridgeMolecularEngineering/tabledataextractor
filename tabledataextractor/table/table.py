@@ -311,15 +311,37 @@ class Table:
 
     def find_FNprefix(self,cc4):
         """
-        Returns a list of cell indexes that match the FNprefix (*, #, ., o, †). Searches only below the data region.
-        :return:
+        FNprefix  = *, #, ., o, †; possibly followed by a period or a parenthesis.
+        Searches only below the data region.
+
+        :param cc4: end of data region
+        :type cc4: (int,int)
+        :return: List of cell indexes that match the FNprefix
         """
         fn_prefix = []
-        fn_prefix_parser = CellParser('^[*#.o†\d]$')
+        fn_prefix_parser = CellParser('^[*#.o†\da-z][.\)]?$')
         for fn_prefix_index in fn_prefix_parser.parse(self.pre_cleaned_table):
             if fn_prefix_index[0] > cc4[0]:
                 fn_prefix.append(fn_prefix_index)
         return fn_prefix
+
+
+    # TODO Fix this function, it doesn't work correctly
+    def find_FNtext(self,fn_prefix):
+        """
+        All the cells following a footnote marker in the same row as an fn_prefix cell
+
+        :param fn_prefix: List of FNprefix cells, indexes
+        :type fn_prefix: list[(int,int)]
+        :return: List of FNtext cells, indexes
+        """
+        fn_text = []
+        for fn_prefix_cell in fn_prefix:
+            # append all non-empty cells following fn_prefix index in the same row
+            for column_index in range(fn_prefix_cell[1]+1,np.shape(self.pre_cleaned_table)[1]):
+                if not self.pre_cleaned_table_empty[fn_prefix_cell[0],column_index]:
+                    fn_text.append((fn_prefix_cell[0],column_index))
+        return fn_text
 
 
     def empty_cells(self,table):
@@ -407,15 +429,15 @@ class Table:
         self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
 
         # Footnotes
-        # For labelling footnotes I need a regex labeler class, which will be a cell parser
-        # so, to define fn_prefix, you will write:
-        # fn_prefix = CellParser(string)
-        # CellParser has a method which inputs a table object and returns the index-es of the cells with the given
-        # match
-        # the advantage of this is that CellParser will be general and enable me to parse anything I want, custom labels
         fn_prefix = self.find_FNprefix(cc4)
         log.info("FNPrefix Cells = {}".format(fn_prefix))
+        for fn_prefix_index in fn_prefix:
+            self.labels[fn_prefix_index] = 'FNprefix'
 
+        fn_text = self.find_FNtext(fn_prefix)
+        log.info("FNtext Cells = {}".format(fn_text))
+        for fn_text_index in fn_text:
+            self.labels[fn_text] = 'FNtext'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
