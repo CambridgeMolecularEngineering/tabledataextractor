@@ -16,7 +16,7 @@ from tabledataextractor.output.print import print_table
 from tabledataextractor.table.parse import CellParser
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 class Table:
