@@ -25,15 +25,8 @@ class TableCC4(Table):
         """Labels only CC4"""
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
-        self.labels[cc4] = 'CC4'
 
 class TestCC4(unittest.TestCase):
-
-    def label_sections(self):
-        """Labels only CC4"""
-        cc4 = self.find_cc4()
-        log.info("Table Cell CC4 = {}".format(cc4))
-        self.labels[cc4] = 'CC4'
 
     def do_table(self, input_path, expected):
         log.debug("Test CC4, Table: {}".format(input_path))
@@ -83,6 +76,61 @@ class TestCC4(unittest.TestCase):
         self.do_table(input_path, expected)
 
 
+class TableCC1CC2(Table):
+    """Derivative of Table used to isolate testing for CC1 and CC2"""
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def label_sections(self):
+        """Label CC1 and CC2 and stop."""
+        cc4 = self.find_cc4()
+        cc1,cc2 = self.find_cc1_cc2(cc4)
+        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
+
+
+class TestCC1CC2(unittest.TestCase):
+
+    def do_table(self, input_path, expected):
+        log.debug("Test CC1 & CC2, Table: {}".format(input_path))
+        table = TableCC1CC2(input_path)
+        result = table.find_cc1_cc2(table.find_cc4())
+        log.debug("Result = {}".format(result))
+        self.assertTupleEqual(expected, result)
+
+    def test_cc1_cc2_1(self):
+        input_path = './data/table_example1.csv'
+        expected = (6,7)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_2(self):
+        input_path = './data/table_example2.csv'
+        expected = (3,5)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_3(self):
+        input_path = './data/table_example3.csv'
+        expected = (7,10)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_4(self):
+        input_path = './data/table_example4.csv'
+        expected = (2,5)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_5(self):
+        input_path = './data/table_example5.csv'
+        expected = (3,5)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_6(self):
+        input_path = './data/table_example6.csv'
+        expected = (11,3)
+        self.do_table(input_path, expected)
+
+    def test_cc1_cc2_7(self):
+        input_path = './data/table_example7.csv'
+        expected = (8,10)
+        self.do_table(input_path, expected)
 
 
 
