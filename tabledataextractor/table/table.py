@@ -16,7 +16,7 @@ from tabledataextractor.output.print import print_table
 from tabledataextractor.table.parse import CellParser
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 
 class Table:
@@ -87,6 +87,7 @@ class Table:
         r2 = r_max - 1
         c2 = 0
         upflag = 0
+        rightflag = 0
         max_area = 0
 
         def duplicate_rows(table):
@@ -209,6 +210,7 @@ class Table:
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 r2 = r2 - 1
                 upflag = 1
+                rightflag = 0
             else:
                 # ====================================================================================================
                 # This part is added to the algorithm by me
@@ -218,16 +220,18 @@ class Table:
                 # header present etc.
                 # It might be that, if there is no cc2 at all that due to the 'upflag == 1' check
                 # nothing will be returned by the function, which would cause a crash
-                if max_area == 0 and upflag == 1:
+                # if max_area == 0 and upflag == 1:
+                if max_area == 0:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
                     log.debug("The data area of the FIRST C2 is: {}".format(data_area))
                     max_area = data_area
                     cc2 = (r2,c2)
                 # ====================================================================================================
 
-                c2 = c2 + 1
+                # c2 = c2 + 1
+                rightflag = 1
 
-                if upflag == 1:
+                if upflag == 1 and rightflag == 1:
                     data_area = (r_max - r2 + 1) * (c_max - c2 + 1)
                     log.debug("The data area of the NEW C2 is: {}".format(data_area))
                     if data_area > max_area:
@@ -236,13 +240,19 @@ class Table:
                         log.debug("CC2 = {}".format(cc2))
                     upflag = 0
 
+                c2 = c2 + 1
+
+
+
+
+
             log.debug("End of loop:   c2= {}, c_max= {}, c1= {}, r2= {}, r1= {}\n\n\n\n".format(c2,c_max,c1,r2,r1))
 
         # re-initialization of r2 and c2 from cc2, added by me; missing in the pseudocode
         r2 = cc2[0]
         c2 = cc2[1]
 
-        # Locate CC1 at intersection of the top row and the leftmost aolumn necessary for indexing:
+        # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
         # test 'r1 < r2' added by me, missing in the pseudocode
         while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 < r2:
             r1 = r1 + 1
