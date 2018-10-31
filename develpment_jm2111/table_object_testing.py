@@ -32,7 +32,8 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\Amo
 # print("=======")
 # table.print()
 
-table = Table(data_path+'table_official_development_assistance.csv')
+# table = Table(data_path+'table_official_development_assistance.csv')
+# table.print()
+#
+table = Table(data_path+'table_example1.csv')
 table.print()
-
-

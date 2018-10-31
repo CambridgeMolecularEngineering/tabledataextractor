@@ -212,7 +212,7 @@ class Table:
                 upflag = 1
                 rightflag = 0
             else:
-                # ====================================================================================================
+                # ====================================================================================================+
                 # This part is added to the algorithm by me
                 # re-initialize max_area if still 0 but we are about to change column
                 # remember this cc2 as the first candidate
@@ -228,7 +228,7 @@ class Table:
                     cc2 = (r2,c2)
                 # ====================================================================================================
 
-                # c2 = c2 + 1
+                c2 = c2 + 1
                 rightflag = 1
 
                 if upflag == 1 and rightflag == 1:
@@ -240,7 +240,7 @@ class Table:
                         log.debug("CC2 = {}".format(cc2))
                     upflag = 0
 
-                c2 = c2 + 1
+                #c2 = c2 + 1
 
 
 
