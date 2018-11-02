@@ -104,9 +104,9 @@ class TestCC1CC2(unittest.TestCase):
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_2(self):
-        """Fails due to lack of row header section."""
+        """Lack of row header section on the LHS"""
         input_path = './data/table_example2.csv'
-        expected = None
+        expected = (0,0),(2,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_3(self):
@@ -125,9 +125,9 @@ class TestCC1CC2(unittest.TestCase):
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_6(self):
-        """Fails due to: table is composed of two tables"""
+        """Table is composed of two tables"""
         input_path = './data/table_example6.csv'
-        expected = (0,0),(0,0)
+        expected = (1,0),(1,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_7(self):

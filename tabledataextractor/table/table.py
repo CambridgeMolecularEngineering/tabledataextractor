@@ -288,7 +288,8 @@ class Table:
 
         # -1 because the last run of the while loops doesn't count, this is not good, solve it differently
         # an error arises if it never went through the while loop
-        # but this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2
+        # but this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2.
+        # TODO Build in assertions for this.
         cc1 = (r1-1,c1-1)
 
         return cc1,cc2
@@ -316,15 +317,16 @@ class Table:
         # OPTION 1
         # searching from the top of table for first half-full row, starting with first row below the header:
         n_rows = len(self.pre_cleaned_table[cc2[0]+1:])
-        for row_index in range(cc2[0]+1,n_rows, 1):
+        for row_index in range(cc2[0]+1,n_rows+1, 1):
             n_full = 0
             n_columns = len(self.pre_cleaned_table[row_index,cc2[1]+1:])
-            for column_index in range(cc2[1]+1,n_columns,1):
+            for column_index in range(cc2[1]+1,n_columns+1,1):
                 empty = self.pre_cleaned_table_empty[row_index,column_index]
                 if not empty:
                     n_full += 1
-                if n_full > int(n_columns / 2):
+                if n_full >= int(n_columns / 2):
                     return (row_index, cc2[1]+1)
+        raise SystemError("No CC3 critical cell found! No data region defined.")
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
 
