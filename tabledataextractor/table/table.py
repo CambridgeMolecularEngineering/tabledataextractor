@@ -169,18 +169,37 @@ class Table:
             """
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
-            if r1 + 1 == r2 and c2+1 == c_max:
-                section = table[r1 + 1, c2+1]
-            elif r1 + 1 == r2 and c2+1 != c_max:
-                section = table[r1 + 1, c2+1:c_max+1]
-            elif r1 + 1 != r2 and c2+1 != c_max:
-                section = table[r1 + 1 : r2+1, c2 + 1:c_max+1]
-            elif r1 + 1 != r2 and c2+1 == c_max:
-                section = table[r1 + 1 : r2+1, c2 + 1]
+            if r1  == r2 and c2+1 == c_max:
+                section = table[r1, c2+1]
+            elif r1 == r2 and c2+1 != c_max:
+                section = table[r1, c2+1:c_max+1]
+            elif r1  != r2 and c2+1 != c_max:
+                section = table[r1 : r2+1, c2 + 1:c_max+1]
+            elif r1  != r2 and c2+1 == c_max:
+                section = table[r1 : r2+1, c2 + 1]
             else:
                 log.critical("Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1+1, r2, c2+1, c_max))
                 section = None
             return section
+
+        # def table_slice_2_cc1(table, r2, r_max, c1, c2):
+        #     """
+        #     Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
+        #     """
+        #     # one more row and column index than in the published pseudocode is needed,
+        #     # since the a:b notation in python doesn't include b
+        #     if r2 + 1 == c2 and c1+1 == r_max:
+        #         section = table[r2 + 1, c1 + 1]
+        #     elif r2 + 1 == c2 and c1+1 != r_max:
+        #         section = table[r2 + 1, c1+1 : r_max+1 ]
+        #     elif r2 + 1 != c2 and c1+1 != r_max:
+        #         section = table[r2+1 : c2+1, c1+1 : r_max+1 ]
+        #     elif r2 + 1 != c2 and c1+1 == r_max:
+        #         section = table[r2+1 : c2+1, c1+1]
+        #     else:
+        #         log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
+        #         section = None
+        #     return section
 
         def table_slice_2_cc1(table, r2, r_max, c1, c2):
             """
@@ -188,14 +207,14 @@ class Table:
             """
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
-            if r2 + 1 == c2 and c1+1 == r_max:
-                section = table[r2 + 1, c1 + 1]
-            elif r2 + 1 == c2 and c1+1 != r_max:
-                section = table[r2 + 1, c1+1 : r_max+1 ]
-            elif r2 + 1 != c2 and c1+1 != r_max:
-                section = table[r2+1 : c2+1, c1+1 : r_max+1 ]
-            elif r2 + 1 != c2 and c1+1 == r_max:
-                section = table[r2+1 : c2+1, c1+1]
+            if r2 == r_max and c1 == c2:
+                section = table[r2, c1]
+            elif r2 == r_max and c1 != c2:
+                section = table[r2, c1 : c2+1 ]
+            elif r2 != r_max and c1 != c2:
+                section = table[r2 : r_max+1, c1 : c2+1 ]
+            elif r2 != r_max and c1 == c2:
+                section = table[r2 : r_max+1, c1]
             else:
                 log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
                 section = None
@@ -222,25 +241,10 @@ class Table:
                     log.debug("CC2= {}".format(cc2))
 
                 r2 = r2 - 1
-                upflag = 1
-
-            # elif not duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
-            #
-            #     data_area = (r_max - r2) * (c_max - c2)
-            #     log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
-            #     log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
-            #     if data_area >= max_area:
-            #         max_area = data_area
-            #         cc2 = (r2, c2)
-            #         log.debug("CC2= {}".format(cc2))
-            #
-            #     break
-
 
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
 
                 c2 = c2 + 1
-                rightflag = 1
 
                 data_area = (r_max - r2) * (c_max - c2)
                 log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
@@ -252,16 +256,9 @@ class Table:
 
             else:
                 r2 = r2 - 1
-
-
-
-
-
-
-
-
-
         log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2,cc2))
+
+
 
         # re-initialization of r2 and c2 from cc2, added by me; missing in the pseudocode
         r2 = cc2[0]
@@ -270,9 +267,22 @@ class Table:
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
         # test 'r1 < r2' added by me, missing in the pseudocode
         while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 < r2:
+
+            log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
+            log.debug("Duplicate columns= {}".format(duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max))))
+
+
             r1 = r1 + 1
+
+
+
         # test 'c1 < c2' added by me, missing in the pseudocode
         while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 < c2:
+
+            log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
+            log.debug("Duplicate rows= {}".format(duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2))))
+
+
             c1 = c1 + 1
 
         cc1 = (r1,c1)
