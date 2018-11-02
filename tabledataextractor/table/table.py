@@ -317,11 +317,14 @@ class Table:
         # OPTION 1
         # searching from the top of table for first half-full row, starting with first row below the header:
         n_rows = len(self.pre_cleaned_table[cc2[0]+1:])
-        for row_index in range(cc2[0]+1,n_rows+1, 1):
+        log.debug("n_rows= {}".format(n_rows))
+        for row_index in range(cc2[0]+1,cc2[0]+n_rows, 1):
             n_full = 0
             n_columns = len(self.pre_cleaned_table[row_index,cc2[1]+1:])
-            for column_index in range(cc2[1]+1,n_columns+1,1):
+            log.debug("n_columns= {}".format(n_columns))
+            for column_index in range(cc2[1]+1,cc2[1]+n_columns,1):
                 empty = self.pre_cleaned_table_empty[row_index,column_index]
+                log.debug("Empty? ".format(empty))
                 if not empty:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
