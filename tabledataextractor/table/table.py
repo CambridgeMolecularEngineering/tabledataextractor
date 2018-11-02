@@ -145,14 +145,18 @@ class Table:
                 log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
                 section_1 = None
 
-            if r1 == r2-1 and c2+1 == c_max:
+            if r1 == r2 and c2+1 == c_max:
                 section_2 = table[r1, c2+1]
-            elif r1 == r2-1 and c2+1 != c_max:
+                log.debug("Slice 1")
+            elif r1 == r2 and c2+1 != c_max:
                 section_2 = table[r1, c2+1 : c_max+1]
-            elif r1 != r2-1 and c2+1 != c_max:
+                log.debug("Slice 2")
+            elif r1 != r2 and c2+1 != c_max:
                 section_2 = table[r1 : r2+1, c2+1 : c_max+1]
-            elif r1 != r2-1 and c2+1 == c_max:
+                log.debug("Slice 3")
+            elif r1 != r2 and c2+1 == c_max:
                 section_2 = table[r1 : r2+1, c2+1]
+                log.debug("Slice 4")
             else:
                 log.critical("Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
                 section_2 = None
@@ -201,14 +205,13 @@ class Table:
         # Locate candidate MIPs by finding the minimum indexing headers:
         while c2 < c_max  and r2 >= r1:
 
-            log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}".format(r_max,c_max,c1,c2,r1,r2))
+            log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}".format(r_max,c_max,c1,c2,r1,r2,cc2))
             temp_section_1, temp_section_2 = table_slice_cc2(self.pre_cleaned_table,r2,r_max,c1,c2)
             log.debug("temp_section_1:\n{}".format(temp_section_1))
             log.debug("temp_section_2:\n{}".format(temp_section_2))
+            log.debug("duplicate_rows= {}, duplicate_columns= {}".format(duplicate_rows(temp_section_1),duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-
-                log.debug("duplicate_rows= {}, duplicate_columns= {}".format(duplicate_rows(temp_section_1),duplicate_rows(temp_section_2)))
 
                 data_area = (r_max - r2) * (c_max - c2)
                 log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2,c2),data_area))
@@ -221,19 +224,34 @@ class Table:
                 r2 = r2 - 1
                 upflag = 1
 
+            # elif not duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
+            #
+            #     data_area = (r_max - r2) * (c_max - c2)
+            #     log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
+            #     log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
+            #     if data_area >= max_area:
+            #         max_area = data_area
+            #         cc2 = (r2, c2)
+            #         log.debug("CC2= {}".format(cc2))
+            #
+            #     break
 
-            else:
+
+            elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
+
                 c2 = c2 + 1
                 rightflag = 1
 
                 data_area = (r_max - r2) * (c_max - c2)
-                log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
+                log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
                 log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
                 if data_area >= max_area:
                     max_area = data_area
                     cc2 = (r2,c2)
                     log.debug("CC2= {}".format(cc2))
 
+            else:
+                r2 = r2 - 1
 
 
 
@@ -242,7 +260,8 @@ class Table:
 
 
 
-        log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2))
+
+        log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2,cc2))
 
         # re-initialization of r2 and c2 from cc2, added by me; missing in the pseudocode
         r2 = cc2[0]
