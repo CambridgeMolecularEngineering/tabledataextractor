@@ -266,26 +266,30 @@ class Table:
 
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
         # test 'r1 < r2' added by me, missing in the pseudocode
-        while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 < r2:
+        log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
+        while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 <= r2:
 
             log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
             log.debug("Duplicate columns= {}".format(duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max))))
-
-
             r1 = r1 + 1
+            log.debug("r1= {}".format(r1))
 
 
 
         # test 'c1 < c2' added by me, missing in the pseudocode
-        while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 < c2:
+        log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
+        while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 <= c2:
 
             log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
             log.debug("Duplicate rows= {}".format(duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2))))
-
-
             c1 = c1 + 1
+            log.debug("c1= {}".format(c1))
 
-        cc1 = (r1,c1)
+
+        # -1 because the last run of the while loops doesn't count, this is not good, solve it differently
+        # an error arises if it never went through the while loop
+        # but this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2
+        cc1 = (r1-1,c1-1)
 
         return cc1,cc2
 
