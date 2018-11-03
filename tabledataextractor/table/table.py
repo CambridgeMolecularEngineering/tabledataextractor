@@ -72,7 +72,9 @@ class Table:
 
     def find_cc1_cc2(self,cc4):
         """
-        Searches for cells 'CC2' and 'CC3' using the MIPS algorithm.
+        Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
+        MIPS locates the critical cells that define the minimum row and column headers needed to index
+        every data cell.
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
         :type cc4: Tuple
@@ -86,8 +88,6 @@ class Table:
         c1 = 0
         r2 = r_max - 1
         c2 = 0
-        upflag = 0
-        rightflag = 0
         max_area = 0
 
         def duplicate_rows(table):
@@ -122,12 +122,14 @@ class Table:
 
         def table_slice_cc2(table,r2,r_max,c1,c2):
             """
-            Function to cut the correct slices out of array for CC2 in find_cc1_cc2()
-            :param table:
-            :param r2:
-            :param r_max:
-            :param c1:
-            :param c2:
+            Function to cut the correct slices out of array for CC2 in find_cc1_cc2().
+            Cuts out the next row and column header candidates from the pre-cleaned table.
+
+            :param table: pre-cleaned table
+            :param r2: current r2 parameter in MIPS algorithm
+            :param r_max: r_max parameter in MIPS algorithm
+            :param c1: first column for MIPS algorithm
+            :param c2: current c2 parameter for MIPS algorithm
             :return: (section_1, section_2)
             """
 
@@ -145,18 +147,17 @@ class Table:
                 log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
                 section_1 = None
 
+            # contrary to the published pseudocode the row maximum is r2, not r2-1
+            # one more row and column index than in the published pseudocode is needed,
+            # since the a:b notation in python doesn't include b
             if r1 == r2 and c2+1 == c_max:
                 section_2 = table[r1, c2+1]
-                log.debug("Slice 1")
             elif r1 == r2 and c2+1 != c_max:
                 section_2 = table[r1, c2+1 : c_max+1]
-                log.debug("Slice 2")
             elif r1 != r2 and c2+1 != c_max:
-                section_2 = table[r1 : r2+1, c2+1 : c_max+1]
-                log.debug("Slice 3")
+                section_2 = table[r1: r2+1, c2+1: c_max+1]
             elif r1 != r2 and c2+1 == c_max:
-                section_2 = table[r1 : r2+1, c2+1]
-                log.debug("Slice 4")
+                section_2 = table[r1: r2+1, c2+1]
             else:
                 log.critical("Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
                 section_2 = None
@@ -165,18 +166,20 @@ class Table:
 
         def table_slice_1_cc1(table, r1, r2, c2, c_max):
             """
-            Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
+            Function to cut a correct slice out of array for CC1 in find_cc1_cc2().
+            Cuts out the column header.
             """
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
-            if r1  == r2 and c2+1 == c_max:
+            # contrary to the published pseudocode, the correct range is [r1:r2,c2+1:c_max] and not [r1+1:r2,c2+1:c_max]
+            if r1 == r2 and c2+1 == c_max:
                 section = table[r1, c2+1]
             elif r1 == r2 and c2+1 != c_max:
                 section = table[r1, c2+1:c_max+1]
-            elif r1  != r2 and c2+1 != c_max:
-                section = table[r1 : r2+1, c2 + 1:c_max+1]
-            elif r1  != r2 and c2+1 == c_max:
-                section = table[r1 : r2+1, c2 + 1]
+            elif r1 != r2 and c2+1 != c_max:
+                section = table[r1: r2+1, c2 + 1:c_max+1]
+            elif r1 != r2 and c2+1 == c_max:
+                section = table[r1: r2+1, c2 + 1]
             else:
                 log.critical("Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1+1, r2, c2+1, c_max))
                 section = None
@@ -318,11 +321,11 @@ class Table:
         # searching from the top of table for first half-full row, starting with first row below the header:
         n_rows = len(self.pre_cleaned_table[cc2[0]+1:])
         log.debug("n_rows= {}".format(n_rows))
-        for row_index in range(cc2[0]+1,cc2[0]+n_rows, 1):
+        for row_index in range(cc2[0]+1,cc2[0]+1+n_rows, 1):
             n_full = 0
             n_columns = len(self.pre_cleaned_table[row_index,cc2[1]+1:])
             log.debug("n_columns= {}".format(n_columns))
-            for column_index in range(cc2[1]+1,cc2[1]+n_columns,1):
+            for column_index in range(cc2[1]+1,cc2[1]+1+n_columns,1):
                 empty = self.pre_cleaned_table_empty[row_index,column_index]
                 log.debug("Empty? ".format(empty))
                 if not empty:
