@@ -281,7 +281,7 @@ class Table:
 
     def find_cc3(self,cc2):
         """
-        Searches for cell 'CC3', as the leftmost cell of the first filled row of data region.
+        Searches for cell 'CC3', as the leftmost cell of the first filled row of the data region.
 
         :param cc2: Tuple, position of CC2 cell found with find_cc4()
         :type cc2: Tuple
@@ -327,7 +327,6 @@ class Table:
             if not empty_row.all():
                 return row_index
 
-
     def find_note_cells(self):
         """
         Searches for all non-empty cells that have not been labelled previously.
@@ -340,7 +339,7 @@ class Table:
 
     def find_FNprefix(self,cc4):
         """
-        FNprefix  = *, #, ., o, †; possibly followed by a period or a parenthesis.
+        FNprefix  = *, #, ., o, †; possibly followed by "." or ")".
         Searches only below the data region.
 
         :param cc4: end of data region
@@ -373,7 +372,7 @@ class Table:
 
     def find_FNprefix_FNtext(self,cc4):
         """
-        FNprefix  = *, #, ., o, †; possibly followed by a period or a parenthesis, followed by FNtext in the same cell.
+        FNprefix  = *, #, ., o, †; possibly followed by "." or ")", followed by FNtext in the same cell.
         FNtext can be started by any word character '\w', '[' or ']'
         Searches only below the data region.
 
