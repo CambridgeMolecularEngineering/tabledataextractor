@@ -185,31 +185,14 @@ class Table:
                 section = None
             return section
 
-        # def table_slice_2_cc1(table, r2, r_max, c1, c2):
-        #     """
-        #     Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
-        #     """
-        #     # one more row and column index than in the published pseudocode is needed,
-        #     # since the a:b notation in python doesn't include b
-        #     if r2 + 1 == c2 and c1+1 == r_max:
-        #         section = table[r2 + 1, c1 + 1]
-        #     elif r2 + 1 == c2 and c1+1 != r_max:
-        #         section = table[r2 + 1, c1+1 : r_max+1 ]
-        #     elif r2 + 1 != c2 and c1+1 != r_max:
-        #         section = table[r2+1 : c2+1, c1+1 : r_max+1 ]
-        #     elif r2 + 1 != c2 and c1+1 == r_max:
-        #         section = table[r2+1 : c2+1, c1+1]
-        #     else:
-        #         log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
-        #         section = None
-        #     return section
-
         def table_slice_2_cc1(table, r2, r_max, c1, c2):
             """
-            Function to cut a correct slice out of array for CC1 in find_cc1_cc2()
+            Function to cut a correct slice out of array for CC1 in find_cc1_cc2().
+            Cuts out the row header.
             """
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
+            # contrary to the published pseudocode, the correct range is [r2:r_max,c1:c2] and not [r2+1:c2,c1+1:r_max]
             if r2 == r_max and c1 == c2:
                 section = table[r2, c1]
             elif r2 == r_max and c1 != c2:
@@ -225,16 +208,22 @@ class Table:
 
         # MAIN MIPS algorithm
         # Locate candidate MIPs by finding the minimum indexing headers:
+        # This is significantly altered compared to the published pseudocode, which is flawed.
+        # The pseudocode clearly does not return cc2 if the column has not been changed and it doesn't
+        # dicriminate between duplicate rows in the row header vs duplicate columns in the column header
         while c2 < c_max  and r2 >= r1:
 
-            log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}".format(r_max,c_max,c1,c2,r1,r2,cc2))
+            log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}"
+                      .format(r_max,c_max,c1,c2,r1,r2,cc2))
+
             temp_section_1, temp_section_2 = table_slice_cc2(self.pre_cleaned_table,r2,r_max,c1,c2)
+
             log.debug("temp_section_1:\n{}".format(temp_section_1))
             log.debug("temp_section_2:\n{}".format(temp_section_2))
-            log.debug("duplicate_rows= {}, duplicate_columns= {}".format(duplicate_rows(temp_section_1),duplicate_rows(temp_section_2)))
+            log.debug("duplicate_rows= {}, duplicate_columns= {}".
+                      format(duplicate_rows(temp_section_1),duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-
                 data_area = (r_max - r2) * (c_max - c2)
                 log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2,c2),data_area))
                 log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2+1:r_max+1,c2+1:c_max+1]))
@@ -242,44 +231,34 @@ class Table:
                     max_area = data_area
                     cc2 = (r2, c2)
                     log.debug("CC2= {}".format(cc2))
-
                 r2 = r2 - 1
-
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-
                 c2 = c2 + 1
-
                 data_area = (r_max - r2) * (c_max - c2)
-                log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
+                log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
                 log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
                 if data_area >= max_area:
                     max_area = data_area
                     cc2 = (r2,c2)
                     log.debug("CC2= {}".format(cc2))
-
             else:
                 r2 = r2 - 1
         log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2,cc2))
 
-
-
-        # re-initialization of r2 and c2 from cc2, added by me; missing in the pseudocode
+        # re-initialization of r2 and c2 from cc2; missing in the pseudocode
         r2 = cc2[0]
         c2 = cc2[1]
 
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
-        # test 'r1 < r2' added by me, missing in the pseudocode
+        # test 'r1 <= r2' to end the loops, missing in the pseudocode
         log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
         while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 <= r2:
-
             log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
             log.debug("Duplicate columns= {}".format(duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max))))
             r1 = r1 + 1
             log.debug("r1= {}".format(r1))
 
-
-
-        # test 'c1 < c2' added by me, missing in the pseudocode
+        # test 'c1 <= c2' to end the loop, missing in the pseudocode
         log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
         while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 <= c2:
 
@@ -288,11 +267,13 @@ class Table:
             c1 = c1 + 1
             log.debug("c1= {}".format(c1))
 
-
-        # -1 because the last run of the while loops doesn't count, this is not good, solve it differently
-        # an error arises if it never went through the while loop
-        # but this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2.
-        # TODO Build in assertions for this.
+        # final cc1 is (r1-1,c1-1), because the last run of the while loops doesn't count
+        # a problem could arise if the code never stepped through the while loops, returning a cc1 with a negative index.
+        # however, this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2.
+        # hence, the assertions:
+        assert not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
+        assert not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
+        assert r1 >= 0 and c1 >= 0
         cc1 = (r1-1,c1-1)
 
         return cc1,cc2
