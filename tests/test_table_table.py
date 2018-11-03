@@ -24,6 +24,7 @@ class TableCC4(Table):
     def label_sections(self):
         """Labels only CC4"""
         cc4 = self.find_cc4()
+        self.labels[cc4] = 'CC4'
         log.info("Table Cell CC4 = {}".format(cc4))
 
 class TestCC4(unittest.TestCase):
@@ -31,6 +32,7 @@ class TestCC4(unittest.TestCase):
     def do_table(self, input_path, expected):
         log.debug("Test CC4, Table: {}".format(input_path))
         table = TableCC4(input_path)
+        table.print()
         result = table.find_cc4()
         log.debug("Result = {}".format(result))
         self.assertTupleEqual(expected, result)
@@ -86,6 +88,8 @@ class TableCC1CC2(Table):
         cc4 = self.find_cc4()
         cc1,cc2 = self.find_cc1_cc2(cc4)
         log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
+        self.labels[cc1] = 'CC1'
+        self.labels[cc2] = 'CC2'
 
 
 class TableCC3(Table):
@@ -94,12 +98,13 @@ class TableCC3(Table):
         super().__init__(*args)
 
     def label_sections(self):
-        """Label CC1 and CC2 and stop."""
+        """Label CC3."""
         title_row = self.find_title_row()
         cc4 = self.find_cc4()
         cc1,cc2 = self.find_cc1_cc2(cc4)
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
+        self.labels[cc3] = 'CC3'
         return cc3
 
 
