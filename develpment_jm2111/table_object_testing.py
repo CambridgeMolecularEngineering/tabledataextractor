@@ -38,8 +38,8 @@ table.print()
 # table = Table(data_path+'table_example1.csv')
 # table.print()
 #
-table = Table(data_path+'development_table.csv')
-table.print()
+# table = Table(data_path+'development_table.csv')
+# table.print()
 
 #
 # table = Table(data_path+'table_example2.csv')

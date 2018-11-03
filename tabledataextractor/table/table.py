@@ -41,7 +41,7 @@ class Table:
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # shadow table with labels
-        self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U20")
+        self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U30")
         self.labels[:,:] = '/'
         self.label_sections()
 
@@ -308,7 +308,6 @@ class Table:
             log.debug("n_columns= {}".format(n_columns))
             for column_index in range(cc2[1]+1,cc2[1]+1+n_columns,1):
                 empty = self.pre_cleaned_table_empty[row_index,column_index]
-                log.debug("Empty? ".format(empty))
                 if not empty:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
@@ -381,7 +380,7 @@ class Table:
         :return: List of cell indexes that match the FNprefix+FNtext
         """
         fn_prefix_fn_text = []
-        fn_prefix_fn_text_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)$')
+        fn_prefix_fn_text_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)')
         for fn_prefix_fn_text_index in fn_prefix_fn_text_parser.parse(self.pre_cleaned_table):
             if fn_prefix_fn_text_index[0] > cc4[0]:
                 fn_prefix_fn_text.append(fn_prefix_fn_text_index)
@@ -438,7 +437,6 @@ class Table:
                 for fn_ref in fn_ref_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
                     fn_refs.append(fn_ref)
         return fn_refs
-
 
     def empty_cells(self,table):
         empty = np.empty_like(table, dtype=bool)
@@ -551,7 +549,6 @@ class Table:
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
             self.labels[note_cell] = 'Note'
-
 
     def print(self):
         log.info("Printing table: {}".format(self.file_path))
