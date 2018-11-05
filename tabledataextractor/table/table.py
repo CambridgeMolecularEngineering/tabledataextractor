@@ -12,6 +12,7 @@ import logging
 import numpy as np
 import re
 from tabledataextractor.input import from_csv
+from tabledataextractor.input import from_html
 from tabledataextractor.output.print import print_table
 from tabledataextractor.table.parse import CellParser
 
@@ -24,7 +25,8 @@ class Table:
     def __init__(self, file_path):
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
-        self.raw_table = from_csv.read(file_path)
+        #self.raw_table = from_csv.read(file_path)
+        self.raw_table = from_html.read(file_path)
 
         # check if everything is ok with the raw table
         if not isinstance(self.raw_table, np.ndarray):
