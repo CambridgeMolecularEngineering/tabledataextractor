@@ -17,6 +17,6 @@ log.setLevel(logging.DEBUG)
 
 
 def read(file_path):
-    array = np.genfromtxt(file_path,delimiter=',',dtype=str, invalid_raise=False)
+    array = np.genfromtxt(file_path,delimiter=',',dtype='<U30', invalid_raise=False)
     return array
 

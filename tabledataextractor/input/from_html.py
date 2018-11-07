@@ -30,7 +30,12 @@ import logging
 #     return list
 
 def makearray(html_table):
-    """Creates a numpy array from an html file"""
+    """
+    Creates a numpy array from an html file, taking rowspan and colspan into account.
+    Modified from:  John Ricco, https://johnricco.github.io/2017/04/04/python-html/
+        'Using Python to scrape HTML tables with merged cells'
+    Added functionality for duplicating cell content for cells with rowspan/colspan.
+    """
     n_cols = 0
     n_rows = 0
 
@@ -41,7 +46,9 @@ def makearray(html_table):
             if len(col_tags) > n_cols:
                 n_cols = len(col_tags)
 
-    array = np.full((n_rows,n_cols), fill_value=None, dtype='<U30')
+    # according to numpy documentation fill_value should be of type Union[int, float, complex]
+    # however, 'str' works just fine
+    array = np.full((n_rows,n_cols), fill_value="", dtype='<U30')
 
     # list to store rowspan values
     skip_index = [0 for i in range(0, n_cols)]

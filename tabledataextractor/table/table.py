@@ -29,7 +29,7 @@ class Table:
         self.raw_table = from_html.read(file_path)
 
         # check if everything is ok with the raw table
-        if not isinstance(self.raw_table, np.ndarray):
+        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U30':
             msg = 'Input was not proeprly converted to numpy array.'
             log.critical(msg)
             raise TypeError(msg)
@@ -440,14 +440,16 @@ class Table:
                     fn_refs.append(fn_ref)
         return fn_refs
 
+
     def empty_cells(self,table):
-        empty = np.empty_like(table, dtype=bool)
-        for i, row in enumerate(table):
-            for j, cell in enumerate(row):
-                if cell == '':
-                    empty[i, j] = True
-                else:
-                    empty[i, j] = False
+        """
+        Returns a mask with 'True' for all empty cells in the original array and 'False' for non-empty cells.
+        The regular expression below, which defines an empty cell can be tweaked.
+        """
+        empty = np.full_like(table, fill_value=False, dtype=bool)
+        empty_parser = CellParser('^([\s\-\–]+)?$')
+        for empty_cell in empty_parser.parse(table, method='fullmatch'):
+            empty[empty_cell[0],empty_cell[1]] = True
         return empty
 
 

@@ -55,3 +55,5 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\Amo
 
 table = Table(data_path+'table_example.html')
 table.print()
+print(table.raw_table_empty,"\n")
+print(table.pre_cleaned_table_empty)
