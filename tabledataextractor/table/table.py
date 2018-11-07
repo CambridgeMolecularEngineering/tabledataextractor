@@ -13,24 +13,29 @@ import numpy as np
 import re
 from tabledataextractor.input import from_csv
 from tabledataextractor.input import from_html
+from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
+from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.table.parse import CellParser
 
+
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 class Table:
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, table_number=1):
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
         #self.raw_table = from_csv.read(file_path)
-        self.raw_table = from_html.read(file_path)
+        #self.raw_table = from_html.read_file(file_path, table_number)
+        #self.raw_table = from_html.read_url(file_path, table_number)
+        self.raw_table = from_any.create_table(self.file_path, table_number)
 
         # check if everything is ok with the raw table
         if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U30':
-            msg = 'Input was not proeprly converted to numpy array.'
+            msg = 'Input was not properly converted to numpy array.'
             log.critical(msg)
             raise TypeError(msg)
 
@@ -559,3 +564,8 @@ class Table:
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
         print_table(self.labels)
+
+    def to_csv(self, file_path):
+        log.info("Saving raw table to .csv to file: {}".format(self.file_path))
+        write_to_csv(self.raw_table, file_path=file_path)
+

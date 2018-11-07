@@ -11,6 +11,7 @@ jm2111@cam.ac.uk
 
 import numpy as np
 from bs4 import BeautifulSoup
+import requests
 import copy
 import logging
 
@@ -24,6 +25,7 @@ def makearray(html_table):
     Modified from:  John Ricco, https://johnricco.github.io/2017/04/04/python-html/
         'Using Python to scrape HTML tables with merged cells'
     Added functionality for duplicating cell content for cells with rowspan/colspan.
+    The table has to be n*m, rectangular, with the same number of columns in every row.
     """
     n_cols = 0
     n_rows = 0
@@ -93,12 +95,13 @@ def makearray(html_table):
                 # insert data into cell
                 array[row_counter, col_counter] = cell_data
 
-                # TODO Insert data into neighbouring rowspan/colspan cells
-                # DO I STILL NEED THE UPPER ROW THEN?, JUST ABOVE?
-                for spanned_col in col_dim:
-                    array[row_counter, col_counter + spanned_col-1] = cell_data
-                for spanned_row in row_dim:
-                    array[row_counter + spanned_row-1, col_counter] = cell_data
+                # Insert data into neighbouring rowspan/colspan cells
+                if colspan:
+                    for spanned_col in range(col_counter+1, col_counter + int(colspan)):
+                        array[row_counter, spanned_col] = cell_data
+                if rowspan:
+                    for spanned_row in range(row_counter+1, row_counter + int(rowspan)):
+                        array[spanned_row, col_counter] = cell_data
 
                 #record column skipping index
                 if row_dim[row_dim_counter] > 1:
@@ -113,12 +116,32 @@ def makearray(html_table):
     return array
 
 
-def read(file_path):
+def read_file(file_path,table_number=1):
     """Method used to read an .html file and return a numpy array"""
     file = open(file_path, encoding='UTF-8')
-    html_table = BeautifulSoup(file, features='lxml')
+    html_soup = BeautifulSoup(file, features='lxml')
     file.close()
-    #list = makelist(html_table)
+    html_table = html_soup.find_all("table")[table_number-1]
     array = makearray(html_table)
     return array
 
+def read_url(url,table_number=1):
+    """
+    Reads in a table from an URL and returns a numpy array.
+
+    :param url: Url of the page where the table is located
+    :type url: str
+    :param table_number: Number of Table on the web page.
+    :type table_number: int
+    """
+
+    if not isinstance(table_number, int):
+        msg = 'Table number is not valid.'
+        log.critical(msg)
+        raise TypeError(msg)
+
+    html_file = requests.get(url)
+    html_soup = BeautifulSoup(html_file.text, features='lxml')
+    html_table = html_soup.find_all("table")[table_number-1]
+    array = makearray(html_table)
+    return array
