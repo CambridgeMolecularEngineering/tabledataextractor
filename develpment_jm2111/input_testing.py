@@ -5,6 +5,6 @@ from pprint import pprint
 data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\AmorphousDatabase\\TableDataExtractor\\develpment_jm2111\\data\\table_example.html'
 
 
+table = from_html.read(data_path)
 
-
-pprint(list)
+#pprint(table)
