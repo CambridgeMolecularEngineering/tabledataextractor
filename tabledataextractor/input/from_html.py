@@ -14,20 +14,9 @@ from bs4 import BeautifulSoup
 import copy
 import logging
 
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
-# def makelist(html_table):
-#     """Creates a python list from an html file"""
-#     list = []
-#     rows = html_table.findAll('tr')
-#     for row in rows:
-#         list.append([])
-#         # look for rows as well as header rows
-#         cols = row.findAll(["td", "th"])
-#         for col in cols:
-#             strings = [str(s) for s in col.findAll(text=True)]
-#             text = ''.join(strings)
-#             list[-1].append(text)
-#     return list
 
 def makearray(html_table):
     """
@@ -104,6 +93,13 @@ def makearray(html_table):
                 # insert data into cell
                 array[row_counter, col_counter] = cell_data
 
+                # TODO Insert data into neighbouring rowspan/colspan cells
+                # DO I STILL NEED THE UPPER ROW THEN?, JUST ABOVE?
+                for spanned_col in col_dim:
+                    array[row_counter, col_counter + spanned_col-1] = cell_data
+                for spanned_row in row_dim:
+                    array[row_counter + spanned_row-1, col_counter] = cell_data
+
                 #record column skipping index
                 if row_dim[row_dim_counter] > 1:
                     this_skip_index[col_counter] = row_dim[row_dim_counter]
@@ -115,14 +111,6 @@ def makearray(html_table):
         skip_index = [i - 1 if i > 0 else i for i in this_skip_index]
 
     return array
-
-
-
-# def makearray(list):
-#     """Creates a numpy array from a list. Works if rows are of different length"""
-#     length = len(sorted(list,key=len, reverse=True)[0])
-#     array = np.array([l+[None]*(length-len(l)) for l in list],dtype=str)
-#     return array
 
 
 def read(file_path):
