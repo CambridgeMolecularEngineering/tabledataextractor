@@ -57,16 +57,21 @@ def create_table(name_key, table_number):
         log.info("Input is list type.")
         return from_list.read(name_key)
 
-    if url(name_key):
+    elif url(name_key):
         log.info("Url: {}".format(name_key))
         return from_html.read_url(name_key, table_number)
 
-    if html(name_key):
+    elif html(name_key):
         log.info("HTML File: {}".format(name_key))
         return from_html.read_file(name_key, table_number)
 
-    if csv(name_key):
+    elif csv(name_key):
         log.info("CSV File: {}".format(name_key))
         return from_csv.read(name_key)
+
+    else:
+        msg = 'Input is invalid'
+        log.critical(msg)
+        raise TypeError(msg)
 
 
