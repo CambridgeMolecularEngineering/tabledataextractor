@@ -15,6 +15,7 @@ import os
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+
 def write_to_csv(table, file_path):
     """
     Writes a numpy array table to a .csv file

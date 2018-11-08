@@ -125,6 +125,7 @@ def read_file(file_path,table_number=1):
     array = makearray(html_table)
     return array
 
+
 def read_url(url,table_number=1):
     """
     Reads in a table from an URL and returns a numpy array.

@@ -14,8 +14,9 @@ import logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-def read(list):
+
+def read(plist):
     """Creates a numpy array from a list. Works if rows are of different length"""
-    length = len(sorted(list,key=len, reverse=True)[0])
-    array = np.array([l+[None]*(length-len(l)) for l in list],dtype='<U30')
+    length = len(sorted(plist,key=len, reverse=True)[0])
+    array = np.array([l+[None]*(length-len(l)) for l in plist],dtype='<U30')
     return array

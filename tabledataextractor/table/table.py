@@ -26,11 +26,17 @@ log.setLevel(logging.INFO)
 class Table:
 
     def __init__(self, file_path, table_number=1):
+        """
+        Initializes the table object by converting the input to a numpy array form and performing all
+        appropriate labelling steps.
+
+        :param file_path: Path to .html or .cvs file, URL or list object that is used as input
+        :type file_path: str | list
+        :param table_number: Number of the table that we want to input if there are several at the given address/path
+        :type table_number: int
+        """
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
-        #self.raw_table = from_csv.read(file_path)
-        #self.raw_table = from_html.read_file(file_path, table_number)
-        #self.raw_table = from_html.read_url(file_path, table_number)
         self.raw_table = from_any.create_table(self.file_path, table_number)
 
         # check if everything is ok with the raw table
@@ -39,7 +45,7 @@ class Table:
             log.critical(msg)
             raise TypeError(msg)
 
-        # mask, cell = True if cell is empty
+        # mask, 'cell = True' if cell is empty
         self.raw_table_empty = self.empty_cells(self.raw_table)
 
         # pre-cleaned table
@@ -51,7 +57,6 @@ class Table:
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U30")
         self.labels[:,:] = '/'
         self.label_sections()
-
 
     def find_cc4(self):
         """
@@ -75,7 +80,6 @@ class Table:
                     n_full += 1
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
-
 
     def find_cc1_cc2(self,cc4):
         """
@@ -217,7 +221,7 @@ class Table:
         # Locate candidate MIPs by finding the minimum indexing headers:
         # This is significantly altered compared to the published pseudocode, which is flawed.
         # The pseudocode clearly does not return cc2 if the column has not been changed and it doesn't
-        # dicriminate between duplicate rows in the row header vs duplicate columns in the column header
+        # discriminate between duplicate rows in the row header vs duplicate columns in the column header
         while c2 < c_max  and r2 >= r1:
 
             log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}"
@@ -257,7 +261,6 @@ class Table:
         c2 = cc2[1]
 
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
-        # test 'r1 <= r2' to end the loops, missing in the pseudocode
         log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
         while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 <= r2:
             log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
@@ -265,7 +268,6 @@ class Table:
             r1 = r1 + 1
             log.debug("r1= {}".format(r1))
 
-        # test 'c1 <= c2' to end the loop, missing in the pseudocode
         log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
         while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 <= c2:
 
@@ -284,7 +286,6 @@ class Table:
         cc1 = (r1-1,c1-1)
 
         return cc1,cc2
-
 
     def find_cc3(self,cc2):
         """
@@ -323,7 +324,6 @@ class Table:
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
 
-
     def find_title_row(self):
         """
         Searches for the topmost non-empty row.
@@ -359,7 +359,6 @@ class Table:
                 fn_prefix.append(fn_prefix_index)
         return fn_prefix
 
-
     def find_FNtext(self,fn_prefix):
         """
         All the cells following a footnote marker in the same row as an fn_prefix cell.
@@ -392,7 +391,6 @@ class Table:
             if fn_prefix_fn_text_index[0] > cc4[0]:
                 fn_prefix_fn_text.append(fn_prefix_fn_text_index)
         return fn_prefix_fn_text
-
 
     def find_FNref(self,fn_prefix,fn_prefix_fn_text):
         """
@@ -445,7 +443,6 @@ class Table:
                     fn_refs.append(fn_ref)
         return fn_refs
 
-
     def empty_cells(self,table):
         """
         Returns a mask with 'True' for all empty cells in the original array and 'False' for non-empty cells.
@@ -456,7 +453,6 @@ class Table:
         for empty_cell in empty_parser.parse(table, method='fullmatch'):
             empty[empty_cell[0],empty_cell[1]] = True
         return empty
-
 
     def pre_clean(self):
         """
@@ -503,7 +499,6 @@ class Table:
         # deletion:
         self.pre_cleaned_table = self.pre_cleaned_table[:,np.sort(indices)]
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
-
 
     def label_sections(self):
         """

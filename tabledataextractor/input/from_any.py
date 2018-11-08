@@ -18,6 +18,7 @@ import logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+
 def url(name):
     try:
         URLValidator()(name)
@@ -25,11 +26,13 @@ def url(name):
     except:
         return False
 
+
 def html(name):
     if os.path.isfile(name) and name.endswith(".html"):
         return True
     else:
         return False
+
 
 def csv(name):
     if os.path.isfile(name) and name.endswith(".csv"):
@@ -41,8 +44,12 @@ def csv(name):
 def create_table(name_key, table_number):
     """
     Checks the input and calls the appropriate modules.
-    Returns a numpy array with the raw table
-    :param input: Any
+    Returns a numpy array with the raw table.
+
+    :param name_key: Path to .html or .cvs file, URL or list object that is used as input
+    :type name_key: str | list
+    :param table_number: Number of the table that we want to input if there are several at the given address/path
+    :type table_number: int
     :return:
     """
 
