@@ -12,6 +12,11 @@ jm2111@cam.ac.uk
 import numpy as np
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.ie.options import Options as IeOptions
 import copy
 import logging
 
@@ -126,6 +131,16 @@ def read_file(file_path,table_number=1):
     return array
 
 
+def configure_selenium(browser='Firefox'):
+    if browser == 'Firefox':
+        options = FirefoxOptions()
+        options.headless = True
+        driver = webdriver.Firefox(options=options, executable_path=r'C:\Users\juras\System\geckodriver\geckodriver.exe')
+        return driver
+    else:
+        return None
+
+
 def read_url(url,table_number=1):
     """
     Reads in a table from an URL and returns a numpy array.
@@ -141,8 +156,20 @@ def read_url(url,table_number=1):
         log.critical(msg)
         raise TypeError(msg)
 
-    html_file = requests.get(url)
-    html_soup = BeautifulSoup(html_file.text, features='lxml')
-    html_table = html_soup.find_all("table")[table_number-1]
-    array = makearray(html_table)
-    return array
+    # first try the requests package, if it fails do the selenium, which is much slower
+    try:
+        html_file = requests.get(url)
+        html_soup = BeautifulSoup(html_file.text, features='lxml')
+        html_table = html_soup.find_all("table")[table_number - 1]
+        array = makearray(html_table)
+        log.info("Package 'requests' was used.")
+        return array
+    except:
+        driver = configure_selenium()
+        driver.get(url)
+        html_file = driver.page_source
+        html_soup = BeautifulSoup(html_file, features='lxml')
+        html_table = html_soup.find_all("table")[table_number-1]
+        array = makearray(html_table)
+        log.info("Package 'selenium' was used.")
+        return array
