@@ -15,6 +15,7 @@ from tabledataextractor.input import from_csv
 from tabledataextractor.input import from_html
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
+from tabledataextractor.output.print import as_string
 from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.table.parse import CellParser
 
@@ -24,17 +25,16 @@ log.setLevel(logging.INFO)
 
 
 class Table:
+    """
+    Initialized by converting the input to a numpy array form and performing all
+    appropriate labelling steps.
 
+    :param file_path: Path to .html or .cvs file, URL or list object that is used as input
+    :type file_path: str | list
+    :param table_number: Number of the table that we want to input if there are several at the given address/path
+    :type table_number: int
+    """
     def __init__(self, file_path, table_number=1):
-        """
-        Initializes the table object by converting the input to a numpy array form and performing all
-        appropriate labelling steps.
-
-        :param file_path: Path to .html or .cvs file, URL or list object that is used as input
-        :type file_path: str | list
-        :param table_number: Number of the table that we want to input if there are several at the given address/path
-        :type table_number: int
-        """
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
         self.raw_table = from_any.create_table(self.file_path, table_number)
@@ -564,3 +564,7 @@ class Table:
         log.info("Saving raw table to .csv to file: {}".format(self.file_path))
         write_to_csv(self.raw_table, file_path=file_path)
 
+    def __str__(self):
+        log.info("Printing table: {}".format(self.file_path))
+        output = as_string(self.pre_cleaned_table)+"\n"+as_string(self.labels)
+        return  output

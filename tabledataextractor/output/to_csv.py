@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 tabledataextractor.output.to_csv.py
-
+======================================
 Outputs the table to cvs.
-
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
 """
 
 import logging

@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.table.parse
-
 Tools for parsing the table based on Regex expressions etc.
-
-jm2111@cam.ac.uk
 """
 
 import logging

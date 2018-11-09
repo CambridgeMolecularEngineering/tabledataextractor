@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_html.py
-
+tabledataextractor.input.from_html
+====================================
 Reads an html formatted table.
-
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
 """
 
 
@@ -160,7 +157,6 @@ def read_url(url,table_number=1):
     try:
         html_file = requests.get(url)
         html_soup = BeautifulSoup(html_file.text, features='lxml')
-        print(html_soup)
         html_table = html_soup.find_all("table")[table_number - 1]
         array = makearray(html_table)
         log.info("Package 'requests' was used.")

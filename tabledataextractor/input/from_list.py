@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_list.py
-
-Reads in a Python list.
-
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
+tabledataextractor.input.from_list
+=====================================
 """
 
 import numpy as np

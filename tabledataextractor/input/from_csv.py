@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_csv.py
-
+tabledataextractor.input.from_csv
+===================================
 Reads a csv formatted table.
-
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
 """
 
 

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_any.py
-
+tabledataextractor.input.from_any
+====================================
 Analyzes the input and calls the appropriate input module.
-
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
 """
 
 from django.core.validators import URLValidator
