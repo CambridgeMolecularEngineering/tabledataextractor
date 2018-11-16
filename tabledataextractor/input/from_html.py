@@ -24,8 +24,10 @@ log.setLevel(logging.DEBUG)
 def makearray(html_table):
     """
     Creates a numpy array from an html file, taking rowspan and colspan into account.
-    Modified from:  John Ricco, https://johnricco.github.io/2017/04/04/python-html/
-        'Using Python to scrape HTML tables with merged cells'
+
+    Modified from:
+        John Ricco, https://johnricco.github.io/2017/04/04/python-html/, *Using Python to scrape HTML tables with merged cells*
+
     Added functionality for duplicating cell content for cells with rowspan/colspan.
     The table has to be n*m, rectangular, with the same number of columns in every row.
     """

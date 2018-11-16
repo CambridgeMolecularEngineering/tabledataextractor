@@ -345,7 +345,7 @@ class Table:
 
     def find_FNprefix(self,cc4):
         """
-        FNprefix  = *, #, ., o, †; possibly followed by "." or ")".
+        FNprefix  = \*, #, ., o, †; possibly followed by "." or ")".
         Searches only below the data region.
 
         :param cc4: end of data region
@@ -377,7 +377,7 @@ class Table:
 
     def find_FNprefix_FNtext(self,cc4):
         """
-        FNprefix  = *, #, ., o, †; possibly followed by "." or ")", followed by FNtext in the same cell.
+        FNprefix  = \*, #, ., o, †; possibly followed by "." or ")", followed by FNtext in the same cell.
         FNtext can be started by any word character '\w', '[' or ']'
         Searches only below the data region.
 
