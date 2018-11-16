@@ -37,6 +37,7 @@ class Table:
     def __init__(self, file_path, table_number=1):
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
+        self.table_number = table_number
         self.raw_table = from_any.create_table(self.file_path, table_number)
 
         # check if everything is ok with the raw table
@@ -565,6 +566,20 @@ class Table:
         write_to_csv(self.raw_table, file_path=file_path)
 
     def __str__(self):
+        """As the user wants to see it"""
         log.info("Printing table: {}".format(self.file_path))
-        output = as_string(self.pre_cleaned_table)+"\n"+as_string(self.labels)
-        return  output
+        output = as_string(self.pre_cleaned_table)
+        return output
+
+    def __repr__(self):
+        """As the developer wants to see it"""
+        intro = "Table({}, table_number={})".format(self.file_path, self.table_number)
+        log.info("Repr. table: {}".format(self.file_path))
+        array_width = np.shape(self.pre_cleaned_table)[1]
+        tables_string = as_string(
+            np.concatenate(
+                (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U30'), self.labels)
+            )
+        )
+        return intro + "\n\n" + tables_string
+

@@ -15,9 +15,14 @@ from tabledataextractor import Table
 #url = 'https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta'
 
 table = Table('https://link.springer.com/article/10.1007%2Fs10853-012-6439-6',3)
+print(repr(table))
+
+# print(table.pre_cleaned_table, "\n")
+# print(table.labels)
+
+
 #table.print()
 #table.to_csv(data_path+'J_Mat_Sci_2012_2.csv')
 
-print(table)
 
 
