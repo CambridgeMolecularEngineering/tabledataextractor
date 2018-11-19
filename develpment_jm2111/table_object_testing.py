@@ -1,7 +1,7 @@
 from tabledataextractor import Table
 
-#data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
-#            'AmorphousDatabase\\TableDataExtractor\\develpment_jm2111\\data\\'
+data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
+           'AmorphousDatabase\\TableDataExtractor\\develpment_jm2111\\data\\'
 
 #url = 'https://link.springer.com/article/10.1007%2Fs10853-012-6439-6'
 #url = 'https://www.sciencedirect.com/science/article/pii/S0022309317305732'
@@ -14,8 +14,15 @@ from tabledataextractor import Table
 #url = 'https://journals.aps.org/prb/abstract/10.1103/PhysRevB.90.094204#fulltext'
 #url = 'https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta'
 
-table = Table('https://link.springer.com/article/10.1007%2Fs10853-012-6439-6',3)
+print("Situation where prefixing would potentially destroy the structure:\n")
+table = Table(data_path + 'table_example4_2.csv')
 print(repr(table))
+
+print("Situation where prefixing would be useful:\n")
+table = Table(data_path + 'table_example4.csv')
+print(repr(table))
+
+
 
 # print(table.pre_cleaned_table, "\n")
 # print(table.labels)

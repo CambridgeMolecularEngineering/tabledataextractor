@@ -41,7 +41,7 @@ class Table:
         self.raw_table = from_any.create_table(self.file_path, table_number)
 
         # check if everything is ok with the raw table
-        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U30':
+        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
             msg = 'Input was not properly converted to numpy array.'
             log.critical(msg)
             raise TypeError(msg)
@@ -52,12 +52,90 @@ class Table:
         # pre-cleaned table
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
+        self.prefix_duplicate_labels()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # shadow table with labels
-        self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U30")
+        self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
         self.labels[:,:] = '/'
         self.label_sections()
+
+
+    def prefix_duplicate_labels(self):
+        """
+        Prefixes duplicate labels in first row or column where this is possible,
+        by adding a new row/column containing the preceding (to the left or above) unique labels, if available.
+
+        The algorithm for column headers:
+
+            1. for row in table, start with first row of the table
+                a) can meaningful prefixing in this row been done?
+                    * YES --> do prefixing and go to 2
+                    * NO  --> go to 1, next row
+            2. run MIPS to get CC1, CC2
+            3. if the prefixing has been done in a cell outside of the header region established by 2, undo prefixing
+                and re-run MIPS without it
+
+        :return:
+        """
+
+        def unique(data,row_or_column):
+            """
+            Returns True if data is unique in the given row/column or False if not unique or not present.
+
+            :param cell:
+            :param row_or_column:
+            :return:
+            """
+            count = 0
+            for cell in row_or_column:
+                if cell == data:
+                    count += 1
+            if count == 1:
+                return True
+            else:
+                return False
+
+        # main algorithm
+        # if cell is not unique, prefix it with the first unique one to the left
+        new_row = []
+        unique_prefix = False
+        prefixed = False
+        row_index = 0
+
+        for row_index, row in enumerate(self.pre_cleaned_table):
+            for cell in row:
+                if unique(cell, row):
+                    new_row.append(cell)
+                elif not unique(cell, row):
+                    # find the first unique cell to the left
+                    for prefix in reversed(new_row):
+                        if unique(prefix, row):
+                            unique_prefix = prefix
+                            break
+                    # prefix the cell and append it to new row
+                    if unique_prefix:
+                        new_row.append(unique_prefix+"/"+cell)
+                        prefixed = True
+            if prefixed:
+                break
+
+        # swap the old row for the new row
+        if prefixed:
+            self.pre_cleaned_table[row_index, :] = new_row
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def find_cc4(self):
         """
@@ -578,7 +656,7 @@ class Table:
         array_width = np.shape(self.pre_cleaned_table)[1]
         tables_string = as_string(
             np.concatenate(
-                (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U30'), self.labels)
+                (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
             )
         )
         return intro + "\n\n" + tables_string

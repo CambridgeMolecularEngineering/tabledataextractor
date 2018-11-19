@@ -43,7 +43,7 @@ def makearray(html_table):
 
     # according to numpy documentation fill_value should be of type Union[int, float, complex]
     # however, 'str' works just fine
-    array = np.full((n_rows,n_cols), fill_value="", dtype='<U30')
+    array = np.full((n_rows,n_cols), fill_value="", dtype='<U60')
 
     # list to store rowspan values
     skip_index = [0 for i in range(0, n_cols)]
