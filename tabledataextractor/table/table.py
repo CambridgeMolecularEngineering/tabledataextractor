@@ -58,7 +58,7 @@ class Table:
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # TESTING
-        # self.print()
+        self.print()
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -159,6 +159,8 @@ class Table:
                 log.info("Column header prefixing, row_index= {}".format(row_index))
                 log.debug("Prefixed row= {}".format(new_row))
                 self.pre_cleaned_table[row_index, :] = new_row
+                # TODO Continue working on this, a new column has to be inserted, also, in a way which doesn't break apart the MIPS algorithm
+                # self.pre_cleaned_table = np.insert(self.pre_cleaned_table,row_index,new_row, axis=0)
 
         # prefixing of row headers
         if prefixed_row_or_column(self.pre_cleaned_table.T):
@@ -168,8 +170,6 @@ class Table:
                 log.info("Row header prefixing, column_index= {}".format(column_index))
                 log.debug("Prefixed column= {}".format(new_column))
                 self.pre_cleaned_table[:, column_index] = new_column
-
-
 
     def find_cc4(self):
         """
