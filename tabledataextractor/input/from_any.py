@@ -50,7 +50,7 @@ def create_table(name_key, table_number):
     :return:
     """
 
-    if isinstance(name_key,list):
+    if isinstance(name_key, list):
         log.info("Input is list type.")
         return from_list.read(name_key)
 

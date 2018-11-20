@@ -17,7 +17,7 @@ from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 from tabledataextractor.output.print import as_string
 from tabledataextractor.output.to_csv import write_to_csv
-from tabledataextractor.table.parse import CellParser
+from tabledataextractor.table.parse import CellParser, StringParser
 
 
 log = logging.getLogger(__name__)
@@ -55,11 +55,13 @@ class Table:
         self.prefix_duplicate_labels()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
+        # just for testing if labelling fails
+        #self.print()
+
         # shadow table with labels
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
         self.labels[:,:] = '/'
         self.label_sections()
-
 
     def prefix_duplicate_labels(self):
         """
@@ -76,14 +78,18 @@ class Table:
             3. if the prefixing has been done in a cell outside of the header region established by 2, undo prefixing
                 and re-run MIPS without it
 
+        The algorithm is not very selective. Sometimes, even if a first row of a header has only unique elements,
+        the second row might be prefixed. However, it is assumed that on average accuracy will still be improved
+        significantly.
+
         :return:
         """
 
-        def unique(data,row_or_column):
+        def unique(data, row_or_column):
             """
             Returns True if data is unique in the given row/column or False if not unique or not present.
 
-            :param cell:
+            :param data:
             :param row_or_column:
             :return:
             """
@@ -96,44 +102,62 @@ class Table:
             else:
                 return False
 
-        # main algorithm
-        # if cell is not unique, prefix it with the first unique one to the left
-        new_row = []
-        unique_prefix = False
-        prefixed = False
-        row_index = 0
+        def prefixed_row_or_column(table):
+            """
+            Main algorithm for creating prefixed column/row headers.
+            If cell is not unique, it is prefixed with the first unique above (for row header) or to the left
+            (for column header)
 
-        for row_index, row in enumerate(self.pre_cleaned_table):
-            for cell in row:
-                if unique(cell, row):
-                    new_row.append(cell)
-                elif not unique(cell, row):
-                    # find the first unique cell to the left
-                    for prefix in reversed(new_row):
-                        if unique(prefix, row):
-                            unique_prefix = prefix
-                            break
-                    # prefix the cell and append it to new row
-                    if unique_prefix:
-                        new_row.append(unique_prefix+"/"+cell)
-                        prefixed = True
+            :param table:
+            :return: Prefixed row or column
+            """
+            unique_prefix = False
+            prefixed = False
+            row_index = 0
+            new_row = []
+            for row_index, row in enumerate(table):
+                new_row = []
+                for cell_index, cell in enumerate(row):
+                    # append if unique or empty cell
+                    if unique(cell, row) or self.empty_string(cell):
+                        new_row.append(cell)
+                    else:
+                        # find the first unique cell to the left
+                        # don't use the first column and first row
+                        # as these will presumably be in the stub header region
+                        for prefix in reversed(new_row[1:]):
+                            # use the prefix if it is unique and not empty
+                            if unique(prefix, row) and not self.empty_string(prefix):
+                                unique_prefix = prefix
+                                break
+                        # prefix the cell and append it to new row
+                        if unique_prefix:
+                            new_row.append(unique_prefix + "/" + cell)
+                            prefixed = True
+                        # else, if no unique prefix was found, just append the original cell,
+                        else:
+                            new_row.append(cell)
+                # and continue to the next row (if no prefixing has been performed)
+                if prefixed:
+                    break
             if prefixed:
-                break
+                return row_index, new_row
+            else:
+                return None
 
-        # swap the old row for the new row
-        if prefixed:
+        # prefixing of column headers
+        if prefixed_row_or_column(self.pre_cleaned_table):
+            row_index, new_row = prefixed_row_or_column(self.pre_cleaned_table)
+            log.info("Column header prefixing, row_index= {}".format(row_index))
+            log.debug("Prefixed row= {}".format(new_row))
             self.pre_cleaned_table[row_index, :] = new_row
 
-
-
-
-
-
-
-
-
-
-
+        # prefixing of row headers
+        if prefixed_row_or_column(self.pre_cleaned_table.T):
+            column_index, new_column = prefixed_row_or_column(self.pre_cleaned_table.T)
+            log.info("Row header prefixing, column_index= {}".format(column_index))
+            log.debug("Prefixed column= {}".format(new_column))
+            self.pre_cleaned_table[:, column_index] = new_column
 
 
 
@@ -528,14 +552,24 @@ class Table:
         The regular expression below, which defines an empty cell can be tweaked.
         """
         empty = np.full_like(table, fill_value=False, dtype=bool)
-        empty_parser = CellParser('^([\s\-\–]+)?$')
+        empty_parser = CellParser('^([\s\-\–\"]+)?$')
         for empty_cell in empty_parser.parse(table, method='fullmatch'):
             empty[empty_cell[0],empty_cell[1]] = True
         return empty
 
+    def empty_string(self, string):
+        """
+        Returns 'True' if a particular string is empty, which is defined with a regular expression
+        :param string:
+        :return:
+        """
+        empty_parser = StringParser('^([\s\-\–\"]+)?$')
+        return empty_parser.parse(string, method='fullmatch')
+
     def pre_clean(self):
         """
         Remove empty and duplicate rows and columns that extend over the whole table.
+        Replace 'None' cells with spaces.
 
         :return:
         """
@@ -578,6 +612,14 @@ class Table:
         # deletion:
         self.pre_cleaned_table = self.pre_cleaned_table[:,np.sort(indices)]
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
+
+        # TODO This is not the solution, needs to be removed
+        # # replace 'None' cells with spaces ' '
+        # for row_index, row in enumerate(self.pre_cleaned_table):
+        #     for column_index, cell in enumerate(row):
+        #         if cell == None:
+        #             self.pre_cleaned_table[row_index, column_index] = ' '
+
 
     def label_sections(self):
         """
@@ -637,7 +679,7 @@ class Table:
         log.info("Printing table: {}".format(self.file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
-        print_table(self.labels)
+        #print_table(self.labels)
 
     def to_csv(self, file_path):
         log.info("Saving raw table to .csv to file: {}".format(self.file_path))
@@ -654,10 +696,11 @@ class Table:
         intro = "Table({}, table_number={})".format(self.file_path, self.table_number)
         log.info("Repr. table: {}".format(self.file_path))
         array_width = np.shape(self.pre_cleaned_table)[1]
-        tables_string = as_string(
+        input_string = as_string(self.raw_table)
+        results_string = as_string(
             np.concatenate(
                 (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
             )
         )
-        return intro + "\n\n" + tables_string
+        return intro + "\n\n" + input_string + results_string
 

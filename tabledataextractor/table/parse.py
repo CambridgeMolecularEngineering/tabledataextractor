@@ -53,7 +53,41 @@ class CellParser:
                     yield row_index,column_index,result.groups()
 
 
+class StringParser:
 
+    def __init__(self, pattern):
+        """
+        :param pattern: Regex pattern which defines the string parser. Returns True if pattern matches
+        :type pattern: str
+        """
+        assert isinstance(pattern, str)
+        self.pattern = pattern
+
+    def parse(self, string, method='match'):
+        """
+        Inputs a string and returns true if pattern matches
+
+        :param string:
+        :param method:
+        :return: str
+        """
+
+        # check if string is of correct type
+        assert isinstance(string, str)
+
+        result = None
+        prog = re.compile(self.pattern)
+
+        if method == 'match':
+            result = prog.match(string)
+        elif method == 'fullmatch':
+            result = prog.fullmatch(string)
+        elif method == 'search':
+            result = prog.search(string)
+        if result:
+            return True
+        else:
+            return False
 
 
 

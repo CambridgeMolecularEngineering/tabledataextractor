@@ -14,15 +14,28 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #url = 'https://journals.aps.org/prb/abstract/10.1103/PhysRevB.90.094204#fulltext'
 #url = 'https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta'
 
-print("Situation where prefixing would potentially destroy the structure:\n")
-table = Table(data_path + 'table_example4_2.csv')
+# print("Situation where prefixing would potentially destroy the structure:\n")
+# table = Table(data_path + 'table_example4_2.csv')
+# print(repr(table))
+#
+# print("Situation where prefixing would be useful:\n")
+# table = Table(data_path + 'table_example4.csv')
+# print(repr(table))
+
+# table = Table(data_path + 'table_example1.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example2.csv')
+# print(repr(table))
+#
+# # table = Table(data_path + 'table_example3.csv')
+# # print(repr(table))
+#
+# table = Table(data_path + 'table_example5.csv')
+# print(repr(table))
+
+table = Table(data_path + 'table_example_11.csv')
 print(repr(table))
-
-print("Situation where prefixing would be useful:\n")
-table = Table(data_path + 'table_example4.csv')
-print(repr(table))
-
-
 
 # print(table.pre_cleaned_table, "\n")
 # print(table.labels)
