@@ -19,9 +19,9 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 # print(repr(table))
 #
 # print("Situation where prefixing would be useful:\n")
-# table = Table(data_path + 'table_example4.csv')
-# print(repr(table))
-
+table = Table(data_path + 'table_example4.csv')
+print(repr(table))
+#
 # table = Table(data_path + 'table_example1.csv')
 # print(repr(table))
 #
@@ -30,12 +30,12 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #
 # # table = Table(data_path + 'table_example3.csv')
 # # print(repr(table))
-#
+
 # table = Table(data_path + 'table_example5.csv')
 # print(repr(table))
 
-table = Table(data_path + 'table_example_11.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example_11.csv')
+# print(repr(table))
 
 # print(table.pre_cleaned_table, "\n")
 # print(table.labels)

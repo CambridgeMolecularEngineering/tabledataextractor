@@ -11,8 +11,6 @@ jm2111@cam.ac.uk
 import logging
 import numpy as np
 import re
-from tabledataextractor.input import from_csv
-from tabledataextractor.input import from_html
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 from tabledataextractor.output.print import as_string
@@ -40,6 +38,9 @@ class Table:
         self.table_number = table_number
         self.raw_table = from_any.create_table(self.file_path, table_number)
 
+        # TESTING
+        # self.raw_table = self.raw_table.T
+
         # check if everything is ok with the raw table
         if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
             msg = 'Input was not properly converted to numpy array.'
@@ -49,16 +50,17 @@ class Table:
         # mask, 'cell = True' if cell is empty
         self.raw_table_empty = self.empty_cells(self.raw_table)
 
-        # pre-cleaned table
+        # pre-cleaning table
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
+        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
         self.prefix_duplicate_labels()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
-        # just for testing if labelling fails
-        #self.print()
+        # TESTING
+        # self.print()
 
-        # shadow table with labels
+        # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
         self.labels[:,:] = '/'
         self.label_sections()
@@ -75,8 +77,9 @@ class Table:
                     * YES --> do prefixing and go to 2
                     * NO  --> go to 1, next row
             2. run MIPS to get CC1, CC2
-            3. if the prefixing has been done in a cell outside of the header region established by 2, undo prefixing
-                and re-run MIPS without it
+            3. accept prefixing only if prefixed rows/cells are not below or to the right of the headers
+               (note, the prefixed cells can still be above or to the left of the header, which will probably
+                change the header region upon the "real" run of MIPS in the next segmentation step
 
         The algorithm is not very selective. Sometimes, even if a first row of a header has only unique elements,
         the second row might be prefixed. However, it is assumed that on average accuracy will still be improved
@@ -145,19 +148,26 @@ class Table:
             else:
                 return None
 
+        # find CC1 & CC2 to see if the prefixing has been done in the data region
+        cc1, cc2 = self.find_cc1_cc2(self.find_cc4())
+
         # prefixing of column headers
         if prefixed_row_or_column(self.pre_cleaned_table):
             row_index, new_row = prefixed_row_or_column(self.pre_cleaned_table)
-            log.info("Column header prefixing, row_index= {}".format(row_index))
-            log.debug("Prefixed row= {}".format(new_row))
-            self.pre_cleaned_table[row_index, :] = new_row
+            # only perform indexing if not below of header region (above is allowed!):
+            if row_index <= cc2[0]:
+                log.info("Column header prefixing, row_index= {}".format(row_index))
+                log.debug("Prefixed row= {}".format(new_row))
+                self.pre_cleaned_table[row_index, :] = new_row
 
         # prefixing of row headers
         if prefixed_row_or_column(self.pre_cleaned_table.T):
             column_index, new_column = prefixed_row_or_column(self.pre_cleaned_table.T)
-            log.info("Row header prefixing, column_index= {}".format(column_index))
-            log.debug("Prefixed column= {}".format(new_column))
-            self.pre_cleaned_table[:, column_index] = new_column
+            # only perform indexing if not to the right of header region (to the left is allowed!):
+            if column_index <= cc2[1]:
+                log.info("Row header prefixing, column_index= {}".format(column_index))
+                log.debug("Prefixed column= {}".format(new_column))
+                self.pre_cleaned_table[:, column_index] = new_column
 
 
 
@@ -552,7 +562,7 @@ class Table:
         The regular expression below, which defines an empty cell can be tweaked.
         """
         empty = np.full_like(table, fill_value=False, dtype=bool)
-        empty_parser = CellParser('^([\s\-\–\"]+)?$')
+        empty_parser = CellParser(r'^([\s\-\–\"]+)?$')
         for empty_cell in empty_parser.parse(table, method='fullmatch'):
             empty[empty_cell[0],empty_cell[1]] = True
         return empty
@@ -563,7 +573,7 @@ class Table:
         :param string:
         :return:
         """
-        empty_parser = StringParser('^([\s\-\–\"]+)?$')
+        empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
         return empty_parser.parse(string, method='fullmatch')
 
     def pre_clean(self):
