@@ -4,8 +4,8 @@ tabledataextractor.table.table
 
 Raw, processed and final labelled table.
 
-jm2111@cam.ac.uk
-~~~~~~~~~~~~~~~~~
+.. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
+
 """
 
 import logging
@@ -54,8 +54,9 @@ class Table:
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
-        # self.prefix_duplicate_labels()
-        # self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+
+        self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
+        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # TESTING
         # self.print()
@@ -65,7 +66,7 @@ class Table:
         self.labels[:,:] = '/'
         self.label_sections()
 
-    def prefix_duplicate_labels(self):
+    def prefix_duplicate_labels(self, table):
         """
         Prefixes duplicate labels in first row or column where this is possible,
         by adding a new row/column containing the preceding (to the left or above) unique labels, if available.
@@ -85,8 +86,15 @@ class Table:
         the second row might be prefixed. However, it is assumed that on average accuracy will still be improved
         significantly.
 
-        :return:
+        :param table: Table to use as input and to do the prefixing on
+        :return: prefixed_table
         """
+
+        # TODO Document all of this madness
+        # TODO Make code slightly nicer
+        # TODO Delete the commented-out, unnecessary sections
+        # TODO Convert the table testing python script into a demonstration for Jacqui
+        # TODO Implement unit testing, specifically for the test tables. When, and when not the prefixing will be done.
 
         def unique(data, row_or_column):
             """
@@ -190,7 +198,6 @@ class Table:
                                 break
                         # prefix the cell and append it to new row
                         if unique_prefix:
-                            # TODO only append if the columns/rows above/left of the duplicate cells are the same or if there are no rows/columns above/left
                             duplicated_row.append(unique_prefix + "/" + cell)
                             new_row.append(unique_prefix)
                             prefixed = True
@@ -206,32 +213,58 @@ class Table:
             else:
                 return None
 
-        # find CC1 & CC2 to see if the prefixing has been done in the data region
-        cc1, cc2 = self.find_cc1_cc2(self.find_cc4())
+        # MAIN ALGORITHM
+        # 1. first, check the MIPS, to see what header we would have gotten without the prefixing
+        # note, cc4 couldn't have changed
+        cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), table)
 
+        # this flag is used for the return value, if it doesn't change the original table is returned
+        prefixed = False
+
+        # 2. DO THE PREFIXING
         # prefixing of column headers
-        if prefixed_row_or_column(self.pre_cleaned_table):
-            row_index, new_row = prefixed_row_or_column(self.pre_cleaned_table)
-            # only perform indexing if not below of header region (above is allowed!):
+        if prefixed_row_or_column(table):
+            row_index, new_row = prefixed_row_or_column(table)
+            # only perform prefixing if not below of header region (above is allowed!)
+            # to allow prefixing even below the old header region cannot be right
             if row_index <= cc2[0]:
                 log.info("Column header prefixing, row_index= {}".format(row_index))
                 log.debug("Prefixed row= {}".format(new_row))
                 # This is if we want to prefix in the same cell:
                 # self.pre_cleaned_table[row_index, :] = new_row
                 # This is for prefixing by adding new row:
-                self.pre_cleaned_table = np.insert(self.pre_cleaned_table, row_index, new_row, axis=0)
+                prefixed = True
+                prefixed_table = np.insert(table, row_index, new_row, axis=0)
 
         # prefixing of row headers
-        if prefixed_row_or_column(self.pre_cleaned_table.T):
-            column_index, new_column = prefixed_row_or_column(self.pre_cleaned_table.T)
-            # only perform indexing if not to the right of header region (to the left is allowed!):
+        if prefixed_row_or_column(table.T):
+            column_index, new_column = prefixed_row_or_column(table.T)
+            # only perform prefixing if not to the right of header region (to the left is allowed!)
+            # to allow prefixing even below the old header region cannot be right
             if column_index <= cc2[1]:
                 log.info("Row header prefixing, column_index= {}".format(column_index))
                 log.debug("Prefixed column= {}".format(new_column))
                 # This is if we want to prefix in the same cell:
                 # self.pre_cleaned_table[:, column_index] = new_column
                 # This is for prefixing by adding a new column:
-                self.pre_cleaned_table = np.insert(self.pre_cleaned_table, column_index, new_column, axis=1)
+                prefixed = True
+                prefixed_table = np.insert(table, column_index, new_column, axis=1)
+
+        # 3. check the headers again, after prefixing
+        # note, cc4 couldn't have changed
+        if prefixed:
+            cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
+            # return prefixed_table only if the prefixing has not made the header to start lower,
+            # it can end lower (and this is desired and what we want - not to include the data region into the header),
+            # but it cannot start lower, because that would mean that we have removed some of the hierarchy and added
+            # hierarchy from the left/above into a column/row
+            if cc1_new[0] <= cc1[0] and cc1_new[1] <= cc1[1]:
+                return prefixed_table
+            else:
+                return table
+        else:
+            return table
+
 
     def find_cc4(self):
         """
