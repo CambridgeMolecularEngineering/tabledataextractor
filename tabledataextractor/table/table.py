@@ -58,7 +58,7 @@ class Table:
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # TESTING
-        self.print()
+        # self.print()
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -105,41 +105,94 @@ class Table:
             else:
                 return False
 
+        # def prefixed_row_or_column(table):
+        #     """
+        #     Main algorithm for creating prefixed column/row headers.
+        #     If cell is not unique, it is prefixed with the first unique above (for row header) or to the left
+        #     (for column header).
+        #
+        #      Returns a new row/column, which contains the old content and the prefixes directly included in the cells.
+        #
+        #     :param table:
+        #     :return: Prefixed row or column
+        #     """
+        #     unique_prefix = False
+        #     prefixed = False
+        #     row_index = 0
+        #     new_row = []
+        #     for row_index, row in enumerate(table):
+        #         new_row = []
+        #         for cell_index, cell in enumerate(row):
+        #             # append if unique or empty cell
+        #             if unique(cell, row) or self.empty_string(cell):
+        #                 new_row.append(cell)
+        #             else:
+        #                 # find the first unique cell to the left
+        #                 # don't use the first column and first row
+        #                 # as these will presumably be in the stub header region
+        #                 for prefix in reversed(new_row[1:]):
+        #                     # use the prefix if it is unique and not empty
+        #                     if unique(prefix, row) and not self.empty_string(prefix):
+        #                         unique_prefix = prefix
+        #                         break
+        #                 # prefix the cell and append it to new row
+        #                 if unique_prefix:
+        #                     new_row.append(unique_prefix + "/" + cell)
+        #                     prefixed = True
+        #                 # else, if no unique prefix was found, just append the original cell,
+        #                 else:
+        #                     new_row.append(cell)
+        #         # and continue to the next row (if no prefixing has been performed)
+        #         if prefixed:
+        #             break
+        #     if prefixed:
+        #         return row_index, new_row
+        #     else:
+        #         return None
+
         def prefixed_row_or_column(table):
             """
             Main algorithm for creating prefixed column/row headers.
             If cell is not unique, it is prefixed with the first unique above (for row header) or to the left
-            (for column header)
+            (for column header).
+
+            Returns the row/column containing the prefixes and the position of the row/column where the new row/column
+            has to be inserted into the original table.
 
             :param table:
-            :return: Prefixed row or column
+            :return: row_index: where the row/column has to be inserted, new_row: the list of prefixes
             """
             unique_prefix = False
             prefixed = False
             row_index = 0
+            duplicated_row = []
             new_row = []
             for row_index, row in enumerate(table):
+                duplicated_row = []
                 new_row = []
                 for cell_index, cell in enumerate(row):
                     # append if unique or empty cell
                     if unique(cell, row) or self.empty_string(cell):
-                        new_row.append(cell)
+                        duplicated_row.append(cell)
+                        new_row.append("")
                     else:
                         # find the first unique cell to the left
                         # don't use the first column and first row
                         # as these will presumably be in the stub header region
-                        for prefix in reversed(new_row[1:]):
+                        for prefix in reversed(duplicated_row[1:]):
                             # use the prefix if it is unique and not empty
                             if unique(prefix, row) and not self.empty_string(prefix):
                                 unique_prefix = prefix
                                 break
                         # prefix the cell and append it to new row
                         if unique_prefix:
-                            new_row.append(unique_prefix + "/" + cell)
+                            duplicated_row.append(unique_prefix + "/" + cell)
+                            new_row.append(unique_prefix)
                             prefixed = True
                         # else, if no unique prefix was found, just append the original cell,
                         else:
-                            new_row.append(cell)
+                            duplicated_row.append(cell)
+                            new_row.append("")
                 # and continue to the next row (if no prefixing has been performed)
                 if prefixed:
                     break
@@ -158,9 +211,10 @@ class Table:
             if row_index <= cc2[0]:
                 log.info("Column header prefixing, row_index= {}".format(row_index))
                 log.debug("Prefixed row= {}".format(new_row))
-                self.pre_cleaned_table[row_index, :] = new_row
-                # TODO Continue working on this, a new column has to be inserted, also, in a way which doesn't break apart the MIPS algorithm
-                # self.pre_cleaned_table = np.insert(self.pre_cleaned_table,row_index,new_row, axis=0)
+                # This is if we want to prefix in the same cell:
+                # self.pre_cleaned_table[row_index, :] = new_row
+                # This is for prefixing by adding new row:
+                self.pre_cleaned_table = np.insert(self.pre_cleaned_table, row_index, new_row, axis=0)
 
         # prefixing of row headers
         if prefixed_row_or_column(self.pre_cleaned_table.T):
@@ -169,7 +223,10 @@ class Table:
             if column_index <= cc2[1]:
                 log.info("Row header prefixing, column_index= {}".format(column_index))
                 log.debug("Prefixed column= {}".format(new_column))
-                self.pre_cleaned_table[:, column_index] = new_column
+                # This is if we want to prefix in the same cell:
+                # self.pre_cleaned_table[:, column_index] = new_column
+                # This is for prefixing by adding a new column:
+                self.pre_cleaned_table = np.insert(self.pre_cleaned_table, column_index, new_column, axis=1)
 
     def find_cc4(self):
         """
