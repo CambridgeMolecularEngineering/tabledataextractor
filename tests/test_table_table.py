@@ -86,7 +86,7 @@ class TableCC1CC2(Table):
     def label_sections(self):
         """Label CC1 and CC2 and stop."""
         cc4 = self.find_cc4()
-        cc1,cc2 = self.find_cc1_cc2(cc4)
+        cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
         log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
         self.labels[cc1] = 'CC1'
         self.labels[cc2] = 'CC2'
@@ -100,7 +100,7 @@ class TableCC3(Table):
     def label_sections(self):
         """Label CC3."""
         cc4 = self.find_cc4()
-        cc1,cc2 = self.find_cc1_cc2(cc4)
+        cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
@@ -113,7 +113,7 @@ class TestCC1CC2(unittest.TestCase):
         log.debug("Test CC1 & CC2, Table: {}".format(input_path))
         table = TableCC1CC2(input_path)
         table.print()
-        result = table.find_cc1_cc2(table.find_cc4())
+        result = table.find_cc1_cc2(table.find_cc4(), table.pre_cleaned_table)
         log.debug("Result = {}".format(result))
         self.assertTupleEqual(expected, result)
 
@@ -214,7 +214,7 @@ class TestTableLabels(unittest.TestCase):
     def test_table_1(self):
         input_path = './data/table_example1.csv'
         expected = [['TableTitle', 'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
-                    ['Note', 'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
+                    ['/',    'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['Note', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'],
                     ['Note', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'],
                     ['Note', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'],

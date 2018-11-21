@@ -54,8 +54,8 @@ class Table:
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
-        self.prefix_duplicate_labels()
-        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        # self.prefix_duplicate_labels()
+        # self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # TESTING
         # self.print()
@@ -256,13 +256,14 @@ class Table:
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
 
-    def find_cc1_cc2(self,cc4):
+    def find_cc1_cc2(self,cc4,table):
         """
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
         every data cell.
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
+        :param table: table which will be used, has to be passed explicitly
         :type cc4: Tuple
         """
 
@@ -397,22 +398,22 @@ class Table:
         # This is significantly altered compared to the published pseudocode, which is flawed.
         # The pseudocode clearly does not return cc2 if the column has not been changed and it doesn't
         # discriminate between duplicate rows in the row header vs duplicate columns in the column header
-        while c2 < c_max  and r2 >= r1:
+        while c2 < c_max and r2 >= r1:
 
             log.debug("Entering loop:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}"
-                      .format(r_max,c_max,c1,c2,r1,r2,cc2))
+                      .format(r_max, c_max, c1, c2, r1, r2, cc2))
 
-            temp_section_1, temp_section_2 = table_slice_cc2(self.pre_cleaned_table,r2,r_max,c1,c2)
+            temp_section_1, temp_section_2 = table_slice_cc2(table, r2, r_max, c1, c2)
 
             log.debug("temp_section_1:\n{}".format(temp_section_1))
             log.debug("temp_section_2:\n{}".format(temp_section_2))
             log.debug("duplicate_rows= {}, duplicate_columns= {}".
-                      format(duplicate_rows(temp_section_1),duplicate_rows(temp_section_2)))
+                      format(duplicate_rows(temp_section_1), duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 data_area = (r_max - r2) * (c_max - c2)
-                log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2,c2),data_area))
-                log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2+1:r_max+1,c2+1:c_max+1]))
+                log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
+                log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
                 if data_area >= max_area:
                     max_area = data_area
                     cc2 = (r2, c2)
@@ -422,32 +423,32 @@ class Table:
                 c2 = c2 + 1
                 data_area = (r_max - r2) * (c_max - c2)
                 log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
-                log.debug("Data area:\n{}".format(self.pre_cleaned_table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
+                log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
                 if data_area >= max_area:
                     max_area = data_area
-                    cc2 = (r2,c2)
+                    cc2 = (r2, c2)
                     log.debug("CC2= {}".format(cc2))
             else:
                 r2 = r2 - 1
-        log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2,cc2))
+        log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2, cc2))
 
         # re-initialization of r2 and c2 from cc2; missing in the pseudocode
         r2 = cc2[0]
         c2 = cc2[1]
 
         # Locate CC1 at intersection of the top row and the leftmost column necessary for indexing:
-        log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
-        while not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)) and r1 <= r2:
-            log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max)))
-            log.debug("Duplicate columns= {}".format(duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1, r2, c2, c_max))))
+        log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(table, r1, r2, c2, c_max)))
+        while not duplicate_columns(table_slice_1_cc1(table, r1, r2, c2, c_max)) and r1 <= r2:
+            log.debug("Potentially duplicate columns:\n{}".format(table_slice_1_cc1(table, r1, r2, c2, c_max)))
+            log.debug("Duplicate columns= {}".format(duplicate_columns(table_slice_1_cc1(table, r1, r2, c2, c_max))))
             r1 = r1 + 1
             log.debug("r1= {}".format(r1))
 
-        log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
-        while not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)) and c1 <= c2:
+        log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(table, r2, r_max, c1, c2)))
+        while not duplicate_rows(table_slice_2_cc1(table, r2, r_max, c1, c2)) and c1 <= c2:
 
-            log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2)))
-            log.debug("Duplicate rows= {}".format(duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2, r_max, c1, c2))))
+            log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(table, r2, r_max, c1, c2)))
+            log.debug("Duplicate rows= {}".format(duplicate_rows(table_slice_2_cc1(table, r2, r_max, c1, c2))))
             c1 = c1 + 1
             log.debug("c1= {}".format(c1))
 
@@ -455,12 +456,12 @@ class Table:
         # a problem could arise if the code never stepped through the while loops, returning a cc1 with a negative index.
         # however, this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2.
         # hence, the assertions:
-        assert not duplicate_columns(table_slice_1_cc1(self.pre_cleaned_table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
-        assert not duplicate_rows(table_slice_2_cc1(self.pre_cleaned_table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
+        assert not duplicate_columns(table_slice_1_cc1(table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
+        assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
         assert r1 >= 0 and c1 >= 0
-        cc1 = (r1-1,c1-1)
+        cc1 = (r1-1, c1-1)
 
-        return cc1,cc2
+        return cc1, cc2
 
     def find_cc3(self,cc2):
         """
@@ -704,8 +705,8 @@ class Table:
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
 
-        cc1,cc2 = self.find_cc1_cc2(cc4)
-        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1,cc2))
+        cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
+        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
         self.labels[cc1] = 'CC1'
         self.labels[cc2] = 'CC2'
 
@@ -723,7 +724,7 @@ class Table:
         fn_prefix = self.find_FNprefix(cc4)
         log.info("FNPrefix Cells = {}".format(fn_prefix))
         for fn_prefix_index in fn_prefix:
-            self.labels[fn_prefix_index[0],fn_prefix_index[1]] = 'FNprefix'
+            self.labels[fn_prefix_index[0], fn_prefix_index[1]] = 'FNprefix'
 
         fn_text = self.find_FNtext(fn_prefix)
         log.info("FNtext Cells = {}".format(fn_text))
@@ -733,12 +734,12 @@ class Table:
         fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
         log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
         for fn_prefix_fn_text_index in fn_prefix_fn_text:
-            self.labels[fn_prefix_fn_text_index[0],fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
+            self.labels[fn_prefix_fn_text_index[0], fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
 
-        fn_refs = self.find_FNref(fn_prefix,fn_prefix_fn_text)
+        fn_refs = self.find_FNref(fn_prefix, fn_prefix_fn_text)
         log.info("FNref Cells = {}".format(fn_refs))
         for fn_ref in fn_refs:
-            if self.labels[fn_ref[0],fn_ref[1]] != '/':
+            if self.labels[fn_ref[0], fn_ref[1]] != '/':
                 self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
             else:
                 self.labels[fn_ref[0], fn_ref[1]] = 'FNref'

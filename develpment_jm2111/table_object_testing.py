@@ -46,6 +46,10 @@ print(repr(table))
 # print(table.pre_cleaned_table, "\n")
 # print(table.labels)
 
+# data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
+#            'AmorphousDatabase\\TableDataExtractor\\tests\\data\\'
+# table = Table(data_path + 'table_example1.csv')
+# print(repr(table))
 
 #table.print()
 #table.to_csv(data_path+'J_Mat_Sci_2012_2.csv')
