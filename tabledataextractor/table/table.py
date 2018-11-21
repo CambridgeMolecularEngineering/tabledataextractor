@@ -159,9 +159,13 @@ class Table:
             Returns the row/column containing the prefixes and the position of the row/column where the new row/column
             has to be inserted into the original table.
 
+            This function is getting ugly and could be rewritten with the use of a nice list of tuples,
+            for every row/column in the table, we have a list of distinct elements with their positions in the row/column
+
             :param table:
             :return: row_index: where the row/column has to be inserted, new_row: the list of prefixes
             """
+
             unique_prefix = False
             prefixed = False
             row_index = 0
@@ -186,6 +190,7 @@ class Table:
                                 break
                         # prefix the cell and append it to new row
                         if unique_prefix:
+                            # TODO only append if the columns/rows above/left of the duplicate cells are the same or if there are no rows/columns above/left
                             duplicated_row.append(unique_prefix + "/" + cell)
                             new_row.append(unique_prefix)
                             prefixed = True
