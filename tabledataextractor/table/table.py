@@ -55,11 +55,12 @@ class Table:
         self.pre_clean()
         self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
-        self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
-        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
-
         # TESTING
         # self.print()
+
+        # prefixing of duplicate labels in the header region
+        self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
+        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -73,26 +74,24 @@ class Table:
 
         The algorithm for column headers:
 
-            1. for row in table, start with first row of the table
-                a) can meaningful prefixing in this row been done?
-                    * YES --> do prefixing and go to 2
-                    * NO  --> go to 1, next row
-            2. run MIPS to get CC1, CC2
-            3. accept prefixing only if prefixed rows/cells are not below or to the right of the headers
-               (note, the prefixed cells can still be above or to the left of the header, which will probably
-                change the header region upon the "real" run of MIPS in the next segmentation step
+            1. Run MIPS, to find the old header region, without prefixing
+            2. For row in table, start with first row of the table
+                a) can *meaningful* prefixing in this row been done?
+                    * YES --> do prefixing and go to 3, prefixing of only one row is possible; accept prefixing only if prefixed rows/cells are above the end of the header (not in the data region), the prefixed cells can still be above the header
+                    * NO  --> go to 2, next row
 
-        The algorithm is not very selective. Sometimes, even if a first row of a header has only unique elements,
-        the second row might be prefixed. However, it is assumed that on average accuracy will still be improved
-        significantly.
+            3. run MIPS to get new header region
+            4. accept prefixing only if the prefixing has not made the header region start lower than before
+
+        Nested prefixing is not supported.
+
+        The algorithm is not completely selective and there might be cases where it's application is undesirable.
+        However, on average, it is supposed to significantly improve table-region classification.
 
         :param table: Table to use as input and to do the prefixing on
-        :return: prefixed_table
+        :return prefixed_table: Table with added rows/columns with prefixes, or, input table, if no prefixing was done
         """
 
-        # TODO Document all of this madness
-        # TODO Make code slightly nicer
-        # TODO Delete the commented-out, unnecessary sections
         # TODO Convert the table testing python script into a demonstration for Jacqui
         # TODO Implement unit testing, specifically for the test tables. When, and when not the prefixing will be done.
 
@@ -113,51 +112,6 @@ class Table:
             else:
                 return False
 
-        # def prefixed_row_or_column(table):
-        #     """
-        #     Main algorithm for creating prefixed column/row headers.
-        #     If cell is not unique, it is prefixed with the first unique above (for row header) or to the left
-        #     (for column header).
-        #
-        #      Returns a new row/column, which contains the old content and the prefixes directly included in the cells.
-        #
-        #     :param table:
-        #     :return: Prefixed row or column
-        #     """
-        #     unique_prefix = False
-        #     prefixed = False
-        #     row_index = 0
-        #     new_row = []
-        #     for row_index, row in enumerate(table):
-        #         new_row = []
-        #         for cell_index, cell in enumerate(row):
-        #             # append if unique or empty cell
-        #             if unique(cell, row) or self.empty_string(cell):
-        #                 new_row.append(cell)
-        #             else:
-        #                 # find the first unique cell to the left
-        #                 # don't use the first column and first row
-        #                 # as these will presumably be in the stub header region
-        #                 for prefix in reversed(new_row[1:]):
-        #                     # use the prefix if it is unique and not empty
-        #                     if unique(prefix, row) and not self.empty_string(prefix):
-        #                         unique_prefix = prefix
-        #                         break
-        #                 # prefix the cell and append it to new row
-        #                 if unique_prefix:
-        #                     new_row.append(unique_prefix + "/" + cell)
-        #                     prefixed = True
-        #                 # else, if no unique prefix was found, just append the original cell,
-        #                 else:
-        #                     new_row.append(cell)
-        #         # and continue to the next row (if no prefixing has been performed)
-        #         if prefixed:
-        #             break
-        #     if prefixed:
-        #         return row_index, new_row
-        #     else:
-        #         return None
-
         def prefixed_row_or_column(table):
             """
             Main algorithm for creating prefixed column/row headers.
@@ -168,9 +122,9 @@ class Table:
             has to be inserted into the original table.
 
             This function is getting ugly and could be rewritten with the use of a nice list of tuples,
-            for every row/column in the table, we have a list of distinct elements with their positions in the row/column
+            for every row/column in the table, we would have a list of distinct elements with their positions in the row/column
 
-            :param table:
+            :param table: input table (will not be changed)
             :return: row_index: where the row/column has to be inserted, new_row: the list of prefixes
             """
 
@@ -230,9 +184,7 @@ class Table:
             if row_index <= cc2[0]:
                 log.info("Column header prefixing, row_index= {}".format(row_index))
                 log.debug("Prefixed row= {}".format(new_row))
-                # This is if we want to prefix in the same cell:
-                # self.pre_cleaned_table[row_index, :] = new_row
-                # This is for prefixing by adding new row:
+                # Prefixing by adding new row:
                 prefixed = True
                 prefixed_table = np.insert(table, row_index, new_row, axis=0)
 
@@ -244,16 +196,19 @@ class Table:
             if column_index <= cc2[1]:
                 log.info("Row header prefixing, column_index= {}".format(column_index))
                 log.debug("Prefixed column= {}".format(new_column))
-                # This is if we want to prefix in the same cell:
-                # self.pre_cleaned_table[:, column_index] = new_column
-                # This is for prefixing by adding a new column:
+                # Prefixing by adding a new column:
                 prefixed = True
                 prefixed_table = np.insert(table, column_index, new_column, axis=1)
 
         # 3. check the headers again, after prefixing
         # note, cc4 couldn't have changed
         if prefixed:
-            cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
+            # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
+            try:
+                cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
+            # TODO Make failure in find_cc1_cc2() a proper exception that is tested and confirmed
+            except:
+                return table
             # return prefixed_table only if the prefixing has not made the header to start lower,
             # it can end lower (and this is desired and what we want - not to include the data region into the header),
             # but it cannot start lower, because that would mean that we have removed some of the hierarchy and added
@@ -264,7 +219,6 @@ class Table:
                 return table
         else:
             return table
-
 
     def find_cc4(self):
         """
@@ -718,14 +672,6 @@ class Table:
         # deletion:
         self.pre_cleaned_table = self.pre_cleaned_table[:,np.sort(indices)]
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
-
-        # TODO This is not the solution, needs to be removed
-        # # replace 'None' cells with spaces ' '
-        # for row_index, row in enumerate(self.pre_cleaned_table):
-        #     for column_index, cell in enumerate(row):
-        #         if cell == None:
-        #             self.pre_cleaned_table[row_index, column_index] = ' '
-
 
     def label_sections(self):
         """
