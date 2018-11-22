@@ -92,9 +92,6 @@ class Table:
         :return prefixed_table: Table with added rows/columns with prefixes, or, input table, if no prefixing was done
         """
 
-        # TODO Convert the table testing python script into a demonstration for Jacqui
-        # TODO Implement unit testing, specifically for the test tables. When, and when not the prefixing will be done.
-
         def unique(data, row_or_column):
             """
             Returns True if data is unique in the given row/column or False if not unique or not present.

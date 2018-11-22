@@ -1,4 +1,6 @@
 from tabledataextractor import Table
+from tabledataextractor.input import from_any
+from tabledataextractor.output.print import print_table
 
 # ======================================
 # Random testing
@@ -22,38 +24,53 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 table = Table(data_path + 'table_example.csv')
 print(repr(table))
 
+table = Table(data_path + 'table_example.html')
+print(repr(table))
+
 table = Table(data_path + 'table_example1.csv')
 print(repr(table))
 
 table = Table(data_path + 'table_example2.csv')
 print(repr(table))
 
-table = Table(data_path + 'table_example3.csv')
-print(repr(table))
+print("===============================================================================================================")
+try:
+    table = Table(data_path + 'table_example3_MIPS_ERROR.csv')
+    print(repr(table))
+except:
+    print("This fails because table is irregular, maybe needs deeper investigeting, "
+          "both columns and rows are duplicate at one point of the MIPS algorithm:\n")
+    table = from_any.create_table(data_path + 'table_example3.csv')
+    print_table(table)
 
 table = Table(data_path + 'table_example4.csv')
 print(repr(table))
 
+print("===============================================================================================================")
+print("Here, prefixing is actually destroying the  layout, but that's an inherently inevitable:\n")
 table = Table(data_path + 'table_example4_2.csv')
 print(repr(table))
 
 table = Table(data_path + 'table_example4_3.csv')
 print(repr(table))
 
+print("===============================================================================================================")
+print("Correctly, no prefixing is performed here:\n")
 table = Table(data_path + 'table_example5.csv')
 print(repr(table))
 
 table = Table(data_path + 'table_example6.csv')
 print(repr(table))
 
-table = Table(data_path + 'table_example_8.html')
-print(repr(table))
-
-table = Table(data_path + 'table_example9.html')
-print(repr(table))
-
-table = Table(data_path + 'table_example_10.html')
-print(repr(table))
+# Output is horrible, some html problems probably
+# table = Table(data_path + 'table_example_8.html')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example9.html')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example_10.html')
+# print(repr(table))
 
 table = Table(data_path + 'table_example_10.csv')
 print(repr(table))

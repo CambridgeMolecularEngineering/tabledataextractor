@@ -38,7 +38,7 @@ def csv(name):
         return False
 
 
-def create_table(name_key, table_number):
+def create_table(name_key, table_number=1):
     """
     Checks the input and calls the appropriate modules.
     Returns a numpy array with the raw table.
