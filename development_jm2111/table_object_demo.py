@@ -33,15 +33,15 @@ print(repr(table))
 table = Table(data_path + 'table_example2.csv')
 print(repr(table))
 
-# print("===============================================================================================================")
-# try:
-#     table = Table(data_path + 'table_example3_MIPS_ERROR.csv')
-#     print(repr(table))
-# except:
-#     print("This fails because table is irregular, maybe needs deeper investigeting, "
-#           "both columns and rows are duplicate at one point of the MIPS algorithm:\n")
-#     table = from_any.create_table(data_path + 'table_example3.csv')
-#     print_table(table)
+print("===============================================================================================================")
+try:
+    table = Table(data_path + 'table_example3_MIPS_ERROR.csv')
+    print(repr(table))
+except:
+    print("This fails because table is irregular, maybe needs deeper investigeting, "
+          "both columns and rows are duplicate at one point of the MIPS algorithm:\n")
+    table = from_any.create_table(data_path + 'table_example3.csv')
+    print_table(table)
 
 table = Table(data_path + 'table_example4.csv')
 print(repr(table))

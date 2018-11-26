@@ -207,7 +207,7 @@ class TestTableLabels(unittest.TestCase):
     def do_table(self, input_path, expected):
         log.debug("Test complete table labelling: {}".format(input_path))
         table = Table(input_path)
-        table.print()
+        print(repr(table))
         result = table.labels.tolist()
         self.assertListEqual(expected, result)
 
