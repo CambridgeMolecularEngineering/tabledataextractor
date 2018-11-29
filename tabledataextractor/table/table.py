@@ -740,10 +740,6 @@ class Table:
         for note_cell in self.find_note_cells():
             self.labels[note_cell] = 'Note'
 
-
-
-    # FACTORIZATION ALGORITHM
-    ###################################################################################################################
     def categorize_header(self, table, cc1, cc2, cc3, cc4):
         """
         Performs header categorization (calls the fact function) for a given table.
@@ -759,13 +755,10 @@ class Table:
         column_header = table[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1]
         row_header = table[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1]
 
-
-        # do column header first
         # empty expression and part of the expression that will be factorized
         # these are SymPy expressions
         expression = 0
         part = 0
-
         for row_index, row in enumerate(column_header.T):
             for column_index, cell in enumerate(row):
                 if column_index == 0:
@@ -773,35 +766,29 @@ class Table:
                 else:
                     part = part * Symbol(cell)
             expression = expression + part
-
         # factorization
         f = factor(expression, deep=True)
-
         log.debug("Factorization, initial column header: {}".format(expression))
         log.debug("Factorization, factorized column header: {}".format(f))
 
-        #f = self.fact(e)
+        # empty expression and part of the expression that will be factorized
+        # these are SymPy expressions
+        expression = 0
+        part = 0
+        for row_index, row in enumerate(row_header):
+            for column_index, cell in enumerate(row):
+                if column_index == 0:
+                    part = Symbol(cell)
+                else:
+                    part = part * Symbol(cell)
+            expression = expression + part
+        # factorization
+        f = factor(expression, deep=True)
+        log.debug("Factorization, initial row header: {}".format(expression))
+        log.debug("Factorization, factorized row header: {}".format(f))
 
 
-    # def fact(self,e):
-    #     """
-    #     Factorization algorithm, according to Embley et. al
-    #
-    #     :param e: sum of products, algebraic expression where x denotes vertical concatenation and + denotes
-    #     horizontal concatenation of table cells
-    #     :return: x
-    #     """
-    #
-    #     # if e is a simple sum:
-    #     x = e
-    #
-    #     else:
-    #
-    #
-    #
-    #     return x
 
-    ###################################################################################################################
 
     def print(self):
         log.info("Printing table: {}".format(self.file_path))
