@@ -11,6 +11,8 @@ Raw, processed and final labelled table.
 import logging
 import numpy as np
 import re
+from sympy import Symbol
+from sympy import factor
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 from tabledataextractor.output.print import as_string
@@ -19,7 +21,7 @@ from tabledataextractor.table.parse import CellParser, StringParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 
 class Table:
@@ -37,6 +39,12 @@ class Table:
         self.file_path = file_path
         self.table_number = table_number
         self.raw_table = from_any.create_table(self.file_path, table_number)
+
+        # initializing important key cells
+        self.cc1 = None
+        self.cc2 = None
+        self.cc3 = None
+        self.cc4 = None
 
         # TESTING
         # self.raw_table = self.raw_table.T
@@ -64,8 +72,12 @@ class Table:
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
-        self.labels[:,:] = '/'
+        self.labels[:, :] = '/'
         self.label_sections()
+
+        # categorization
+        if self.cc1 and self.cc2 and self.cc3 and self.cc4:
+            self.categorize_header(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
 
     def prefix_duplicate_labels(self, table):
         """
@@ -680,15 +692,19 @@ class Table:
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
+        self.cc4 = cc4
 
         cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
         log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
         self.labels[cc1] = 'CC1'
         self.labels[cc2] = 'CC2'
+        self.cc1 = cc1
+        self.cc2 = cc2
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
+        self.cc3 = cc3
 
         self.labels[title_row, :] = 'TableTitle'
         self.labels[cc1[0]:cc2[0]+1, cc1[1]:cc2[1]+1] = 'StubHeader'
@@ -723,6 +739,69 @@ class Table:
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
             self.labels[note_cell] = 'Note'
+
+
+
+    # FACTORIZATION ALGORITHM
+    ###################################################################################################################
+    def categorize_header(self, table, cc1, cc2, cc3, cc4):
+        """
+        Performs header categorization (calls the fact function) for a given table.
+
+        :param table: Table on which to perform the categorization
+        :param cc1: key cell
+        :param cc2: key cell
+        :param cc3: key cell
+        :param cc4: key cell
+        :return:
+        """
+
+        column_header = table[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1]
+        row_header = table[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1]
+
+
+        # do column header first
+        # empty expression and part of the expression that will be factorized
+        # these are SymPy expressions
+        expression = 0
+        part = 0
+
+        for row_index, row in enumerate(column_header.T):
+            for column_index, cell in enumerate(row):
+                if column_index == 0:
+                    part = Symbol(cell)
+                else:
+                    part = part * Symbol(cell)
+            expression = expression + part
+
+        # factorization
+        f = factor(expression, deep=True)
+
+        log.debug("Factorization, initial column header: {}".format(expression))
+        log.debug("Factorization, factorized column header: {}".format(f))
+
+        #f = self.fact(e)
+
+
+    # def fact(self,e):
+    #     """
+    #     Factorization algorithm, according to Embley et. al
+    #
+    #     :param e: sum of products, algebraic expression where x denotes vertical concatenation and + denotes
+    #     horizontal concatenation of table cells
+    #     :return: x
+    #     """
+    #
+    #     # if e is a simple sum:
+    #     x = e
+    #
+    #     else:
+    #
+    #
+    #
+    #     return x
+
+    ###################################################################################################################
 
     def print(self):
         log.info("Printing table: {}".format(self.file_path))

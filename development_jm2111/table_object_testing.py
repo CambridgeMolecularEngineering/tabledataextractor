@@ -21,17 +21,17 @@ from tabledataextractor.output.print import print_table
 data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
            'AmorphousDatabase\\TableDataExtractor\\development_jm2111\\data\\'
 
-table = Table(data_path + 'table_example.csv')
-print(repr(table))
-
-table = Table(data_path + 'table_example.html')
-print(repr(table))
-
-table = Table(data_path + 'table_example1.csv')
-print(repr(table))
-
-table = Table(data_path + 'table_example2.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example.html')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example1.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example2.csv')
+# print(repr(table))
 
 # print("===============================================================================================================")
 # try:
@@ -43,24 +43,24 @@ print(repr(table))
 #     table = from_any.create_table(data_path + 'table_example3.csv')
 #     print_table(table)
 
-table = Table(data_path + 'table_example4.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example4.csv')
+# print(repr(table))
 
-print("===============================================================================================================")
-print("Here, prefixing is actually destroying the  layout, but that's an inherently inevitable:\n")
-table = Table(data_path + 'table_example4_2.csv')
-print(repr(table))
-
-table = Table(data_path + 'table_example4_3.csv')
-print(repr(table))
-
-print("===============================================================================================================")
-print("Correctly, no prefixing is performed here:\n")
-table = Table(data_path + 'table_example5.csv')
-print(repr(table))
-
-table = Table(data_path + 'table_example6.csv')
-print(repr(table))
+# print("===============================================================================================================")
+# print("Here, prefixing is actually destroying the  layout, but that's an inherently inevitable:\n")
+# table = Table(data_path + 'table_example4_2.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example4_3.csv')
+# print(repr(table))
+#
+# print("===============================================================================================================")
+# print("Correctly, no prefixing is performed here:\n")
+# table = Table(data_path + 'table_example5.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example6.csv')
+# print(repr(table))
 
 # Output is horrible, some html problems probably
 # table = Table(data_path + 'table_example_8.html')
@@ -72,14 +72,19 @@ print(repr(table))
 # table = Table(data_path + 'table_example_10.html')
 # print(repr(table))
 
-table = Table(data_path + 'table_example_10.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example_10.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example_11.csv')
+# print(repr(table))
+#
+# table = Table(data_path + 'table_official_development_assistance.csv')
+# print(repr(table))
 
-table = Table(data_path + 'table_example_11.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example_12.csv')
+# print(repr(table))
 
-table = Table(data_path + 'table_official_development_assistance.csv')
+table = Table(data_path + 'table_example_12_real.csv')
 print(repr(table))
-
 
 
