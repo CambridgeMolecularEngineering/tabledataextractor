@@ -11,6 +11,8 @@ import unittest
 import logging
 
 from tabledataextractor import Table
+from tabledataextractor.input import from_csv
+from tabledataextractor.output.print import print_table
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -200,6 +202,48 @@ class TestCC3(unittest.TestCase):
         input_path = './data/table_example7.csv'
         expected = (4,1)
         self.do_table(input_path, expected)
+
+
+class TestDuplicateLabelPrefixing(unittest.TestCase):
+
+    def do_table(self, input_path, expected_path):
+        log.debug("Test duplicate label prefixing: {}".format(input_path))
+        table = Table(input_path)
+        print_table(table.raw_table)
+        print_table(table.pre_cleaned_table)
+        result = table.pre_cleaned_table.tolist()
+        expected = from_csv.read(expected_path).tolist()
+        self.assertListEqual(expected, result)
+
+    def test_table_8(self):
+        """Prefixing in column header"""
+        input_path = './data/table_example8.csv'
+        expected_path = './data/table_example8b.csv'
+        self.do_table(input_path, expected_path)
+
+    def test_table_9(self):
+        """Prefixing in row header"""
+        input_path = './data/table_example9.csv'
+        expected_path = './data/table_example9b.csv'
+        self.do_table(input_path, expected_path)
+
+    def test_table_10(self):
+        """Prefixing will destroy the labelling"""
+        input_path = './data/table_example10.csv'
+        expected_path = './data/table_example10b.csv'
+        self.do_table(input_path, expected_path)
+
+    def test_table_11(self):
+        """Prefixing is not performed, column header"""
+        input_path = './data/table_example11.csv'
+        expected_path = './data/table_example11b.csv'
+        self.do_table(input_path, expected_path)
+
+    def test_table_12(self):
+        """Prefixing is not performed, row header"""
+        input_path = './data/table_example12.csv'
+        expected_path = './data/table_example12b.csv'
+        self.do_table(input_path, expected_path)
 
 
 class TestTableLabels(unittest.TestCase):
