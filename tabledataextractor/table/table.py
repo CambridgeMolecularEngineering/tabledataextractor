@@ -12,7 +12,7 @@ import logging
 import numpy as np
 import re
 from sympy import Symbol
-from sympy import factor
+from sympy import factor, factor_list
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 from tabledataextractor.output.print import as_string
@@ -767,7 +767,8 @@ class Table:
                     part = part * Symbol(cell)
             expression = expression + part
         # factorization
-        f = factor(expression, deep=True)
+        # f = factor(expression, deep=True)
+        f = factor_list(expression)
         log.debug("Factorization, initial column header: {}".format(expression))
         log.debug("Factorization, factorized column header: {}".format(f))
 
@@ -783,7 +784,8 @@ class Table:
                     part = part * Symbol(cell)
             expression = expression + part
         # factorization
-        f = factor(expression, deep=True)
+        # f = factor(expression, deep=True)
+        f = factor_list(expression)
         log.debug("Factorization, initial row header: {}".format(expression))
         log.debug("Factorization, factorized row header: {}".format(f))
 

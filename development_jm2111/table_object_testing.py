@@ -78,13 +78,13 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 # table = Table(data_path + 'table_example_11.csv')
 # print(repr(table))
 #
-# table = Table(data_path + 'table_official_development_assistance.csv')
-# print(repr(table))
+table = Table(data_path + 'table_official_development_assistance.csv')
+print(repr(table))
 
 # table = Table(data_path + 'table_example_12.csv')
 # print(repr(table))
 
-table = Table(data_path + 'table_example_12_real.csv')
-print(repr(table))
+# table = Table(data_path + 'table_example_12_real.csv')
+# print(repr(table))
 
 
