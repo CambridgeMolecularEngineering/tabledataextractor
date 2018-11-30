@@ -40,11 +40,13 @@ class Table:
         self.table_number = table_number
         self.raw_table = from_any.create_table(self.file_path, table_number)
 
-        # initializing important key cells
+        # initializing empty elements
         self.cc1 = None
         self.cc2 = None
         self.cc3 = None
         self.cc4 = None
+
+        self.category_table = None
 
         # TESTING
         # self.raw_table = self.raw_table.T
@@ -77,7 +79,8 @@ class Table:
 
         # categorization
         if self.cc1 and self.cc2 and self.cc3 and self.cc4:
-            self.categorize_header(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
+            self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
+
 
     def prefix_duplicate_labels(self, table):
         """
@@ -740,9 +743,35 @@ class Table:
         for note_cell in self.find_note_cells():
             self.labels[note_cell] = 'Note'
 
-    def categorize_header(self, table, cc1, cc2, cc3, cc4):
+    def categorize_header(self, header):
         """
-        Performs header categorization (calls the fact function) for a given table.
+        Performs header categorization (calls the SymPy fact function) for a given table.
+
+        :param header: Header region, Numpy array
+        :return: factor_list
+        """
+
+        # empty expression and part of the expression that will be factorized
+        # these are SymPy expressions
+        expression = 0
+        part = 0
+        for row_index, row in enumerate(header):
+            for column_index, cell in enumerate(row):
+                if column_index == 0:
+                    part = Symbol(cell)
+                else:
+                    part = part * Symbol(cell)
+            expression = expression + part
+        # factorization
+        # f = factor(expression, deep=True)
+        f = factor_list(expression)
+        log.debug("Factorization, initial header: {}".format(expression))
+        log.debug("Factorization, factorized header: {}".format(f))
+        return f
+
+    def build_category_table(self, table, cc1, cc2, cc3, cc4):
+        """
+        Build category table for given input table.
 
         :param table: Table on which to perform the categorization
         :param cc1: key cell
@@ -752,44 +781,17 @@ class Table:
         :return:
         """
 
-        column_header = table[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1]
-        row_header = table[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1]
+        column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
+        row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
 
-        # empty expression and part of the expression that will be factorized
-        # these are SymPy expressions
-        expression = 0
-        part = 0
-        for row_index, row in enumerate(column_header.T):
-            for column_index, cell in enumerate(row):
-                if column_index == 0:
-                    part = Symbol(cell)
-                else:
-                    part = part * Symbol(cell)
-            expression = expression + part
-        # factorization
-        # f = factor(expression, deep=True)
-        f = factor_list(expression)
-        log.debug("Factorization, initial column header: {}".format(expression))
-        log.debug("Factorization, factorized column header: {}".format(f))
+        column_factors = self.categorize_header(column_header.T)
+        row_factors = self.categorize_header(row_header)
 
-        # empty expression and part of the expression that will be factorized
-        # these are SymPy expressions
-        expression = 0
-        part = 0
-        for row_index, row in enumerate(row_header):
-            for column_index, cell in enumerate(row):
-                if column_index == 0:
-                    part = Symbol(cell)
-                else:
-                    part = part * Symbol(cell)
-            expression = expression + part
-        # factorization
-        # f = factor(expression, deep=True)
-        f = factor_list(expression)
-        log.debug("Factorization, initial row header: {}".format(expression))
-        log.debug("Factorization, factorized row header: {}".format(f))
+        # TODO Create a (nested) dictionary (JSON) where each data point has it's categories or Pandas DataFrame
 
+        # Make the Pandas DataFrame
 
+        return []
 
 
     def print(self):
