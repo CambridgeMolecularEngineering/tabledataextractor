@@ -44,16 +44,16 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #     table = from_any.create_table(data_path + 'table_example3.csv')
 #     print_table(table)
 
-# table = Table(data_path + 'table_example4.csv')
-# print(repr(table))
+table = Table(data_path + 'table_example4.csv')
+print(repr(table))
 
 # print("===============================================================================================================")
 # print("Here, prefixing is actually destroying the  layout, but that's an inherently inevitable:\n")
-# table = Table(data_path + 'table_example4_2.csv')
-# print(repr(table))
+table = Table(data_path + 'table_example4_2.csv')
+print(repr(table))
 #
-# table = Table(data_path + 'table_example4_3.csv')
-# print(repr(table))
+table = Table(data_path + 'table_example4_3.csv')
+print(repr(table))
 #
 # print("===============================================================================================================")
 # print("Correctly, no prefixing is performed here:\n")
@@ -79,8 +79,8 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 # table = Table(data_path + 'table_example_11.csv')
 # print(repr(table))
 #
-# table = Table(data_path + 'table_official_development_assistance.csv')
-# print(repr(table))
+table = Table(data_path + 'table_official_development_assistance.csv')
+print(repr(table))
 
 table = Table(data_path + 'table_example_12.csv')
 print(repr(table))
@@ -89,8 +89,8 @@ print(repr(table))
 # print(categories)
 # print("I need to get 'c' here, the second element:", categories[2][1])
 
-# table = Table(data_path + 'table_example_12_real.csv')
-# print(repr(table))
+table = Table(data_path + 'table_example_12_real.csv')
+print(repr(table))
 
 #print(table.stub_header,"\n", table.col_header, "\n", table.row_header, "\n", table.data)
 
