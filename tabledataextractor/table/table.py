@@ -17,6 +17,7 @@ from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 from tabledataextractor.output.print import as_string
 from tabledataextractor.output.to_csv import write_to_csv
+from tabledataextractor.output.to_pandas import to_pandas, print_category_table, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
 
 
@@ -76,6 +77,12 @@ class Table:
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
         self.labels[:, :] = '/'
         self.label_sections()
+
+        # making regions proper elements of the table object
+        self.stub_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc1[1]:self.cc2[1] + 1]
+        self.row_header = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc1[1]:self.cc2[1] + 1]
+        self.col_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc3[1]:self.cc4[1] + 1]
+        self.data = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc3[1]:self.cc4[1] + 1]
 
         # categorization
         if self.cc1 and self.cc2 and self.cc3 and self.cc4:
@@ -778,7 +785,7 @@ class Table:
         :param cc2: key cell
         :param cc3: key cell
         :param cc4: key cell
-        :return:
+        :return: category table as numpy array, Pandas data frame is used to create it
         """
 
         column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
@@ -790,8 +797,12 @@ class Table:
         # TODO Create a (nested) dictionary (JSON) where each data point has it's categories or Pandas DataFrame
 
         # Make the Pandas DataFrame
+        dataframe = to_pandas(self)
+        # print_category_table(dataframe)
 
-        return []
+        category_table = build_category_table(dataframe)
+
+        return category_table
 
 
     def print(self):
