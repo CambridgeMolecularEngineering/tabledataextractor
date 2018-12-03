@@ -4,11 +4,11 @@ Outputs the table to a Pandas DataFrame.
 """
 
 import pandas as pd
-import numpy as np
 
-def to_pandas (table):
+
+def to_pandas(table):
     """
-    Creates a Pandas DataFrame from a Table object
+    Creates a Pandas DataFrame from a Table object.
 
     :param table: Table object
     :return:
@@ -18,22 +18,34 @@ def to_pandas (table):
     df = pd.DataFrame(columns=index_col, index=index_row, data=table.data)
     return df
 
-def find_multiindex_level(row_number,column_number,df):
+
+def find_multiindex_level(row_number, column_number, df):
+    """
+    Helping function for build_category_table().
+    Finds the Pandas MultiIndex level in a given Pandas DataFrame, for a particular data value.
+    """
     result_index = []
-    if hasattr(df.index,'labels'):
+    if hasattr(df.index, 'labels'):
         for i,labels in enumerate(df.index.labels):
             result_index.append(df.index.levels[i][labels[row_number]])
     else:
         result_index.append(df.index[row_number])
     result_column = []
-    if hasattr(df.columns,'labels'):
-        for i,labels in enumerate(df.columns.labels):
+    if hasattr(df.columns, 'labels'):
+        for i, labels in enumerate(df.columns.labels):
             result_column.append(df.columns.levels[i][labels[column_number]])
     else:
         result_column.append(df.columns[column_number])
-    return result_index,result_column
+    return result_index, result_column
+
 
 def print_category_table(df):
+    """
+    Prints the category table to screen, from Pandas DataFrame input
+
+    :param df: Pandas DataFrame input
+    :return:
+    """
     values = df.values  # data is converted to numpy array
     print("{:11s} {:10s} {:36s} {:20s}".format("Cell_ID", "Data", "Row Categories", "Column Categories"))
     for i, row in enumerate(values):
@@ -41,24 +53,22 @@ def print_category_table(df):
             categories = find_multiindex_level(i, j, df)
             print("{:3} {:3} {:15}   {:35}  {:40}".format(i, j, str(cell), ''.join(str(categories[0])), ''.join(str(categories[1]))))
 
+
 def build_category_table(df):
+    """
+    Builds category table in form of list, from Pandas DataFrame input
+
+    :param df: Pandas DataFrame input
+    :return: category_table, List
+    """
     values = df.values  # data is converted to numpy array
-
-    n_rows = np.size(values)
-
-    category_table = np.full((n_rows, 3), r"/", dtype="<U60")
-
-    counter = 0
+    category_table = []
     for i, row in enumerate(values):
         for j, cell in enumerate(row):
-
+            data_point = []
             categories = find_multiindex_level(i, j, df)
-            category_table[counter, 0] = cell
-
-            # TODO Play with this, I want the categories to be nested arrays
-            category_table[counter, 1] = str(categories[0])
-            category_table[counter, 2] = str(categories[1])
-
-            counter += 1
-
+            data_point.append(cell)
+            data_point.append(categories[0])
+            data_point.append(categories[1])
+            category_table.append(data_point)
     return category_table

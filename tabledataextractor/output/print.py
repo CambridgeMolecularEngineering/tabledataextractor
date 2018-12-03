@@ -7,6 +7,7 @@ Reads a csv formatted table.
 
 import logging
 import numpy as np
+from prettytable import PrettyTable
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -50,7 +51,7 @@ def as_string(table):
     output = ''
 
     # find the maximum cell width for each column i
-    for i,column in enumerate(table.T):
+    for i, column in enumerate(table.T):
         for cell in column:
             if len(cell) > cell_width[i]:
                 cell_width[i] = len(cell)
@@ -62,3 +63,18 @@ def as_string(table):
         output += "\n"
     output += "\n"
     return output
+
+
+def list_as_PrettyTable(table_list):
+    """
+    Turns list into PrettyTable object, ready for printing
+
+    :param table_list: list to be printed
+    :return:
+    """
+    t = PrettyTable()
+    t.field_names = ["Data", "Row Categories", "Column Categories"]
+    for row in table_list:
+        t.add_row(row)
+    return t
+

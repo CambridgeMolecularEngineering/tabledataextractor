@@ -14,10 +14,10 @@ import re
 from sympy import Symbol
 from sympy import factor, factor_list
 from tabledataextractor.input import from_any
-from tabledataextractor.output.print import print_table
+from tabledataextractor.output.print import print_table, list_as_PrettyTable
 from tabledataextractor.output.print import as_string
 from tabledataextractor.output.to_csv import write_to_csv
-from tabledataextractor.output.to_pandas import to_pandas, print_category_table, build_category_table
+from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
 
 
@@ -87,7 +87,6 @@ class Table:
         # categorization
         if self.cc1 and self.cc2 and self.cc3 and self.cc4:
             self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
-
 
     def prefix_duplicate_labels(self, table):
         """
@@ -788,28 +787,22 @@ class Table:
         :return: category table as numpy array, Pandas data frame is used to create it
         """
 
-        column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
-        row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
-
-        column_factors = self.categorize_header(column_header.T)
-        row_factors = self.categorize_header(row_header)
-
-        # TODO Create a (nested) dictionary (JSON) where each data point has it's categories or Pandas DataFrame
+        # Obsolete code, original header factorization, according to Embley et al.
+        # column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
+        # row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
+        # column_factors = self.categorize_header(column_header.T)
+        # row_factors = self.categorize_header(row_header)
 
         # Make the Pandas DataFrame
         dataframe = to_pandas(self)
-        # print_category_table(dataframe)
-
         category_table = build_category_table(dataframe)
-
         return category_table
-
 
     def print(self):
         log.info("Printing table: {}".format(self.file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
-        #print_table(self.labels)
+        # print_table(self.labels)
 
     def to_csv(self, file_path):
         log.info("Saving raw table to .csv to file: {}".format(self.file_path))
@@ -832,5 +825,6 @@ class Table:
                 (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
             )
         )
-        return intro + "\n\n" + input_string + results_string
+        t = list_as_PrettyTable(self.category_table)
+        return intro + "\n\n" + input_string + results_string + str(t)
 

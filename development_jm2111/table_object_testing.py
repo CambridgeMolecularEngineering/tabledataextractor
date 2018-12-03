@@ -1,4 +1,5 @@
 from tabledataextractor import Table
+from pprint import pprint
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
 
@@ -83,9 +84,13 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 
 table = Table(data_path + 'table_example_12.csv')
 print(repr(table))
+# pprint(table.category_table)
+# categories = table.category_table[0]
+# print(categories)
+# print("I need to get 'c' here, the second element:", categories[2][1])
 
 # table = Table(data_path + 'table_example_12_real.csv')
 # print(repr(table))
 
-print(table.stub_header,"\n", table.col_header, "\n", table.row_header, "\n", table.data)
+#print(table.stub_header,"\n", table.col_header, "\n", table.row_header, "\n", table.data)
 
