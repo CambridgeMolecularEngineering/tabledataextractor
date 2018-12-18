@@ -79,13 +79,13 @@ class Table:
         self.label_sections()
 
         # making regions proper elements of the table object
-        self.stub_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc1[1]:self.cc2[1] + 1]
-        self.row_header = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc1[1]:self.cc2[1] + 1]
-        self.col_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc3[1]:self.cc4[1] + 1]
-        self.data = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc3[1]:self.cc4[1] + 1]
-
-        # categorization
         if self.cc1 and self.cc2 and self.cc3 and self.cc4:
+            self.stub_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc1[1]:self.cc2[1] + 1]
+            self.row_header = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc1[1]:self.cc2[1] + 1]
+            self.col_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc3[1]:self.cc4[1] + 1]
+            self.data = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc3[1]:self.cc4[1] + 1]
+
+            # categorization
             self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
 
     def prefix_duplicate_labels(self, table):

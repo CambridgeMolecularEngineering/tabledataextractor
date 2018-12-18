@@ -339,6 +339,73 @@ class TestTableLabels(unittest.TestCase):
         self.do_table(input_path, expected)
 
 
+class TestCategorizationTable(unittest.TestCase):
+
+    def do_table(self, input_path, expected):
+        log.debug("Test Categorization Table: {}".format(input_path))
+        table = Table(input_path)
+        print(repr(table))
+        result = table.category_table
+        self.assertListEqual(expected, result)
+
+    def test_table_1(self):
+        input_path = './data/table_example1.csv'
+        expected = [['4.64', ['This study'], ['Rutile', 'a = b (A)']], ['2.99', ['This study'], ['Rutile', 'c (A)']], ['0.305', ['This study'], ['Rutile', 'u']], ['3.83', ['This study'], ['Anatase', 'a = b (A)']], ['9.62', ['This study'], ['Anatase', 'c (A)']], ['0.208', ['This study'], ['Anatase', 'u']], ['4.67', ['GGA [25]'], ['Rutile', 'a = b (A)']], ['2.97', ['GGA [25]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [25]'], ['Rutile', 'u']], ['3.80', ['GGA [25]'], ['Anatase', 'a = b (A)']], ['9.67', ['GGA [25]'], ['Anatase', 'c (A)']], ['0.207', ['GGA [25]'], ['Anatase', 'u']], ['4.63', ['GGA [26]'], ['Rutile', 'a = b (A)']], ['2.98', ['GGA [26]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [26]'], ['Rutile', 'u']], ['""', ['GGA [26]'], ['Anatase', 'a = b (A)']], ['""', ['GGA [26]'], ['Anatase', 'c (A)']], ['""', ['GGA [26]'], ['Anatase', 'u']], ['""', ['HF [27]'], ['Rutile', 'a = b (A)']], ['""', ['HF [27]'], ['Rutile', 'c (A)']], ['""', ['HF [27]'], ['Rutile', 'u']], ['3.76', ['HF [27]'], ['Anatase', 'a = b (A)']], ['9.85', ['HF [27]'], ['Anatase', 'c (A)']], ['0.202', ['HF [27]'], ['Anatase', 'u']], ['4.594', ['Expt. [23]'], ['Rutile', 'a = b (A)']], ['2.958', ['Expt. [23]'], ['Rutile', 'c (A)']], ['0.305', ['Expt. [23]'], ['Rutile', 'u']], ['3.785', ['Expt. [23]'], ['Anatase', 'a = b (A)']], ['9.514', ['Expt. [23]'], ['Anatase', 'c (A)']], ['0.207', ['Expt. [23]'], ['Anatase', 'u']]]
+        self.do_table(input_path, expected)
+
+    def test_table_2(self):
+        """Table without a row header."""
+        input_path = './data/table_example2.csv'
+        expected = [['2.990', ['4.640'], ['2006', 'Government transfers', 'Implicit transfer rates1 %']], ['0.305', ['4.640'], ['2006', 'Government transfers', 'Shares %']], ['3.830', ['4.640'], ['2007', 'Government transfers', 'Average $ constant 2007']], ['9.620', ['4.640'], ['2007', 'Government transfers', 'Implicit transfer rates1 %']], ['0.208', ['4.640'], ['2007', 'Government transfers', 'Shares %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_3(self):
+        input_path = './data/table_example3.csv'
+        expected = [['3735', ['Norway'], ['Million dollar', '2007']], ['4006', ['Norway'], ['Million dollar', '2008']], ['4081', ['Norway'], ['Million dollar', '2009']], ['4580', ['Norway'], ['Million dollar', '2010*']], ['4936', ['Norway'], ['Million dollar', '2011*']], ['0.95', ['Norway'], ['Percentage of GNI', '2007']], ['0.89', ['Norway'], ['Percentage of GNI', '2008']], ['1.06', ['Norway'], ['Percentage of GNI', '2009']], ['1.1', ['Norway'], ['Percentage of GNI', '2010*']], ['1', ['Norway'], ['Percentage of GNI', '2011*']], ['2562', ['Denmark'], ['Million dollar', '2007']], ['2803', ['Denmark'], ['Million dollar', '2008']], ['2810', ['Denmark'], ['Million dollar', '2009']], ['2871', ['Denmark'], ['Million dollar', '2010*']], ['2981', ['Denmark'], ['Million dollar', '2011*']], ['0.81', ['Denmark'], ['Percentage of GNI', '2007']], ['0.82', ['Denmark'], ['Percentage of GNI', '2008']], ['0.88', ['Denmark'], ['Percentage of GNI', '2009']], ['0.91', ['Denmark'], ['Percentage of GNI', '2010*']], ['0.86', ['Denmark'], ['Percentage of GNI', '2011*']], ['2669', ['Australia'], ['Million dollar', '2007']], ['2954', ['Australia'], ['Million dollar', '2008']], ['2762', ['Australia'], ['Million dollar', '2009']], ['3826', ['Australia'], ['Million dollar', '2010*']], ['4799', ['Australia'], ['Million dollar', '2011*']], ['0.32', ['Australia'], ['Percentage of GNI', '2007']], ['0.32', ['Australia'], ['Percentage of GNI', '2008']], ['0.29', ['Australia'], ['Percentage of GNI', '2009']], ['0.32', ['Australia'], ['Percentage of GNI', '2010*']], ['0.35', ['Australia'], ['Percentage of GNI', '2011*']], ['320', ['New Zealand'], ['Million dollar', '2007']], ['348', ['New Zealand'], ['Million dollar', '2008']], ['309', ['New Zealand'], ['Million dollar', '2009']], ['342', ['New Zealand'], ['Million dollar', '2010*']], ['429', ['New Zealand'], ['Million dollar', '2011*']], ['0.27', ['New Zealand'], ['Percentage of GNI', '2007']], ['0.3', ['New Zealand'], ['Percentage of GNI', '2008']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2009']], ['0.26', ['New Zealand'], ['Percentage of GNI', '2010*']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2011*']], ['104206', ['OECD/DAC1'], ['Million dollar', '2007']], ['121954', ['OECD/DAC1'], ['Million dollar', '2008']], ['119778', ['OECD/DAC1'], ['Million dollar', '2009']], ['128465', ['OECD/DAC1'], ['Million dollar', '2010*']], ['133526', ['OECD/DAC1'], ['Million dollar', '2011*']], ['0.27', ['OECD/DAC1'], ['Percentage of GNI', '2007']], ['0.3', ['OECD/DAC1'], ['Percentage of GNI', '2008']], ['0.31', ['OECD/DAC1'], ['Percentage of GNI', '2009']], ['0.32', ['OECD/DAC1'], ['Percentage of GNI', '2010*']], ['0.31', ['OECD/DAC1'], ['Percentage of GNI', '2011*']]]
+        self.do_table(input_path, expected)
+
+    def test_table_4(self):
+        input_path = './data/table_example4.csv'
+        expected = [['1647218', ['2003'], ['Short messages/thousands']], ['24.3', ['2003'], ['A Change %']], ['347', ['2003'], [' Short messages/subscription']], ['2314', ['2003'], ['Multimedia messages/thousands']], ['', ['2003'], ['B Change %']], ['2193498', ['2004'], ['Short messages/thousands']], ['33.2', ['2004'], ['A Change %']], ['439', ['2004'], [' Short messages/subscription']], ['7386', ['2004'], ['Multimedia messages/thousands']], ['219.2', ['2004'], ['B Change %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_5(self):
+        input_path = './data/table_example5.csv'
+        expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_7(self):
+        input_path = './data/table_example7.csv'
+        expected = [['3735', ['Norwaya)'], ['Million dollar', '2007']], ['4081', ['Norwaya)'], ['Million dollar', '2009']], ['4006', ['Norwaya)'], ['Million dollar', '2008']], ['4580', ['Norwaya)'], ['Million dollar', '2010*']], ['4936', ['Norwaya)'], ['Million dollar', '2011*']], ['0.95', ['Norwaya)'], ['Percentage of GNI', '2007']], ['0.89', ['Norwaya)'], ['Percentage of GNI', '2008']], ['1.06', ['Norwaya)'], ['Percentage of GNI', '2009']], ['1.1', ['Norwaya)'], ['Percentage of GNI', '2010*']], ['1', ['Norwaya)'], ['Percentage of GNI', '2011*']], ['2562', ['Denmark'], ['Million dollar', '2007']], ['2810', ['Denmark'], ['Million dollar', '2009']], ['2803', ['Denmark'], ['Million dollar', '2008']], ['2871', ['Denmark'], ['Million dollar', '2010*']], ['2981', ['Denmark'], ['Million dollar', '2011*']], ['0.81', ['Denmark'], ['Percentage of GNI', '2007']], ['0.82', ['Denmark'], ['Percentage of GNI', '2008']], ['0.88', ['Denmark'], ['Percentage of GNI', '2009']], ['0.91', ['Denmark'], ['Percentage of GNI', '2010*']], ['0.86', ['Denmark'], ['Percentage of GNI', '2011*']], ['2669', ['Australia'], ['Million dollar', '2007']], ['2762', ['Australia'], ['Million dollar', '2009']], ['2954', ['Australia'], ['Million dollar', '2008']], ['3826', ['Australia'], ['Million dollar', '2010*']], ['4799', ['Australia'], ['Million dollar', '2011*']], ['0.32', ['Australia'], ['Percentage of GNI', '2007']], ['0.32', ['Australia'], ['Percentage of GNI', '2008']], ['0.29', ['Australia'], ['Percentage of GNI', '2009']], ['0.32', ['Australia'], ['Percentage of GNI', '2010*']], ['0.35', ['Australia'], ['Percentage of GNI', '2011*']], ['320', ['New Zealand'], ['Million dollar', '2007']], ['309', ['New Zealand'], ['Million dollar', '2009']], ['348', ['New Zealand'], ['Million dollar', '2008']], ['342', ['New Zealand'], ['Million dollar', '2010*']], ['429', ['New Zealand'], ['Million dollar', '2011*']], ['0.27', ['New Zealand'], ['Percentage of GNI', '2007']], ['0.3', ['New Zealand'], ['Percentage of GNI', '2008']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2009']], ['0.26', ['New Zealand'], ['Percentage of GNI', '2010*']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2011*']], ['104206', ['OECD/DAC 1'], ['Million dollar', '2007']], ['119778', ['OECD/DAC 1'], ['Million dollar', '2009']], ['121954', ['OECD/DAC 1'], ['Million dollar', '2008']], ['128465', ['OECD/DAC 1'], ['Million dollar', '2010*']], ['133526', ['OECD/DAC 1'], ['Million dollar', '2011*']], ['0.27', ['OECD/DAC 1'], ['Percentage of GNI', '2007']], ['0.3', ['OECD/DAC 1'], ['Percentage of GNI', '2008']], ['0.31', ['OECD/DAC 1'], ['Percentage of GNI', '2009']], ['0.32', ['OECD/DAC 1'], ['Percentage of GNI', '2010*']], ['0.31', ['OECD/DAC 1'], ['Percentage of GNI', '2011*']]]
+        self.do_table(input_path, expected)
+
+    def test_table_8(self):
+        input_path = './data/table_example8.csv'
+        expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', 'Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', 'Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_9(self):
+        input_path = './data/table_example9.csv'
+        expected = [['1647218', ['', 'Short messages/thousands'], ['2003']], ['2193498', ['', 'Short messages/thousands'], ['2004']], ['24.3', ['Short messages/thousands', 'Change %'], ['2003']], ['33.2', ['Short messages/thousands', 'Change %'], ['2004']], ['347', ['', 'Short messages/subscription'], ['2003']], ['439', ['', 'Short messages/subscription'], ['2004']], ['2314', ['', 'Multimedia messages/thousands'], ['2003']], ['7386', ['', 'Multimedia messages/thousands'], ['2004']], ['', ['Multimedia messages/thousands', 'Change %'], ['2003']], ['219.2', ['Multimedia messages/thousands', 'Change %'], ['2004']]]
+        self.do_table(input_path, expected)
+
+    def test_table_10(self):
+        """Table where prefixing destroys the layout"""
+        input_path = './data/table_example10.csv'
+        expected = [['', [''], ['', 'Short messages/thousands']], ['A', [''], ['Short messages/thousands', 'Change %']], ['', [''], ['', ' Short messages/subscription']], ['', [''], ['', 'Multimedia messages/thousands']], ['B', [''], ['Multimedia messages/thousands', 'Change %']], ['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_11(self):
+        input_path = './data/table_example11b.csv'
+        expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Category A', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Category B', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Category A', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Category B', 'Change %']]]
+        self.do_table(input_path, expected)
+
+    def test_table_12(self):
+        input_path = './data/table_example12.csv'
+        expected = [['1647218', ['', 'Short messages/thousands'], ['2003']], ['2193498', ['', 'Short messages/thousands'], ['2004']], ['24.3', ['Category A', 'Change %'], ['2003']], ['33.2', ['Category A', 'Change %'], ['2004']], ['347', ['', 'Short messages/subscription'], ['2003']], ['439', ['', 'Short messages/subscription'], ['2004']], ['2314', ['', 'Multimedia messages/thousands'], ['2003']], ['7386', ['', 'Multimedia messages/thousands'], ['2004']], ['', ['Category B', 'Change %'], ['2003']], ['219.2', ['Category B', 'Change %'], ['2004']]]
+        self.do_table(input_path, expected)
+
+
 if __name__ == '__main__':
     unittest.main()
 
