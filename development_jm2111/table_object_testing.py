@@ -2,6 +2,7 @@ from tabledataextractor import Table
 from pprint import pprint
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table
+from tabledataextractor.output.to_csv import write_to_csv
 
 # ======================================
 # Random testing
@@ -14,12 +15,13 @@ from tabledataextractor.output.print import print_table
 # url = 'https://journals.aps.org/prb/abstract/10.1103/PhysRevB.86.064201#fulltext'
 # url = 'https://journals.aps.org/prb/abstract/10.1103/PhysRevB.90.094204#fulltext'
 # url = 'https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta'
+url = 'https://www.sciencedirect.com/science/article/pii/S0022309317305732'
 
 # ======================================
 # Testing of duplicate label prefixing
 # ======================================
 
-#data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
+# data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #           'AmorphousDatabase\\TableDataExtractor\\development_jm2111\\data\\'
 
 data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
@@ -104,71 +106,84 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #print(table.stub_header,"\n", table.col_header, "\n", table.row_header, "\n", table.data)
 
 
-table = Table(data_path + 'table_example1.csv')
-print(repr(table))
-print(table.category_table)
+# table = Table(data_path + 'table_example1.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example2.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example3.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example4.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example5.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example6.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example7.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example8.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example8b.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example9.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example9b.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example10.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example10b.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example11.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example11b.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example12.csv')
+# print(repr(table))
+# print(table.category_table)
+#
+# table = Table(data_path + 'table_example12b.csv')
+# print(repr(table))
+# print(table.category_table)
 
-table = Table(data_path + 'table_example2.csv')
-print(repr(table))
-print(table.category_table)
+# table = Table(data_path + 'table_example_cat1.csv')
+# print(repr(table))
+# print(table.category_table)
 
-table = Table(data_path + 'table_example3.csv')
-print(repr(table))
-print(table.category_table)
 
-table = Table(data_path + 'table_example4.csv')
-print(repr(table))
-print(table.category_table)
+# table = Table(url,2)
+# write_to_csv(table.raw_table, data_path+'table_example_cn.csv')
 
-table = Table(data_path + 'table_example5.csv')
-print(repr(table))
-print(table.category_table)
+table = Table(data_path + 'table_example13.csv')
 
-table = Table(data_path + 'table_example6.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example7.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example8.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example8b.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example9.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example9b.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example10.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example10b.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example11.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example11b.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example12.csv')
-print(repr(table))
-print(table.category_table)
-
-table = Table(data_path + 'table_example12b.csv')
 print(repr(table))
 print(table.category_table)
 
