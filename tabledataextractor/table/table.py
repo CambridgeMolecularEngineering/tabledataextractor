@@ -8,11 +8,12 @@ Raw, processed and final labelled table.
 
 """
 
+import sys
 import logging
 import numpy as np
 import re
 from sympy import Symbol
-from sympy import factor, factor_list
+from sympy import factor_list
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import print_table, list_as_PrettyTable
 from tabledataextractor.output.print import as_string
@@ -73,6 +74,7 @@ class Table:
         self.row_header = None
         self.col_header = None
         self.data = None
+        self.transposed = False
 
         # run the table analysis
         self.analyze_table()
@@ -82,9 +84,6 @@ class Table:
         Performs the analysis of the input table.
         Is run automatically on initialization of the table object, but can be re-run manually if needed.
         """
-
-        # TESTING, quick inversion of the input raw table
-        # self.raw_table = self.raw_table.T
 
         # mask, 'cell = True' if cell is empty
         self.raw_table_empty = self.empty_cells(self.raw_table)
@@ -116,6 +115,17 @@ class Table:
             # categorization
             self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3,
                                                             self.cc4)
+
+    def transpose(self):
+        """
+        Transposes the raw_table and calls the analyze_table() function again.
+        In this way, if working interactively from a Jupyter notebook, it is possible to input a table and then
+        transpose it.
+        """
+        self.raw_table = self.raw_table.T
+        self.transposed = True
+        # self.print()
+        self.analyze_table()
 
     def prefix_duplicate_labels(self, table):
         """
@@ -450,8 +460,9 @@ class Table:
                 log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
                 if data_area >= max_area:
                     max_area = data_area
-                    cc2 = (r2, c2)
-                    log.debug("CC2= {}".format(cc2))
+                # TODO Dangerous change, removing the maximal data area requirement
+                cc2 = (r2, c2)
+                log.debug("CC2= {}".format(cc2))
                 r2 = r2 - 1
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 c2 = c2 + 1
@@ -460,10 +471,21 @@ class Table:
                 log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
                 if data_area >= max_area:
                     max_area = data_area
-                    cc2 = (r2, c2)
-                    log.debug("CC2= {}".format(cc2))
+                # TODO Dangerous change, removing the maximal data area requirement
+                cc2 = (r2, c2)
+                log.debug("CC2= {}".format(cc2))
+            # NEW ADDITION 19/12
+            elif duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
+                c2 = c2 + 1
+                r2 = r2 + 1
+                cc2 = (r2, c2)
+            # if none of those above is satisfied, just run to the end of the loop
             else:
-                r2 = r2 - 1
+                r2 = r2 + 1
+                cc2 = (r2, c2)
+                break
+                #r2 = r2 - 1
+
         log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2, cc2))
 
         # re-initialization of r2 and c2 from cc2; missing in the pseudocode
@@ -845,7 +867,7 @@ class Table:
 
     def __repr__(self):
         """As the developer wants to see it"""
-        intro = "Table({}, table_number={})".format(self.file_path, self.table_number)
+        intro = "Table({}, table_number={}, transposed={})".format(self.file_path, self.table_number, self.transposed)
         log.info("Repr. table: {}".format(self.file_path))
         array_width = np.shape(self.pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
