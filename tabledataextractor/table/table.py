@@ -35,28 +35,56 @@ class Table:
     :param table_number: Number of the table that we want to input if there are several at the given address/path
     :type table_number: int
     """
+
     def __init__(self, file_path, table_number=1):
+        """
+        Will initialize the table object, with all 'None' properties.
+        After reading-in of the raw table from a source the table will be analyzed
+
+        :param file_path: Path to .html or .cvs file, URL or list object that is used as input
+        :type file_path: str | list
+        :param table_number: Number of the table that we want to input if there are several at the given address/path
+        :type table_number: int
+        """
+
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
         self.table_number = table_number
+
+        # read-in the raw table from any source
         self.raw_table = from_any.create_table(self.file_path, table_number)
+        # check if everything is ok with the raw table
+        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
+            msg = 'Input was not properly converted to numpy array.'
+            log.critical(msg)
+            raise TypeError(msg)
 
         # initializing empty elements
         self.cc1 = None
         self.cc2 = None
         self.cc3 = None
         self.cc4 = None
-
         self.category_table = None
+        self.pre_cleaned_table = None
+        self.pre_cleaned_table_empty = None
+        self.raw_table_empty = None
+        self.labels = None
+        self.stub_header = None
+        self.row_header = None
+        self.col_header = None
+        self.data = None
 
-        # TESTING
+        # run the table analysis
+        self.analyze_table()
+
+    def analyze_table(self):
+        """
+        Performs the analysis of the input table.
+        Is run automatically on initialization of the table object, but can be re-run manually if needed.
+        """
+
+        # TESTING, quick inversion of the input raw table
         # self.raw_table = self.raw_table.T
-
-        # check if everything is ok with the raw table
-        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
-            msg = 'Input was not properly converted to numpy array.'
-            log.critical(msg)
-            raise TypeError(msg)
 
         # mask, 'cell = True' if cell is empty
         self.raw_table_empty = self.empty_cells(self.raw_table)
@@ -86,7 +114,8 @@ class Table:
             self.data = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc3[1]:self.cc4[1] + 1]
 
             # categorization
-            self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3, self.cc4)
+            self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3,
+                                                            self.cc4)
 
     def prefix_duplicate_labels(self, table):
         """
