@@ -809,7 +809,8 @@ class Table:
             self.labels[cc2] = 'CC2'
             self.cc1 = cc1
             self.cc2 = cc2
-        # this is ugly but defining a custom exception raises an error, due to the assertion in find_cc1_cc2
+        # this is ugly but defining a custom exception raises an error, due to the assertion in find_cc1_cc2()
+        # TODO make the exceptions nice and proper
         except:
             msg = "\n==================================================================================\n" \
                   "!!!!!!! ERROR: Main MIPS Algorithm failed. Maybe the input table is bad    !!!!!!!  \n" \
@@ -936,5 +937,4 @@ class Table:
         )
         t = list_as_PrettyTable(self.category_table)
         return intro + "\n\n" + input_string + results_string + str(t)
-
 
