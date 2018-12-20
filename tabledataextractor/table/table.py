@@ -23,7 +23,7 @@ from tabledataextractor.table.parse import CellParser, StringParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 class Table:
@@ -65,7 +65,7 @@ class Table:
         self.cc2 = None
         self.cc3 = None
         self.cc4 = None
-        self.category_table = None
+        self.category_table = []
         self.pre_cleaned_table = None
         self.pre_cleaned_table_empty = None
         self.raw_table_empty = None
@@ -125,6 +125,20 @@ class Table:
         self.raw_table = self.raw_table.T
         self.transposed = True
         # self.print()
+        self.cc1 = None
+        self.cc2 = None
+        self.cc3 = None
+        self.cc4 = None
+        self.category_table = []
+        self.pre_cleaned_table = None
+        self.pre_cleaned_table_empty = None
+        self.raw_table_empty = None
+        self.labels = None
+        self.stub_header = None
+        self.row_header = None
+        self.col_header = None
+        self.data = None
+        self.transposed = False
         self.analyze_table()
 
     def prefix_duplicate_labels(self, table):
@@ -227,7 +241,12 @@ class Table:
         # MAIN ALGORITHM
         # 1. first, check the MIPS, to see what header we would have gotten without the prefixing
         # note, cc4 couldn't have changed
-        cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), table)
+        log.info("Prefixing. Attempt to run main MIPS algorithm.")
+        try:
+            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), table)
+        except:
+            log.error("Prefixing was not performed due to failure of MIPS algorithm.")
+            return table
 
         # this flag is used for the return value, if it doesn't change the original table is returned
         prefixed = False
@@ -263,8 +282,8 @@ class Table:
             # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
             try:
                 cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
-            # TODO Make failure in find_cc1_cc2() a proper exception that is tested and confirmed
             except:
+                log.info("Prefixing was not performed because it destroyed the table")
                 return table
             # return prefixed_table only if the prefixing has not made the header to start lower,
             # it can end lower (and this is desired and what we want - not to include the data region into the header),
@@ -536,8 +555,10 @@ class Table:
             log.debug("c1= {}".format(c1))
 
         # final cc1 is (r1-1,c1-1), because the last run of the while loops doesn't count
-        # a problem could arise if the code never stepped through the while loops, returning a cc1 with a negative index.
-        # however, this should never happen since the final headers CANNOT have duplicate rows/columns, by definition of cc2.
+        # a problem could arise if the code never stepped through the while loops,
+        # returning a cc1 with a negative index.
+        # however, this should never happen since the final headers CANNOT have duplicate rows/columns,
+        # by definition of cc2.
         # hence, the assertions:
         assert not duplicate_columns(table_slice_1_cc1(table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
         assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
@@ -781,12 +802,22 @@ class Table:
         self.labels[cc4] = 'CC4'
         self.cc4 = cc4
 
-        cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
-        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
-        self.labels[cc1] = 'CC1'
-        self.labels[cc2] = 'CC2'
-        self.cc1 = cc1
-        self.cc2 = cc2
+        try:
+            cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
+            log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
+            self.labels[cc1] = 'CC1'
+            self.labels[cc2] = 'CC2'
+            self.cc1 = cc1
+            self.cc2 = cc2
+        # this is ugly but defining a custom exception raises an error, due to the assertion in find_cc1_cc2
+        except:
+            msg = "\n==================================================================================\n" \
+                  "!!!!!!! ERROR: Main MIPS Algorithm failed. Maybe the input table is bad    !!!!!!!  \n" \
+                  "==================================================================================\n"
+            print("Table({}, table_number={}, transposed={})".format(self.file_path, self.table_number, self.transposed))
+            print(msg)
+            log.critical(msg)
+            return None
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
@@ -905,4 +936,5 @@ class Table:
         )
         t = list_as_PrettyTable(self.category_table)
         return intro + "\n\n" + input_string + results_string + str(t)
+
 
