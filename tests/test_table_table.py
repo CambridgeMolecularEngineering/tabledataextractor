@@ -412,6 +412,79 @@ class TestCategorizationTable(unittest.TestCase):
         self.do_table(input_path, expected)
 
 
+class TestSingleRowColumnTable(unittest.TestCase):
+
+    def do_table(self, input_path, expected, expected_t, expected_cat, expected_cat_t):
+        log.debug("Test single column/row table: {}".format(input_path))
+
+        # Table labels
+        table = Table(input_path)
+        print(repr(table))
+        result = table.labels.tolist()
+        self.assertListEqual(expected, result)
+
+        # Category table
+        result = table.category_table
+        self.assertListEqual(expected_cat, result)
+
+        # Inverted table labels
+        table.transpose()
+        print(repr(table))
+        result = table.labels.tolist()
+        self.assertListEqual(expected_t, result)
+
+        # Inverted category table
+        result = table.category_table
+        self.assertListEqual(expected_cat_t, result)
+
+    def test_table_1(self):
+        input_path = './data/te_01.csv'
+        expected = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
+                    ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
+        expected_t = [['StubHeader', 'ColHeader'],
+                      ['RowHeader', 'Data'],
+                      ['RowHeader', 'Data'],
+                      ['RowHeader', 'Data'],
+                      ['RowHeader', 'Data'],
+                      ['RowHeader', 'Data'],
+                      ['RowHeader', 'Data']]
+        expected_cat = [['"4.64"', ['"This study"'], ['"A"']], ['"2.99"', ['"This study"'], ['"B"']], ['"0.305"', ['"This study"'], ['"C"']], ['"3.83"', ['"This study"'], ['"D"']], ['"9.62"', ['"This study"'], ['"E"']], ['"0.208"', ['"This study"'], ['"F"']]]
+        expected_cat_t = [['"4.64"', ['"A"'], ['"This study"']], ['"2.99"', ['"B"'], ['"This study"']], ['"0.305"', ['"C"'], ['"This study"']], ['"3.83"', ['"D"'], ['"This study"']], ['"9.62"', ['"E"'], ['"This study"']], ['"0.208"', ['"F"'], ['"This study"']]]
+        self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
+
+    def test_table_2(self):
+        input_path = './data/te_02.csv'
+        expected = [['StubHeader', 'ColHeader'],
+                    ['RowHeader', 'Data'],
+                    ['RowHeader', 'Data'],
+                    ['RowHeader', 'Data'],
+                    ['RowHeader', 'Data'],
+                    ['RowHeader', 'Data'],
+                    ['RowHeader', 'Data']]
+        expected_t = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
+                      ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
+        expected_cat = [['"4.64"', ['"A"'], ['"This study"']], ['"2.99"', ['"B"'], ['"This study"']], ['"0.305"', ['"C"'], ['"This study"']], ['"3.83"', ['"D"'], ['"This study"']], ['"9.62"', ['"E"'], ['"This study"']], ['"0.208"', ['"F"'], ['"This study"']]]
+        expected_cat_t = [['"4.64"', ['"This study"'], ['"A"']], ['"2.99"', ['"This study"'], ['"B"']], ['"0.305"', ['"This study"'], ['"C"']], ['"3.83"', ['"This study"'], ['"D"']], ['"9.62"', ['"This study"'], ['"E"']], ['"0.208"', ['"This study"'], ['"F"']]]
+        self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
+
+    def test_table_3(self):
+        input_path = './data/te_03.csv'
+        expected = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'],
+                    ['/', 'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
+                    ['/', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data'],
+                    ['Note', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data']]
+        expected_t = [['TableTitle', 'StubHeader', 'ColHeader', 'ColHeader'],
+                      ['Note', 'RowHeader', 'Data', 'Data'],
+                      ['Note', 'RowHeader', 'Data', 'Data'],
+                      ['Note', 'RowHeader', 'Data', 'Data'],
+                      ['Note', 'RowHeader', 'Data', 'Data'],
+                      ['Note', 'RowHeader', 'Data', 'Data'],
+                      ['Note', 'RowHeader', 'Data', 'Data']]
+        expected_cat = [['"B"', ['"A"'], ['"Test3"']], ['"C"', ['"A"'], ['"Test4"']], ['"D"', ['"A"'], ['"Test5"']], ['"E"', ['"A"'], ['"Test6"']], ['"F"', ['"A"'], ['"Test7"']], ['"2.99"', ['"4.64"'], ['"Test3"']], ['"0.305"', ['"4.64"'], ['"Test4"']], ['"3.83"', ['"4.64"'], ['"Test5"']], ['"9.62"', ['"4.64"'], ['"Test6"']], ['"0.208"', ['"4.64"'], ['"Test7"']]]
+        expected_cat_t = [['"A"', ['"Test2"'], ['""']], ['"4.64"', ['"Test2"'], ['"This study"']], ['"B"', ['"Test3"'], ['""']], ['"2.99"', ['"Test3"'], ['"This study"']], ['"C"', ['"Test4"'], ['""']], ['"0.305"', ['"Test4"'], ['"This study"']], ['"D"', ['"Test5"'], ['""']], ['"3.83"', ['"Test5"'], ['"This study"']], ['"E"', ['"Test6"'], ['""']], ['"9.62"', ['"Test6"'], ['"This study"']], ['"F"', ['"Test7"'], ['""']], ['"0.208"', ['"Test7"'], ['"This study"']]]
+        self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
+
+
 if __name__ == '__main__':
     unittest.main()
 

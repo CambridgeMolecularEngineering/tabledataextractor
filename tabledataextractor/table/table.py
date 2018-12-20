@@ -138,7 +138,6 @@ class Table:
         self.row_header = None
         self.col_header = None
         self.data = None
-        self.transposed = False
         self.analyze_table()
 
     def prefix_duplicate_labels(self, table):
