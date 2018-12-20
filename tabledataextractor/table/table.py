@@ -300,7 +300,7 @@ class Table:
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
 
-    def find_cc1_cc2(self,cc4,table):
+    def find_cc1_cc2(self,cc4,table, use_max_data_area=False):
         """
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
@@ -308,7 +308,10 @@ class Table:
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
         :param table: table which will be used, has to be passed explicitly
+        :param use_max_data_area: If set to True the maximum data area for CC2 will be used, according to Embley et al.
+        However, this is an unsafe setting and the default 'False' is usually better.
         :type cc4: Tuple
+        :type use_max_data_area: boolean
         """
 
         # Initialize
@@ -455,36 +458,60 @@ class Table:
                       format(duplicate_rows(temp_section_1), duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-                data_area = (r_max - r2) * (c_max - c2)
-                log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
-                log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
-                if data_area >= max_area:
-                    max_area = data_area
-                # TODO Dangerous change, removing the maximal data area requirement
-                cc2 = (r2, c2)
-                log.debug("CC2= {}".format(cc2))
-                r2 = r2 - 1
+                if use_max_data_area:
+                    data_area = (r_max - r2) * (c_max - c2)
+                    log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
+                    log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
+                    if data_area >= max_area:
+                        max_area = data_area
+                        cc2 = (r2, c2)
+                        log.debug("CC2= {}".format(cc2))
+                    r2 = r2 - 1
+                else:
+                    cc2 = (r2, c2)
+                    log.debug("CC2= {}".format(cc2))
+                    r2 = r2 - 1
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 c2 = c2 + 1
-                data_area = (r_max - r2) * (c_max - c2)
-                log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
-                log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
-                if data_area >= max_area:
-                    max_area = data_area
-                # TODO Dangerous change, removing the maximal data area requirement
-                cc2 = (r2, c2)
-                log.debug("CC2= {}".format(cc2))
-            # NEW ADDITION 19/12
+                if use_max_data_area:
+                    data_area = (r_max - r2) * (c_max - c2)
+                    log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
+                    log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
+                    if data_area >= max_area:
+                        max_area = data_area
+                        cc2 = (r2, c2)
+                        log.debug("CC2= {}".format(cc2))
+                else:
+                    cc2 = (r2, c2)
+                    log.debug("CC2= {}".format(cc2))
             elif duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
                 c2 = c2 + 1
                 r2 = r2 + 1
-                cc2 = (r2, c2)
-            # if none of those above is satisfied, just run to the end of the loop
+                if use_max_data_area:
+                    data_area = (r_max - r2) * (c_max - c2)
+                    log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
+                    log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
+                    if data_area >= max_area:
+                        max_area = data_area
+                        cc2 = (r2, c2)
+                        log.debug("CC2= {}".format(cc2))
+                else:
+                    cc2 = (r2, c2)
+            # if none of those above is satisfied, just finish the loop
             else:
                 r2 = r2 + 1
-                cc2 = (r2, c2)
-                break
-                #r2 = r2 - 1
+                if use_max_data_area:
+                    data_area = (r_max - r2) * (c_max - c2)
+                    log.debug("The data area of the new candidate C2= {} is *4: {}".format((r2, c2), data_area))
+                    log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
+                    if data_area >= max_area:
+                        max_area = data_area
+                        cc2 = (r2, c2)
+                        log.debug("CC2= {}".format(cc2))
+                    break
+                else:
+                    cc2 = (r2, c2)
+                    break
 
         log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2, cc2))
 
