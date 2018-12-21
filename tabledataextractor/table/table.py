@@ -58,7 +58,13 @@ class Table:
         if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
             msg = 'Input was not properly converted to numpy array.'
             log.critical(msg)
-            raise TypeError(msg)
+            raise InputTableError(msg)
+
+        # check that array has dimension greater than one in both dimensions
+        if self.raw_table.ndim == 1:
+            msg = 'Table has only one row or column.'
+            log.critical(msg)
+            raise InputTableError(msg)
 
         # initializing empty elements
         self.cc1 = None
@@ -937,3 +943,10 @@ class Table:
         t = list_as_PrettyTable(self.category_table)
         return intro + "\n\n" + input_string + results_string + str(t)
 
+
+class InputTableError(Exception):
+    """
+    Use when something is wrong with the provided input.
+    """
+    def __init__(self, message):
+        self.message = message
