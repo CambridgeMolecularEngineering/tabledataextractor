@@ -25,26 +25,26 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
           'AmorphousDatabase\\TableDataExtractor\\development_jm2111\\data\\'
 
 
-# table = Table(data_path + 'table_example.csv')
-# print(repr(table))
-# table.transpose()
-# print(repr(table))
-#
-# table = Table(data_path + 'table_example.html')
-# print(repr(table))
-# table.transpose()
-# print(repr(table))
-#
-# table = Table(data_path + 'table_example1.csv')
-# print(repr(table))
-# table.transpose()
-# print(repr(table))
-#
-# table = Table(data_path + 'table_example2.csv')
-# print(repr(table))
-# table.transpose()
-# print(repr(table))
-#
+table = Table(data_path + 'table_example.csv')
+print(repr(table))
+table.transpose()
+print(repr(table))
+
+table = Table(data_path + 'table_example.html')
+print(repr(table))
+table.transpose()
+print(repr(table))
+
+table = Table(data_path + 'table_example1.csv')
+print(repr(table))
+table.transpose()
+print(repr(table))
+
+table = Table(data_path + 'table_example2.csv')
+print(repr(table))
+table.transpose()
+print(repr(table))
+
 #
 #
 # print("===============================================================================================================")
