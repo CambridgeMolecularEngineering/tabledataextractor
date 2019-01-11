@@ -40,12 +40,31 @@ class Table:
     def __init__(self, file_path, table_number=1, **kwargs):
         """
         Will initialize the table object, with all 'None' properties.
-        After reading-in of the raw table from a source the table will be analyzed
+        After reading-in of the raw table from a source the table will be analyzed.
+
+        Optional configuration keywords:
+            ``use_title_row = True``, default. A title row will be assumed if possible.
+
+            ``use_max_data_area = False``, default. If True the max data area will be used to determine CC2 in the main MIPS algorithm.
+            It is probably never necessary to set this to True.
+
+            ``use_notes_in_first_col = True``, default.
+            Sometimes, if the data cells can be uniquely indexed with the second column in the table,
+            the first column will be recognized as 'Notes', which is correct and expected behaviour.
+            However, by putting this to 'False' the first column of the table will always be part of the
+            row index.
+
+            ``use_prefixing = True``, default.
+            Will perform the prefixing steps if row or column index cells are not unique.
+
+            ``use_footnotes =True``, default.
+            Will label footnotes.
 
         :param file_path: Path to .html or .cvs file, URL or list object that is used as input
         :type file_path: str | list
         :param table_number: Number of the table that we want to input if there are several at the given address/path
         :type table_number: int
+        :type kwargs: dict
         """
 
         log.info('Initialization of table: "{}"'.format(file_path))
