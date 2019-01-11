@@ -37,7 +37,7 @@ class Table:
     :type table_number: int
     """
 
-    def __init__(self, file_path, table_number=1):
+    def __init__(self, file_path, table_number=1, **kwargs):
         """
         Will initialize the table object, with all 'None' properties.
         After reading-in of the raw table from a source the table will be analyzed
@@ -51,6 +51,16 @@ class Table:
         log.info('Initialization of table: "{}"'.format(file_path))
         self.file_path = file_path
         self.table_number = table_number
+
+        # TODO Set the keywords based on the provided input dictionary kwargs
+        self.use_title_row = True
+        self.use_max_data_area = False
+        self.use_notes_in_first_col = True
+        self.use_prefixing = True
+        self.use_footnotes = True
+
+
+
 
         # read-in the raw table from any source
         self.raw_table = from_any.create_table(self.file_path, table_number)
