@@ -25,7 +25,7 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
           'AmorphousDatabase\\TableDataExtractor\\development_jm2111\\data\\'
 
 
-table = Table(data_path + 'table_example.csv')
+table = Table(data_path + 'table_example.csv', use_title_row=False)
 print(table.configs)
 print(repr(table))
 table.transpose()

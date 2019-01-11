@@ -23,7 +23,7 @@ from tabledataextractor.table.parse import CellParser, StringParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 
 class Table:
@@ -67,6 +67,7 @@ class Table:
                 msg = 'keyword {} does not exist.'.format(key)
                 log.critical(msg)
                 raise InputError(msg)
+        log.info('Configuration parameters are: {}'.format(self.configs))
 
         # read-in the raw table from any source
         self.raw_table = from_any.create_table(self.file_path, table_number)
@@ -76,7 +77,7 @@ class Table:
             log.critical(msg)
             raise InputTableError(msg)
 
-        # check that array has dimension greater than one in both dimensions
+        # check that array has dimension greater than 1 in both dimensions
         if self.raw_table.ndim == 1:
             msg = 'Table has only one row or column.'
             log.critical(msg)
@@ -119,8 +120,9 @@ class Table:
         # self.print()
 
         # prefixing of duplicate labels in the header region
-        self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
-        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        if self.configs['use_prefixing']:
+            self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
+            self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -340,7 +342,7 @@ class Table:
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
 
-    def find_cc1_cc2(self,cc4,table, use_max_data_area=False):
+    def find_cc1_cc2(self,cc4,table):
         """
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
@@ -498,7 +500,7 @@ class Table:
                       format(duplicate_rows(temp_section_1), duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-                if use_max_data_area:
+                if self.configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
@@ -513,7 +515,7 @@ class Table:
                     r2 = r2 - 1
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 c2 = c2 + 1
-                if use_max_data_area:
+                if self.configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -527,7 +529,7 @@ class Table:
             elif duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
                 c2 = c2 + 1
                 r2 = r2 + 1
-                if use_max_data_area:
+                if self.configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -540,7 +542,7 @@ class Table:
             # if none of those above is satisfied, just finish the loop
             else:
                 r2 = r2 + 1
-                if use_max_data_area:
+                if self.configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *4: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -585,6 +587,11 @@ class Table:
         assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
         assert r1 >= 0 and c1 >= 0
         cc1 = (r1-1, c1-1)
+
+        # provision for using the uppermost row possible for cc1, if titles are turned of
+        # however, a 'Notes' section in the first column of the table can still exist
+        if not self.configs['use_title_row']:
+            cc1 = (0, c1-1)
 
         return cc1, cc2
 
