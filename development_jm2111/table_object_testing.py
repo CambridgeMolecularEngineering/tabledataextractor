@@ -26,24 +26,27 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 
 
 table = Table(data_path + 'table_example.csv')
+print(table.configs)
 print(repr(table))
 table.transpose()
+print(table.configs)
 print(repr(table))
 
-table = Table(data_path + 'table_example.html')
-print(repr(table))
-table.transpose()
-print(repr(table))
 
-table = Table(data_path + 'table_example1.csv')
-print(repr(table))
-table.transpose()
-print(repr(table))
-
-table = Table(data_path + 'table_example2.csv')
-print(repr(table))
-table.transpose()
-print(repr(table))
+# table = Table(data_path + 'table_example.html')
+# print(repr(table))
+# table.transpose()
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example1.csv')
+# print(repr(table))
+# table.transpose()
+# print(repr(table))
+#
+# table = Table(data_path + 'table_example2.csv')
+# print(repr(table))
+# table.transpose()
+# print(repr(table))
 
 #
 #
@@ -287,10 +290,10 @@ print(repr(table))
 # write_to_csv(table.raw_table, data_path+'table_example_cn.csv')
 
 
-table = Table(data_path + 'te_no_data.csv')
-print(repr(table))
-table.transpose()
-print(repr(table))
+# table = Table(data_path + 'te_no_data.csv')
+# print(repr(table))
+# table.transpose()
+# print(repr(table))
 
 # table = Table(data_path + 'te_no_data2.csv')
 # print(repr(table))

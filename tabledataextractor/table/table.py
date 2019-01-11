@@ -52,15 +52,21 @@ class Table:
         self.file_path = file_path
         self.table_number = table_number
 
-        # TODO Set the keywords based on the provided input dictionary kwargs
-        self.use_title_row = True
-        self.use_max_data_area = False
-        self.use_notes_in_first_col = True
-        self.use_prefixing = True
-        self.use_footnotes = True
-
-
-
+        # default settings
+        self.configs = dict()
+        self.configs['use_title_row'] = True
+        self.configs['use_max_data_area'] = False
+        self.configs['use_notes_in_first_col'] = True
+        self.configs['use_prefixing'] = True
+        self.configs['use_footnotes'] = True
+        # setting the config tags based on kwargs input
+        for key, value in kwargs.items():
+            if key in self.configs:
+                self.configs[key] = value
+            else:
+                msg = 'keyword {} does not exist.'.format(key)
+                log.critical(msg)
+                raise InputError(msg)
 
         # read-in the raw table from any source
         self.raw_table = from_any.create_table(self.file_path, table_number)
@@ -957,6 +963,14 @@ class Table:
 class InputTableError(Exception):
     """
     Use when something is wrong with the provided input.
+    """
+    def __init__(self, message):
+        self.message = message
+
+
+class InputError(Exception):
+    """
+    Use when something is wrong with the commands called
     """
     def __init__(self, message):
         self.message = message
