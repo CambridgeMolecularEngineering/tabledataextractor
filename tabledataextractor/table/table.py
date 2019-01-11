@@ -589,9 +589,12 @@ class Table:
         cc1 = (r1-1, c1-1)
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
-        # however, a 'Notes' section in the first column of the table can still exist
         if not self.configs['use_title_row']:
-            cc1 = (0, c1-1)
+            cc1 = (0, cc1[1])
+
+        # provision for using the first column as row header, disables a 'Notes' section in the first column
+        if not self.configs['use_notes_in_first_col']:
+            cc1 = (cc1[0], 0)
 
         return cc1, cc2
 
@@ -860,28 +863,29 @@ class Table:
         self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
 
         # Footnotes
-        fn_prefix = self.find_FNprefix(cc4)
-        log.info("FNPrefix Cells = {}".format(fn_prefix))
-        for fn_prefix_index in fn_prefix:
-            self.labels[fn_prefix_index[0], fn_prefix_index[1]] = 'FNprefix'
+        if self.configs['use_footnotes']:
+            fn_prefix = self.find_FNprefix(cc4)
+            log.info("FNPrefix Cells = {}".format(fn_prefix))
+            for fn_prefix_index in fn_prefix:
+                self.labels[fn_prefix_index[0], fn_prefix_index[1]] = 'FNprefix'
 
-        fn_text = self.find_FNtext(fn_prefix)
-        log.info("FNtext Cells = {}".format(fn_text))
-        for fn_text_index in fn_text:
-            self.labels[fn_text_index] = 'FNtext'
+            fn_text = self.find_FNtext(fn_prefix)
+            log.info("FNtext Cells = {}".format(fn_text))
+            for fn_text_index in fn_text:
+                self.labels[fn_text_index] = 'FNtext'
 
-        fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
-        log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
-        for fn_prefix_fn_text_index in fn_prefix_fn_text:
-            self.labels[fn_prefix_fn_text_index[0], fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
+            fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
+            log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
+            for fn_prefix_fn_text_index in fn_prefix_fn_text:
+                self.labels[fn_prefix_fn_text_index[0], fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
 
-        fn_refs = self.find_FNref(fn_prefix, fn_prefix_fn_text)
-        log.info("FNref Cells = {}".format(fn_refs))
-        for fn_ref in fn_refs:
-            if self.labels[fn_ref[0], fn_ref[1]] != '/':
-                self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
-            else:
-                self.labels[fn_ref[0], fn_ref[1]] = 'FNref'
+            fn_refs = self.find_FNref(fn_prefix, fn_prefix_fn_text)
+            log.info("FNref Cells = {}".format(fn_refs))
+            for fn_ref in fn_refs:
+                if self.labels[fn_ref[0], fn_ref[1]] != '/':
+                    self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
+                else:
+                    self.labels[fn_ref[0], fn_ref[1]] = 'FNref'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
