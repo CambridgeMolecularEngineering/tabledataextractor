@@ -45,16 +45,16 @@ data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
 #
 # print(table.category_table)
 
-table = Table(r'C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\tests\data\example_table.csv')
-# print(table)
+# table = Table(r'C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\tests\data\example_table.csv')
+# # print(table)
+# #
+# print(table.category_table)
 #
-print(table.category_table)
-
-print(repr(table))
-
-table.transpose()
-
-print(repr(table))
+# print(repr(table))
+#
+# table.transpose()
+#
+# print(repr(table))
 
 
 
@@ -284,10 +284,15 @@ print(repr(table))
 # table.transpose()
 # print(repr(table))
 #
-# table = Table(data_path + 'table_example13.csv')
-# print(repr(table))
-# table.transpose()
-# print(repr(table))
+
+data_path = 'C:\\Users\\juras\\OneDrive - University Of Cambridge\\Projects\\' \
+          'AmorphousDatabase\\TableDataExtractor\\tests\\data\\'
+table = Table(data_path + 'table_example13.csv')
+print(repr(table))
+print(table.category_table)
+table.transpose()
+print(repr(table))
+print(table.category_table)
 #
 # table = Table(data_path + 'te_01.csv')
 # print(repr(table))
