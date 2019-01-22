@@ -11,6 +11,7 @@ setup(name='TableDataExtractor',
       long_description=open('README.md').read(),
       zip_safe=False,
       test_suite=['pytest'],
+      test_requires=['pytest'],
       install_requires=[
             'numpy=1.15.2',
             'sympy=1.3',
