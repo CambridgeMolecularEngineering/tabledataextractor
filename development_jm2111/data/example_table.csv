@@ -1,0 +1,6 @@
+Type,Compound,Tc/K,Tn/K,B [T],species
+Inorganic,BiFeO3,1100,643,,Bi-F
+Inorganic,LaCrO3,257,150,0.1 mT,La-Cr
+Organic,LaCrO2,,10,500,La-Cr
+Inorganic,Gd,,294,659 T,Gd-Gd
+* This table is rubbish,,,,,

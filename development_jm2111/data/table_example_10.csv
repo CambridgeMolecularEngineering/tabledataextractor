@@ -1,0 +1,6 @@
+Simulation approach,TiOx building block fraction (%),TiOx building block fraction (%),TiOx building block fraction (%),TiOx building block fraction (%),TiOx building block fraction (%),Mean coord. number
+"",TiO4,TiO5,TiO6,TiO7,TiO8,""
+CPMD,1.4,18.3,62,18.3,,5.96
+CPMD + VASP,,25,50,25,,6.00
+DFTB,9,43,48,,,5.40
+DFTB + VASP,2.7,27.4,47.9,19.2,2.7,5.82
