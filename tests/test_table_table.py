@@ -40,7 +40,7 @@ class TestCC4(unittest.TestCase):
         self.assertTupleEqual(expected, result)
 
     def test_cc4_1(self):
-        input_path = './data/table_example1.csv'
+        input_path = './tests/data/table_example1.csv'
         expected = (6,7)
         self.do_table(input_path, expected)
 
@@ -50,32 +50,32 @@ class TestCC4(unittest.TestCase):
         However, in find_cc4() we choose the criterion that the data region starts, from below, when at least half of
         the row is non-empty.
         """
-        input_path = './data/table_example2.csv'
+        input_path = './tests/data/table_example2.csv'
         expected = (3,5)
         self.do_table(input_path, expected)
 
     def test_cc4_3(self):
-        input_path = './data/table_example3.csv'
+        input_path = './tests/data/table_example3.csv'
         expected = (7,10)
         self.do_table(input_path, expected)
 
     def test_cc4_4(self):
-        input_path = './data/table_example4.csv'
+        input_path = './tests/data/table_example4.csv'
         expected = (2,5)
         self.do_table(input_path, expected)
 
     def test_cc4_5(self):
-        input_path = './data/table_example5.csv'
+        input_path = './tests/data/table_example5.csv'
         expected = (3,5)
         self.do_table(input_path, expected)
 
     def test_cc4_6(self):
-        input_path = './data/table_example6.csv'
+        input_path = './tests/data/table_example6.csv'
         expected = (11,3)
         self.do_table(input_path, expected)
 
     def test_cc4_7(self):
-        input_path = './data/table_example7.csv'
+        input_path = './tests/data/table_example7.csv'
         expected = (8,10)
         self.do_table(input_path, expected)
 
@@ -120,39 +120,39 @@ class TestCC1CC2(unittest.TestCase):
         self.assertTupleEqual(expected, result)
 
     def test_cc1_cc2_1(self):
-        input_path = './data/table_example1.csv'
+        input_path = './tests/data/table_example1.csv'
         expected = (0,1),(1,1)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_2(self):
         """Lack of row header section on the LHS"""
-        input_path = './data/table_example2.csv'
+        input_path = './tests/data/table_example2.csv'
         expected = (0,0),(2,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_3(self):
-        input_path = './data/table_example3.csv'
+        input_path = './tests/data/table_example3.csv'
         expected = (1,0),(2,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_4(self):
-        input_path = './data/table_example4.csv'
+        input_path = './tests/data/table_example4.csv'
         expected = (0,0),(0,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_5(self):
-        input_path = './data/table_example5.csv'
+        input_path = './tests/data/table_example5.csv'
         expected = (0,0),(1,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_6(self):
         """Table is composed of two tables"""
-        input_path = './data/table_example6.csv'
+        input_path = './tests/data/table_example6.csv'
         expected = (1,0),(1,0)
         self.do_table(input_path, expected)
 
     def test_cc1_cc2_7(self):
-        input_path = './data/table_example7.csv'
+        input_path = './tests/data/table_example7.csv'
         expected = (1,0),(2,0)
         self.do_table(input_path, expected)
 
@@ -167,39 +167,39 @@ class TestCC3(unittest.TestCase):
         self.assertTupleEqual(expected, result)
 
     def test_cc3_1(self):
-        input_path = './data/table_example1.csv'
+        input_path = './tests/data/table_example1.csv'
         expected = (2,2)
         self.do_table(input_path, expected)
 
     def test_cc3_2(self):
         """Lack of row header section on the LHS"""
-        input_path = './data/table_example2.csv'
+        input_path = './tests/data/table_example2.csv'
         expected = (3,1)
         self.do_table(input_path, expected)
 
     def test_cc3_3(self):
-        input_path = './data/table_example3.csv'
+        input_path = './tests/data/table_example3.csv'
         expected = (3,1)
         self.do_table(input_path, expected)
 
     def test_cc3_4(self):
-        input_path = './data/table_example4.csv'
+        input_path = './tests/data/table_example4.csv'
         expected = (1,1)
         self.do_table(input_path, expected)
 
     def test_cc3_5(self):
-        input_path = './data/table_example5.csv'
+        input_path = './tests/data/table_example5.csv'
         expected = (2,1)
         self.do_table(input_path, expected)
 
     def test_cc3_6(self):
         """Table is composed of two tables"""
-        input_path = './data/table_example6.csv'
+        input_path = './tests/data/table_example6.csv'
         expected = (2,1)
         self.do_table(input_path, expected)
 
     def test_cc3_7(self):
-        input_path = './data/table_example7.csv'
+        input_path = './tests/data/table_example7.csv'
         expected = (4,1)
         self.do_table(input_path, expected)
 
@@ -217,32 +217,32 @@ class TestDuplicateLabelPrefixing(unittest.TestCase):
 
     def test_table_8(self):
         """Prefixing in column header"""
-        input_path = './data/table_example8.csv'
-        expected_path = './data/table_example8b.csv'
+        input_path = './tests/data/table_example8.csv'
+        expected_path = './tests/data/table_example8b.csv'
         self.do_table(input_path, expected_path)
 
     def test_table_9(self):
         """Prefixing in row header"""
-        input_path = './data/table_example9.csv'
-        expected_path = './data/table_example9b.csv'
+        input_path = './tests/data/table_example9.csv'
+        expected_path = './tests/data/table_example9b.csv'
         self.do_table(input_path, expected_path)
 
     def test_table_10(self):
         """Prefixing will destroy the labelling"""
-        input_path = './data/table_example10.csv'
-        expected_path = './data/table_example10b.csv'
+        input_path = './tests/data/table_example10.csv'
+        expected_path = './tests/data/table_example10b.csv'
         self.do_table(input_path, expected_path)
 
     def test_table_11(self):
         """Prefixing is not performed, column header"""
-        input_path = './data/table_example11.csv'
-        expected_path = './data/table_example11b.csv'
+        input_path = './tests/data/table_example11.csv'
+        expected_path = './tests/data/table_example11b.csv'
         self.do_table(input_path, expected_path)
 
     def test_table_12(self):
         """Prefixing is not performed, row header"""
-        input_path = './data/table_example12.csv'
-        expected_path = './data/table_example12b.csv'
+        input_path = './tests/data/table_example12.csv'
+        expected_path = './tests/data/table_example12b.csv'
         self.do_table(input_path, expected_path)
 
 
@@ -256,7 +256,7 @@ class TestTableLabels(unittest.TestCase):
         self.assertListEqual(expected, result)
 
     def test_table_1(self):
-        input_path = './data/table_example1.csv'
+        input_path = './tests/data/table_example1.csv'
         expected = [['TableTitle', 'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['/',    'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['Note', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'],
@@ -268,7 +268,7 @@ class TestTableLabels(unittest.TestCase):
 
     def test_table_2(self):
         """Lack of row header section on the LHS"""
-        input_path = './data/table_example2.csv'
+        input_path = './tests/data/table_example2.csv'
         expected = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
@@ -277,7 +277,7 @@ class TestTableLabels(unittest.TestCase):
         self.do_table(input_path, expected)
 
     def test_table_3(self):
-        input_path = './data/table_example3.csv'
+        input_path = './tests/data/table_example3.csv'
         expected = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
@@ -289,14 +289,14 @@ class TestTableLabels(unittest.TestCase):
         self.do_table(input_path, expected)
 
     def test_table_4(self):
-        input_path = './data/table_example4.csv'
+        input_path = './tests/data/table_example4.csv'
         expected = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data'],
                     ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data']]
         self.do_table(input_path, expected)
 
     def test_table_5(self):
-        input_path = './data/table_example5.csv'
+        input_path = './tests/data/table_example5.csv'
         expected = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data'],
@@ -305,7 +305,7 @@ class TestTableLabels(unittest.TestCase):
 
     def test_table_6(self):
         """Table is composed of two tables"""
-        input_path = './data/table_example6.csv'
+        input_path = './tests/data/table_example6.csv'
         expected = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['RowHeader', 'Data', 'Data', 'Data'],
@@ -321,7 +321,7 @@ class TestTableLabels(unittest.TestCase):
         self.do_table(input_path, expected)
 
     def test_table_7(self):
-        input_path = './data/table_example7.csv'
+        input_path = './tests/data/table_example7.csv'
         expected = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader & FNref', 'ColHeader & FNref', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader & FNref', 'ColHeader & FNref'],
@@ -349,65 +349,65 @@ class TestCategorizationTable(unittest.TestCase):
         self.assertListEqual(expected, result)
 
     def test_table_1(self):
-        input_path = './data/table_example1.csv'
+        input_path = './tests/data/table_example1.csv'
         expected = [['4.64', ['This study'], ['Rutile', 'a = b (A)']], ['2.99', ['This study'], ['Rutile', 'c (A)']], ['0.305', ['This study'], ['Rutile', 'u']], ['3.83', ['This study'], ['Anatase', 'a = b (A)']], ['9.62', ['This study'], ['Anatase', 'c (A)']], ['0.208', ['This study'], ['Anatase', 'u']], ['4.67', ['GGA [25]'], ['Rutile', 'a = b (A)']], ['2.97', ['GGA [25]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [25]'], ['Rutile', 'u']], ['3.80', ['GGA [25]'], ['Anatase', 'a = b (A)']], ['9.67', ['GGA [25]'], ['Anatase', 'c (A)']], ['0.207', ['GGA [25]'], ['Anatase', 'u']], ['4.63', ['GGA [26]'], ['Rutile', 'a = b (A)']], ['2.98', ['GGA [26]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [26]'], ['Rutile', 'u']], ['""', ['GGA [26]'], ['Anatase', 'a = b (A)']], ['""', ['GGA [26]'], ['Anatase', 'c (A)']], ['""', ['GGA [26]'], ['Anatase', 'u']], ['""', ['HF [27]'], ['Rutile', 'a = b (A)']], ['""', ['HF [27]'], ['Rutile', 'c (A)']], ['""', ['HF [27]'], ['Rutile', 'u']], ['3.76', ['HF [27]'], ['Anatase', 'a = b (A)']], ['9.85', ['HF [27]'], ['Anatase', 'c (A)']], ['0.202', ['HF [27]'], ['Anatase', 'u']], ['4.594', ['Expt. [23]'], ['Rutile', 'a = b (A)']], ['2.958', ['Expt. [23]'], ['Rutile', 'c (A)']], ['0.305', ['Expt. [23]'], ['Rutile', 'u']], ['3.785', ['Expt. [23]'], ['Anatase', 'a = b (A)']], ['9.514', ['Expt. [23]'], ['Anatase', 'c (A)']], ['0.207', ['Expt. [23]'], ['Anatase', 'u']]]
         self.do_table(input_path, expected)
 
     def test_table_2(self):
         """Table without a row header."""
-        input_path = './data/table_example2.csv'
+        input_path = './tests/data/table_example2.csv'
         expected = [['2.990', ['4.640'], ['2006', 'Government transfers', 'Implicit transfer rates1 %']], ['0.305', ['4.640'], ['2006', 'Government transfers', 'Shares %']], ['3.830', ['4.640'], ['2007', 'Government transfers', 'Average $ constant 2007']], ['9.620', ['4.640'], ['2007', 'Government transfers', 'Implicit transfer rates1 %']], ['0.208', ['4.640'], ['2007', 'Government transfers', 'Shares %']]]
         self.do_table(input_path, expected)
 
     def test_table_3(self):
-        input_path = './data/table_example3.csv'
+        input_path = './tests/data/table_example3.csv'
         expected = [['3735', ['Norway'], ['Million dollar', '2007']], ['4006', ['Norway'], ['Million dollar', '2008']], ['4081', ['Norway'], ['Million dollar', '2009']], ['4580', ['Norway'], ['Million dollar', '2010*']], ['4936', ['Norway'], ['Million dollar', '2011*']], ['0.95', ['Norway'], ['Percentage of GNI', '2007']], ['0.89', ['Norway'], ['Percentage of GNI', '2008']], ['1.06', ['Norway'], ['Percentage of GNI', '2009']], ['1.1', ['Norway'], ['Percentage of GNI', '2010*']], ['1', ['Norway'], ['Percentage of GNI', '2011*']], ['2562', ['Denmark'], ['Million dollar', '2007']], ['2803', ['Denmark'], ['Million dollar', '2008']], ['2810', ['Denmark'], ['Million dollar', '2009']], ['2871', ['Denmark'], ['Million dollar', '2010*']], ['2981', ['Denmark'], ['Million dollar', '2011*']], ['0.81', ['Denmark'], ['Percentage of GNI', '2007']], ['0.82', ['Denmark'], ['Percentage of GNI', '2008']], ['0.88', ['Denmark'], ['Percentage of GNI', '2009']], ['0.91', ['Denmark'], ['Percentage of GNI', '2010*']], ['0.86', ['Denmark'], ['Percentage of GNI', '2011*']], ['2669', ['Australia'], ['Million dollar', '2007']], ['2954', ['Australia'], ['Million dollar', '2008']], ['2762', ['Australia'], ['Million dollar', '2009']], ['3826', ['Australia'], ['Million dollar', '2010*']], ['4799', ['Australia'], ['Million dollar', '2011*']], ['0.32', ['Australia'], ['Percentage of GNI', '2007']], ['0.32', ['Australia'], ['Percentage of GNI', '2008']], ['0.29', ['Australia'], ['Percentage of GNI', '2009']], ['0.32', ['Australia'], ['Percentage of GNI', '2010*']], ['0.35', ['Australia'], ['Percentage of GNI', '2011*']], ['320', ['New Zealand'], ['Million dollar', '2007']], ['348', ['New Zealand'], ['Million dollar', '2008']], ['309', ['New Zealand'], ['Million dollar', '2009']], ['342', ['New Zealand'], ['Million dollar', '2010*']], ['429', ['New Zealand'], ['Million dollar', '2011*']], ['0.27', ['New Zealand'], ['Percentage of GNI', '2007']], ['0.3', ['New Zealand'], ['Percentage of GNI', '2008']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2009']], ['0.26', ['New Zealand'], ['Percentage of GNI', '2010*']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2011*']], ['104206', ['OECD/DAC1'], ['Million dollar', '2007']], ['121954', ['OECD/DAC1'], ['Million dollar', '2008']], ['119778', ['OECD/DAC1'], ['Million dollar', '2009']], ['128465', ['OECD/DAC1'], ['Million dollar', '2010*']], ['133526', ['OECD/DAC1'], ['Million dollar', '2011*']], ['0.27', ['OECD/DAC1'], ['Percentage of GNI', '2007']], ['0.3', ['OECD/DAC1'], ['Percentage of GNI', '2008']], ['0.31', ['OECD/DAC1'], ['Percentage of GNI', '2009']], ['0.32', ['OECD/DAC1'], ['Percentage of GNI', '2010*']], ['0.31', ['OECD/DAC1'], ['Percentage of GNI', '2011*']]]
         self.do_table(input_path, expected)
 
     def test_table_4(self):
-        input_path = './data/table_example4.csv'
+        input_path = './tests/data/table_example4.csv'
         expected = [['1647218', ['2003'], ['Short messages/thousands']], ['24.3', ['2003'], ['A Change %']], ['347', ['2003'], [' Short messages/subscription']], ['2314', ['2003'], ['Multimedia messages/thousands']], ['', ['2003'], ['B Change %']], ['2193498', ['2004'], ['Short messages/thousands']], ['33.2', ['2004'], ['A Change %']], ['439', ['2004'], [' Short messages/subscription']], ['7386', ['2004'], ['Multimedia messages/thousands']], ['219.2', ['2004'], ['B Change %']]]
         self.do_table(input_path, expected)
 
     def test_table_5(self):
-        input_path = './data/table_example5.csv'
+        input_path = './tests/data/table_example5.csv'
         expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
         self.do_table(input_path, expected)
 
     def test_table_7(self):
-        input_path = './data/table_example7.csv'
+        input_path = './tests/data/table_example7.csv'
         expected = [['3735', ['Norwaya)'], ['Million dollar', '2007']], ['4081', ['Norwaya)'], ['Million dollar', '2009']], ['4006', ['Norwaya)'], ['Million dollar', '2008']], ['4580', ['Norwaya)'], ['Million dollar', '2010*']], ['4936', ['Norwaya)'], ['Million dollar', '2011*']], ['0.95', ['Norwaya)'], ['Percentage of GNI', '2007']], ['0.89', ['Norwaya)'], ['Percentage of GNI', '2008']], ['1.06', ['Norwaya)'], ['Percentage of GNI', '2009']], ['1.1', ['Norwaya)'], ['Percentage of GNI', '2010*']], ['1', ['Norwaya)'], ['Percentage of GNI', '2011*']], ['2562', ['Denmark'], ['Million dollar', '2007']], ['2810', ['Denmark'], ['Million dollar', '2009']], ['2803', ['Denmark'], ['Million dollar', '2008']], ['2871', ['Denmark'], ['Million dollar', '2010*']], ['2981', ['Denmark'], ['Million dollar', '2011*']], ['0.81', ['Denmark'], ['Percentage of GNI', '2007']], ['0.82', ['Denmark'], ['Percentage of GNI', '2008']], ['0.88', ['Denmark'], ['Percentage of GNI', '2009']], ['0.91', ['Denmark'], ['Percentage of GNI', '2010*']], ['0.86', ['Denmark'], ['Percentage of GNI', '2011*']], ['2669', ['Australia'], ['Million dollar', '2007']], ['2762', ['Australia'], ['Million dollar', '2009']], ['2954', ['Australia'], ['Million dollar', '2008']], ['3826', ['Australia'], ['Million dollar', '2010*']], ['4799', ['Australia'], ['Million dollar', '2011*']], ['0.32', ['Australia'], ['Percentage of GNI', '2007']], ['0.32', ['Australia'], ['Percentage of GNI', '2008']], ['0.29', ['Australia'], ['Percentage of GNI', '2009']], ['0.32', ['Australia'], ['Percentage of GNI', '2010*']], ['0.35', ['Australia'], ['Percentage of GNI', '2011*']], ['320', ['New Zealand'], ['Million dollar', '2007']], ['309', ['New Zealand'], ['Million dollar', '2009']], ['348', ['New Zealand'], ['Million dollar', '2008']], ['342', ['New Zealand'], ['Million dollar', '2010*']], ['429', ['New Zealand'], ['Million dollar', '2011*']], ['0.27', ['New Zealand'], ['Percentage of GNI', '2007']], ['0.3', ['New Zealand'], ['Percentage of GNI', '2008']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2009']], ['0.26', ['New Zealand'], ['Percentage of GNI', '2010*']], ['0.28', ['New Zealand'], ['Percentage of GNI', '2011*']], ['104206', ['OECD/DAC 1'], ['Million dollar', '2007']], ['119778', ['OECD/DAC 1'], ['Million dollar', '2009']], ['121954', ['OECD/DAC 1'], ['Million dollar', '2008']], ['128465', ['OECD/DAC 1'], ['Million dollar', '2010*']], ['133526', ['OECD/DAC 1'], ['Million dollar', '2011*']], ['0.27', ['OECD/DAC 1'], ['Percentage of GNI', '2007']], ['0.3', ['OECD/DAC 1'], ['Percentage of GNI', '2008']], ['0.31', ['OECD/DAC 1'], ['Percentage of GNI', '2009']], ['0.32', ['OECD/DAC 1'], ['Percentage of GNI', '2010*']], ['0.31', ['OECD/DAC 1'], ['Percentage of GNI', '2011*']]]
         self.do_table(input_path, expected)
 
     def test_table_8(self):
-        input_path = './data/table_example8.csv'
+        input_path = './tests/data/table_example8.csv'
         expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', 'Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', 'Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
         self.do_table(input_path, expected)
 
     def test_table_9(self):
-        input_path = './data/table_example9.csv'
+        input_path = './tests/data/table_example9.csv'
         expected = [['1647218', ['', 'Short messages/thousands'], ['2003']], ['2193498', ['', 'Short messages/thousands'], ['2004']], ['24.3', ['Short messages/thousands', 'Change %'], ['2003']], ['33.2', ['Short messages/thousands', 'Change %'], ['2004']], ['347', ['', 'Short messages/subscription'], ['2003']], ['439', ['', 'Short messages/subscription'], ['2004']], ['2314', ['', 'Multimedia messages/thousands'], ['2003']], ['7386', ['', 'Multimedia messages/thousands'], ['2004']], ['', ['Multimedia messages/thousands', 'Change %'], ['2003']], ['219.2', ['Multimedia messages/thousands', 'Change %'], ['2004']]]
         self.do_table(input_path, expected)
 
     def test_table_10(self):
         """Table where prefixing destroys the layout"""
-        input_path = './data/table_example10.csv'
+        input_path = './tests/data/table_example10.csv'
         expected = [['', [''], ['', 'Short messages/thousands']], ['A', [''], ['Short messages/thousands', 'Change %']], ['', [''], ['', ' Short messages/subscription']], ['', [''], ['', 'Multimedia messages/thousands']], ['B', [''], ['Multimedia messages/thousands', 'Change %']], ['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Short messages/thousands', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Multimedia messages/thousands', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Short messages/thousands', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Multimedia messages/thousands', 'Change %']]]
         self.do_table(input_path, expected)
 
     def test_table_11(self):
-        input_path = './data/table_example11b.csv'
+        input_path = './tests/data/table_example11b.csv'
         expected = [['1647218', ['2003'], ['', 'Short messages/thousands']], ['24.3', ['2003'], ['Category A', 'Change %']], ['347', ['2003'], ['', ' Short messages/subscription']], ['2314', ['2003'], ['', 'Multimedia messages/thousands']], ['', ['2003'], ['Category B', 'Change %']], ['2193498', ['2004'], ['', 'Short messages/thousands']], ['33.2', ['2004'], ['Category A', 'Change %']], ['439', ['2004'], ['', ' Short messages/subscription']], ['7386', ['2004'], ['', 'Multimedia messages/thousands']], ['219.2', ['2004'], ['Category B', 'Change %']]]
         self.do_table(input_path, expected)
 
     def test_table_12(self):
-        input_path = './data/table_example12.csv'
+        input_path = './tests/data/table_example12.csv'
         expected = [['1647218', ['', 'Short messages/thousands'], ['2003']], ['2193498', ['', 'Short messages/thousands'], ['2004']], ['24.3', ['Category A', 'Change %'], ['2003']], ['33.2', ['Category A', 'Change %'], ['2004']], ['347', ['', 'Short messages/subscription'], ['2003']], ['439', ['', 'Short messages/subscription'], ['2004']], ['2314', ['', 'Multimedia messages/thousands'], ['2003']], ['7386', ['', 'Multimedia messages/thousands'], ['2004']], ['', ['Category B', 'Change %'], ['2003']], ['219.2', ['Category B', 'Change %'], ['2004']]]
         self.do_table(input_path, expected)
 
     def test_table_13(self):
         """Coordination numbers"""
-        input_path = './data/table_example13.csv'
+        input_path = './tests/data/table_example13.csv'
         expected = [['1.82\xa0±\xa00.3', ['NAsAs'], ['As40Te60']], ['1.07\xa0±\xa00.3', ['NAsAs'], ['As30Cu10Te60']], ['1.13\xa0±\xa00.3', ['NAsAs'], ['As20Cu20Te60']], ['1.18\xa0±\xa00.3', ['NAsAs'], ['As15Cu25Te60']], ['0.79\xa0±\xa00.3', ['NAsAs'], ['As10Cu30Te60']], ['–', ['NAsCu'], ['As40Te60']], ['0.37\xa0±\xa00.2', ['NAsCu'], ['As30Cu10Te60']], ['0.71\xa0±\xa00.25', ['NAsCu'], ['As20Cu20Te60']], ['0.85\xa0±\xa00.25', ['NAsCu'], ['As15Cu25Te60']], ['0.51\xa0±\xa00.3', ['NAsCu'], ['As10Cu30Te60']], ['1.34\xa0±\xa00.3', ['NAsTe'], ['As40Te60']], ['1.58\xa0±\xa00.3', ['NAsTe'], ['As30Cu10Te60']], ['1.80\xa0±\xa00.3', ['NAsTe'], ['As20Cu20Te60']], ['1.94\xa0±\xa00.4', ['NAsTe'], ['As15Cu25Te60']], ['2.76\xa0±\xa00.6', ['NAsTe'], ['As10Cu30Te60']], ['–', ['NCuAs'], ['As40Te60']], ['1.11\xa0±\xa00.6', ['NCuAs'], ['As30Cu10Te60']], ['0.71\xa0±\xa00.25', ['NCuAs'], ['As20Cu20Te60']], ['0.51\xa0±\xa00.15', ['NCuAs'], ['As15Cu25Te60']], ['0.17\xa0±\xa00.1', ['NCuAs'], ['As10Cu30Te60']], ['–', ['NCuCu'], ['As40Te60']], ['1.07\xa0±\xa00.6', ['NCuCu'], ['As30Cu10Te60']], ['1.69\xa0±\xa00.5', ['NCuCu'], ['As20Cu20Te60']], ['1.83\xa0±\xa00.5', ['NCuCu'], ['As15Cu25Te60']], ['3.11\xa0±\xa00.7', ['NCuCu'], ['As10Cu30Te60']], ['–', ['NCuTe'], ['As40Te60']], ['2.32\xa0±\xa00.6', ['NCuTe'], ['As30Cu10Te60']], ['2.01\xa0±\xa00.6', ['NCuTe'], ['As20Cu20Te60']], ['2.46\xa0±\xa00.6', ['NCuTe'], ['As15Cu25Te60']], ['2.17\xa0±\xa00.5', ['NCuTe'], ['As10Cu30Te60']], ['0.89', ['NTeAs'], ['As40Te60']], ['0.79\xa0±\xa00.25', ['NTeAs'], ['As30Cu10Te60']], ['0.60\xa0±\xa00.2', ['NTeAs'], ['As20Cu20Te60']], ['0.49\xa0±\xa00.2', ['NTeAs'], ['As15Cu25Te60']], ['0.46\xa0±\xa00.1', ['NTeAs'], ['As10Cu30Te60']], ['–', ['NTeCu'], ['As40Te60']], ['0.39\xa0±\xa00.2', ['NTeCu'], ['As30Cu10Te60']], ['0.67\xa0±\xa00.2', ['NTeCu'], ['As20Cu20Te60']], ['1.03\xa0±\xa00.25', ['NTeCu'], ['As15Cu25Te60']], ['1.08\xa0±\xa00.25', ['NTeCu'], ['As10Cu30Te60']], ['1.01', ['NTeTe'], ['As40Te60']], ['1.14\xa0±\xa00.2', ['NTeTe'], ['As30Cu10Te60']], ['1.43\xa0±\xa00.2', ['NTeTe'], ['As20Cu20Te60']], ['1.44\xa0±\xa00.2', ['NTeTe'], ['As15Cu25Te60']], ['1.65\xa0±\xa00.2', ['NTeTe'], ['As10Cu30Te60']], ['3.16\xa0±\xa00.3', ['NAsAs + NAsTe'], ['As40Te60']], ['2.65\xa0±\xa00.3', ['NAsAs + NAsTe'], ['As30Cu10Te60']], ['2.93\xa0±\xa00.3', ['NAsAs + NAsTe'], ['As20Cu20Te60']], ['3.12\xa0±\xa00.3', ['NAsAs + NAsTe'], ['As15Cu25Te60']], ['3.55\xa0±\xa00.6', ['NAsAs + NAsTe'], ['As10Cu30Te60']], ['1.90\xa0±\xa00.2', ['NTeAs + NTeTe'], ['As40Te60']], ['1.93\xa0±\xa00.2', ['NTeAs + NTeTe'], ['As30Cu10Te60']], ['2.03\xa0±\xa00.2', ['NTeAs + NTeTe'], ['As20Cu20Te60']], ['1.93\xa0±\xa00.2', ['NTeAs + NTeTe'], ['As15Cu25Te60']], ['2.11\xa0±\xa00.2', ['NTeAs + NTeTe'], ['As10Cu30Te60']], ['3.16\xa0±\xa00.3', ['NAs'], ['As40Te60']], ['3.02\xa0±\xa00.3', ['NAs'], ['As30Cu10Te60']], ['3.64\xa0±\xa00.3', ['NAs'], ['As20Cu20Te60']], ['3.97\xa0±\xa00.3', ['NAs'], ['As15Cu25Te60']], ['4.06\xa0±\xa00.6', ['NAs'], ['As10Cu30Te60']], ['–', ['NCu'], ['As40Te60']], ['4.50\xa0±\xa01.0', ['NCu'], ['As30Cu10Te60']], ['4.41\xa0+\xa00.5', ['NCu'], ['As20Cu20Te60']], ['4.80\xa0±\xa00.5', ['NCu'], ['As15Cu25Te60']], ['5.45\xa0±\xa00.6', ['NCu'], ['As10Cu30Te60']], ['1.90\xa0±\xa00.2', ['NTe'], ['As40Te60']], ['2.32\xa0±\xa00.2', ['NTe'], ['As30Cu10Te60']], ['2.70\xa0±\xa00.2', ['NTe'], ['As20Cu20Te60']], ['2.96\xa0±\xa00.2', ['NTe'], ['As15Cu25Te60']], ['3.19\xa0±\xa00.3', ['NTe'], ['As10Cu30Te60']]]
         self.do_table(input_path, expected)
 
@@ -438,7 +438,7 @@ class TestSingleRowColumnTable(unittest.TestCase):
         self.assertListEqual(expected_cat_t, result)
 
     def test_table_1(self):
-        input_path = './data/te_01.csv'
+        input_path = './tests/data/te_01.csv'
         expected = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
         expected_t = [['StubHeader', 'ColHeader'],
@@ -453,7 +453,7 @@ class TestSingleRowColumnTable(unittest.TestCase):
         self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
 
     def test_table_2(self):
-        input_path = './data/te_02.csv'
+        input_path = './tests/data/te_02.csv'
         expected = [['StubHeader', 'ColHeader'],
                     ['RowHeader', 'Data'],
                     ['RowHeader', 'Data'],
@@ -468,7 +468,7 @@ class TestSingleRowColumnTable(unittest.TestCase):
         self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
 
     def test_table_3(self):
-        input_path = './data/te_03.csv'
+        input_path = './tests/data/te_03.csv'
         expected = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'],
                     ['/', 'StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                     ['/', 'RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data'],

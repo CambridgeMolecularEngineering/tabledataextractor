@@ -233,22 +233,10 @@ INFO       in test_table_table.py --> Table Cell CC3 = (4, 1)
 INFO       in test_table_table.py --> Table Cell CC3 = (4, 1)
 DEBUG      in test_table_table.py --> Result = (4, 1)
 INFO       in table.py            --> Printing table: ./data/table_example7.csv
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example1.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+DEBUG      in test_table_table.py --> Test CC4, Table: ./tests/data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./tests/data/table_example1.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-INFO       in from_any.py         --> CSV File: ./data/table_example1.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (7, 8) to (7, 8).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Prefixing. Attempt to run main MIPS algorithm.
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in test_table_table.py --> Table Cell CC4 = (6, 7)
-INFO       in table.py            --> Printing table: ./data/table_example1.csv
-DEBUG      in test_table_table.py --> Result = (6, 7)
+CRITICAL   in from_any.py         --> Input is invalid
 DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example2.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}

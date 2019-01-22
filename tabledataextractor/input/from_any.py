@@ -69,6 +69,6 @@ def create_table(name_key, table_number=1):
     else:
         msg = 'Input is invalid'
         log.critical(msg)
-        raise TypeError(msg)
+        raise TypeError(msg, str(name_key))
 
 
