@@ -10,7 +10,7 @@ setup(name='TableDataExtractor',
       packages=find_packages(exclude=['tests']),
       long_description=open('README.md').read(),
       zip_safe=False,
-      test_suite='unittest'
+      test_suite='unittest',
       tests_require=[
             'numpy==1.15.2',
             'sympy',
