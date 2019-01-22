@@ -1,31 +1,3 @@
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example1.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example2.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example3.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example4.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example5.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example6.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example7.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
 DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example1.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
@@ -82,51 +54,31 @@ DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example7.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example10.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example10.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example11.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example11.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example12.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example12.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example8.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example8.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example9.csv
-INFO       in table.py            --> Initialization of table: "./data/table_example9.csv"
-INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
-CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example1.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example1.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example2.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example2.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example3.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example3.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example4.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example4.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example5.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example5.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example6.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example6.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
-DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example7.csv
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example7.csv
 INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
@@ -178,6 +130,26 @@ DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_ex
 INFO       in table.py            --> Initialization of table: "./data/table_example9.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example10.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example10.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example11.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example11.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example12.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example12.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example8.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example8.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example9.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example9.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
 DEBUG      in test_table_table.py --> Test single column/row table: ./data/te_01.csv
 INFO       in table.py            --> Initialization of table: "./data/te_01.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
@@ -188,5 +160,33 @@ INFO       in table.py            --> Configuration parameters are: {'use_title_
 CRITICAL   in from_any.py         --> Input is invalid
 DEBUG      in test_table_table.py --> Test single column/row table: ./data/te_03.csv
 INFO       in table.py            --> Initialization of table: "./data/te_03.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example6.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
 INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
 CRITICAL   in from_any.py         --> Input is invalid
