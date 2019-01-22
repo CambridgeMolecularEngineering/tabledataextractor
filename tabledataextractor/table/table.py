@@ -23,7 +23,7 @@ from tabledataextractor.table.parse import CellParser, StringParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 class Table:
@@ -115,6 +115,7 @@ class Table:
         self.stub_header = None
         self.row_header = None
         self.col_header = None
+        self.title_row = None
         self.data = None
         self.transposed = False
 
@@ -846,6 +847,7 @@ class Table:
         """
 
         title_row = self.find_title_row()
+        self.title_row = title_row
 
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
