@@ -24,4 +24,4 @@ before_script:
   - sleep 3
 script:
   - export PYTHONPATH="$PWD:$PYTHONPATH"
-  - python -m unittest tests
+  - python -m unittest tests/*
