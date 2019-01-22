@@ -1,252 +1,192 @@
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (7, 8) to (7, 8).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (6, 7)
-INFO       in table.py            --> Table Cell CC1 = (0, 1); Table Cell CC2 = (1, 1)
-INFO       in table.py            --> Table Cell CC3 = (2, 2)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.html"
-INFO       in from_any.py         --> HTML File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.html
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (7, 7) to (7, 7).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (6, 6)
-INFO       in table.py            --> Table Cell CC1 = (0, 0); Table Cell CC2 = (1, 0)
-INFO       in table.py            --> Table Cell CC3 = (2, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example.html
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example1.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example1.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (7, 8) to (7, 8).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (6, 7)
-INFO       in table.py            --> Table Cell CC1 = (0, 1); Table Cell CC2 = (1, 1)
-INFO       in table.py            --> Table Cell CC3 = (2, 2)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example1.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example2.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example2.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (5, 6) to (5, 6).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (3, 5)
-INFO       in table.py            --> Table Cell CC1 = (0, 0); Table Cell CC2 = (2, 0)
-INFO       in table.py            --> Table Cell CC3 = (3, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example2.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (4, 6) to (4, 6).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Column header prefixing, row_index= 1
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (4, 5)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (2, 0)
-INFO       in table.py            --> Table Cell CC3 = (3, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4_3.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4_3.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (7, 3) to (7, 3).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Row header prefixing, column_index= 0
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (6, 3)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (1, 1)
-INFO       in table.py            --> Table Cell CC3 = (2, 2)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example4_3.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example5.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example5.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (5, 6) to (5, 6).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Column header prefixing, row_index= 2
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (4, 5)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (2, 0)
-INFO       in table.py            --> Table Cell CC3 = (3, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example5.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example6.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example6.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (12, 4) to (12, 4).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (11, 3)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (1, 0)
-INFO       in table.py            --> Table Cell CC3 = (2, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example6.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_10.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_10.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (6, 7) to (6, 7).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (5, 6)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (1, 0)
-INFO       in table.py            --> Table Cell CC3 = (2, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_10.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_11.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_11.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (11, 5) to (11, 5).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (9, 4)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (1, 0)
-INFO       in table.py            --> Table Cell CC3 = (2, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = [(10, 0, ('a', 'From peak fit and not integration'))]
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "(^.+\s)(a)(\s.+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^(a)$"
-INFO       in table.py            --> FNref Cells = [(8, 2, ('5.7(2) ', 'a', None)), (8, 3, ('5.7(2) ', 'a', None))]
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_example_11.csv
-INFO       in table.py            --> Initialization of table: "C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_official_development_assistance.csv"
-INFO       in from_any.py         --> CSV File: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_official_development_assistance.csv
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [1, 10] deleted.
-INFO       in table.py            --> Empty columns [13] deleted.
-INFO       in table.py            --> Duplicate rows [3] removed.
-INFO       in table.py            --> Duplicate columns [4, 12] removed.
-INFO       in table.py            --> Table shape changed from (14, 14) to (11, 11).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (7, 10)
-INFO       in table.py            --> Table Cell CC1 = (1, 0); Table Cell CC2 = (2, 0)
-INFO       in table.py            --> Table Cell CC3 = (3, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = [(8, 0, ('1',))]
-INFO       in table.py            --> FNtext Cells = [(8, 1)]
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = [(9, 0, ('*', 'Test')), (10, 0, ('*', 'Source'))]
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "(^.+\s)(1)(\s.+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^(1)$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "(\*)"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "(\*)"
-INFO       in table.py            --> FNref Cells = [(7, 0, ('OECD/DAC ', '1', None)), (2, 4, ('*',)), (2, 5, ('*',)), (2, 9, ('*',)), (2, 10, ('*',)), (2, 4, ('*',)), (2, 5, ('*',)), (2, 9, ('*',)), (2, 10, ('*',)), (9, 0, ('*',))]
-INFO       in table.py            --> Repr. table: C:\Users\juras\OneDrive - University Of Cambridge\Projects\AmorphousDatabase\TableDataExtractor\development_jm2111\data\table_official_development_assistance.csv
-INFO       in table.py            --> Initialization of table: "https://journals.aps.org/prb/abstract/10.1103/PhysRevB.86.064201#fulltext"
-INFO       in from_any.py         --> Url: https://journals.aps.org/prb/abstract/10.1103/PhysRevB.86.064201#fulltext
-INFO       in table.py            --> Initialization of table: "https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta"
-INFO       in from_any.py         --> Url: https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta
-INFO       in from_html.py        --> Package 'requests' was used.
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Empty rows [] deleted.
-INFO       in table.py            --> Empty columns [] deleted.
-INFO       in table.py            --> Duplicate rows [] removed.
-INFO       in table.py            --> Duplicate columns [] removed.
-INFO       in table.py            --> Table shape changed from (8, 10) to (8, 10).
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([\s\-\–\"]+)?$"
-INFO       in table.py            --> Table Cell CC4 = (7, 9)
-INFO       in table.py            --> Table Cell CC1 = (0, 0); Table Cell CC2 = (0, 0)
-INFO       in table.py            --> Table Cell CC3 = (1, 1)
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)$"
-INFO       in table.py            --> FNPrefix Cells = []
-INFO       in table.py            --> FNtext Cells = []
-INFO       in parse.py            --> Initialization of CellParser with regex pattern: "^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)"
-INFO       in table.py            --> FNPrefix&FNtext Cells = []
-INFO       in table.py            --> FNref Cells = []
-INFO       in table.py            --> Repr. table: https://iopscience.iop.org/article/10.1088/0022-3727/46/32/325302/meta
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example6.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC4, Table: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example6.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC1 & CC2, Table: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example6.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test CC3, Table: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example10.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example10.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example11.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example11.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example12.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example12.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example8.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example8.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test duplicate label prefixing: ./data/table_example9.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example9.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example6.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example6.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test complete table labelling: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example1.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example1.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example10.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example10.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example11b.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example11b.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example12.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example12.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example13.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example13.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example2.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example2.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example3.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example3.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example4.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example4.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example5.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example5.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example7.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example7.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example8.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example8.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test Categorization Table: ./data/table_example9.csv
+INFO       in table.py            --> Initialization of table: "./data/table_example9.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test single column/row table: ./data/te_01.csv
+INFO       in table.py            --> Initialization of table: "./data/te_01.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test single column/row table: ./data/te_02.csv
+INFO       in table.py            --> Initialization of table: "./data/te_02.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
+DEBUG      in test_table_table.py --> Test single column/row table: ./data/te_03.csv
+INFO       in table.py            --> Initialization of table: "./data/te_03.csv"
+INFO       in table.py            --> Configuration parameters are: {'use_title_row': True, 'use_max_data_area': False, 'use_notes_in_first_col': True, 'use_prefixing': True, 'use_footnotes': True}
+CRITICAL   in from_any.py         --> Input is invalid
