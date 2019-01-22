@@ -10,10 +10,10 @@ jm2111@cam.ac.uk
 import logging
 
 __title__ = 'TableDataExtractor'
-__version__ = '1.0.0'
+__version__ = '1.0'
 __author__ = 'Juraj Mavračić'
 __email__ = 'jm2111@cam.ac.uk'
-__license__ = 'MIT'  # ?
+__license__ = 'proprietary'  # ?
 __copyright__ = 'Copyright 2018 Juraj Mavracic'
 
 log = logging.getLogger(__name__)
