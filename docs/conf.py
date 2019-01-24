@@ -19,14 +19,14 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'TableDataExtractor'
-copyright = '2018, Juraj Mavračić'
-author = 'Juraj Mavračić'
+project = u'TableDataExtractor'
+copyright = u'2018, Juraj Mavračić'
+author = u'Juraj Mavračić'
 
 # The short X.Y version
-version = 'pre-release'
+version = u'pre-release'
 # The full version, including alpha/beta/rc tags
-release = '2018'
+release = u'2018'
 
 
 # -- General configuration ---------------------------------------------------
