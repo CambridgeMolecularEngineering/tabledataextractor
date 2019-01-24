@@ -44,6 +44,7 @@ Usage::
    cell_parser
    input
    output
+   examples
    external
 
 
