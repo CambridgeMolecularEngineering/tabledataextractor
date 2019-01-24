@@ -370,8 +370,7 @@ class Table:
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
         :param table: table which will be used, has to be passed explicitly
-        :param use_max_data_area: If set to True the maximum data area for CC2 will be used, according to Embley et al.
-        However, this is an unsafe setting and the default 'False' is usually better.
+        :param use_max_data_area: If set to True the maximum data area for CC2 will be used, according to Embley et al. However, this is an unsafe setting and the default 'False' is usually better.
         :type cc4: Tuple
         :type use_max_data_area: boolean
         """
