@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_any
-====================================
 Analyzes the input and calls the appropriate input module.
 """
 

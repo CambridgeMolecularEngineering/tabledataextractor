@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.output.print.py
-====================================
 Reads a csv formatted table.
 """
 
