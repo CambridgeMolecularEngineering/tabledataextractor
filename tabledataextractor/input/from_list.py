@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_list
-=====================================
+Inputs from python list object.
 """
 
 import numpy as np

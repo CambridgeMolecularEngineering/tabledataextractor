@@ -6,7 +6,27 @@
 Welcome to TableDataExtractor!
 ==============================================
 
-Usage::
+Input a table as **.csv** file, **python list**, **.html** file, or **url** and output a standardized table where each row corresponds to a single data entry in the original table.
+TableDataExtractor will take care of complicated header structures in row and column headers, which includes:
+
+   * spanning cells
+   * nested column/row headers
+   * titles within the table
+   * note cells
+   * footnotes
+   * prefixing of row and column headers if non-unique
+
+.. highlights::
+   **TableDataExtractor will output to Pandas and will automatically create complex MultiIndex DataFrame structures.**
+
+.. rubric:: Example
+
+Importing Table 3 from 'https://link.springer.com/article/10.1007%2Fs10853-012-6439-6':
+
+.. image:: ./images/table_example.png
+
+
+::
 
    from tabledataextractor import Table
    table = Table('https://link.springer.com/article/10.1007%2Fs10853-012-6439-6',3)
@@ -14,37 +34,54 @@ Usage::
 
 ::
 
-                            Ti–O          Ti–Ti1     Ti–Ti2     O–O
-    96-Atom model I         1.92          3.08       3.48       2.85
-    96-Atom model II        1.91          3.07       3.53       2.83
-    192-Atom model          1.94          3.13       3.59       2.74
-    RMC + Expt. [4]         1.96          3.00       3.55       2.67
-    Rutile (this study)     1.97, 2.00    2.99       3.60       2.56, 2.80
-    Rutile (Expt. [28])     1.95, 1.98    2.96       3.57       2.53, 2.78
-    Anatase (this study)    1.96, 2.00    3.07       3.83       2.49, 2.82
-    Anatase (Expt. [28])    1.94, 1.96    3.03       3.78       2.45, 2.80
-
-
-    StubHeader  ColHeader  ColHeader  ColHeader  ColHeader
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
-    RowHeader   Data       Data       Data       Data
+    +--------------+----------------------------+-------------------+
+    |     Data     |       Row Categories       | Column Categories |
+    +--------------+----------------------------+-------------------+
+    |     1.92     |   [' 96-Atom model I ']    |     [' Ti–O ']    |
+    |     3.08     |   [' 96-Atom model I ']    |   [' Ti–Ti1  ']   |
+    |     3.48     |   [' 96-Atom model I ']    |   [' Ti–Ti2  ']   |
+    |     2.85     |   [' 96-Atom model I ']    |     [' O–O ']     |
+    |     1.91     |   [' 96-Atom model II ']   |     [' Ti–O ']    |
+    |     3.07     |   [' 96-Atom model II ']   |   [' Ti–Ti1  ']   |
+    |     3.53     |   [' 96-Atom model II ']   |   [' Ti–Ti2  ']   |
+    |     2.83     |   [' 96-Atom model II ']   |     [' O–O ']     |
+    |     1.94     |    [' 192-Atom model ']    |     [' Ti–O ']    |
+    |     3.13     |    [' 192-Atom model ']    |   [' Ti–Ti1  ']   |
+    |     3.59     |    [' 192-Atom model ']    |   [' Ti–Ti2  ']   |
+    |     2.74     |    [' 192-Atom model ']    |     [' O–O ']     |
+    |     1.96     |   [' RMC + Expt. [4] ']    |     [' Ti–O ']    |
+    |     3.00     |   [' RMC + Expt. [4] ']    |   [' Ti–Ti1  ']   |
+    |     3.55     |   [' RMC + Expt. [4] ']    |   [' Ti–Ti2  ']   |
+    |     2.67     |   [' RMC + Expt. [4] ']    |     [' O–O ']     |
+    |  1.97, 2.00  | [' Rutile (this study) ']  |     [' Ti–O ']    |
+    |     2.99     | [' Rutile (this study) ']  |   [' Ti–Ti1  ']   |
+    |     3.60     | [' Rutile (this study) ']  |   [' Ti–Ti2  ']   |
+    |  2.56, 2.80  | [' Rutile (this study) ']  |     [' O–O ']     |
+    |  1.95, 1.98  | [' Rutile (Expt. [28]) ']  |     [' Ti–O ']    |
+    |     2.96     | [' Rutile (Expt. [28]) ']  |   [' Ti–Ti1  ']   |
+    |     3.57     | [' Rutile (Expt. [28]) ']  |   [' Ti–Ti2  ']   |
+    |  2.53, 2.78  | [' Rutile (Expt. [28]) ']  |     [' O–O ']     |
+    |  1.96, 2.00  | [' Anatase (this study) '] |     [' Ti–O ']    |
+    |      3.07    | [' Anatase (this study) '] |   [' Ti–Ti1  ']   |
+    |     3.83     | [' Anatase (this study) '] |   [' Ti–Ti2  ']   |
+    |  2.49, 2.82  | [' Anatase (this study) '] |     [' O–O ']     |
+    |  1.94, 1.96  | [' Anatase (Expt. [28]) '] |     [' Ti–O ']    |
+    |     3.03     | [' Anatase (Expt. [28]) '] |   [' Ti–Ti1  ']   |
+    |     3.78     | [' Anatase (Expt. [28]) '] |   [' Ti–Ti2  ']   |
+    |  2.45, 2.80  | [' Anatase (Expt. [28]) '] |     [' O–O ']     |
+    +--------------+----------------------------+-------------------+
 
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :maxdepth: 1
    :caption: Contents:
 
+   examples
    table_object
    cell_parser
    input
    output
-   examples
    external
 
 

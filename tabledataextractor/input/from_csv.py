@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_csv
-===================================
 Reads a csv formatted table from file.
 
 The file has to be 'utf-8' encoded.

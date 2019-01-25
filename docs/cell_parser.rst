@@ -7,6 +7,9 @@ Cell Parser
     .. autoclass:: CellParser
         :members:
 
+    .. autoclass:: StringParser
+        :members:
+
 
 
 

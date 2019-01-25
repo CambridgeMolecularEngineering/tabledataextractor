@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.input.from_html
-====================================
 Reads an html formatted table.
 """
 

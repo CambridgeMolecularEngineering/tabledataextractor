@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-tabledataextractor.table.table
-
 Raw, processed and final labelled table.
 
 .. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
@@ -31,18 +29,7 @@ class Table:
     Initialized by converting the input to a numpy array form and performing all
     appropriate labelling steps.
 
-    :param file_path: Path to .html or .cvs file, URL or list object that is used as input
-    :type file_path: str | list
-    :param table_number: Number of the table that we want to input if there are several at the given address/path
-    :type table_number: int
-    """
-
-    def __init__(self, file_path, table_number=1, **kwargs):
-        """
-        Will initialize the table object, with all 'None' properties.
-        After reading-in of the raw table from a source the table will be analyzed.
-
-        Optional configuration keywords:
+     Optional configuration keywords:
             ``use_title_row = True``, default. A title row will be assumed if possible.
 
             ``use_max_data_area = False``, default. If True the max data area will be used to determine CC2 in the main MIPS algorithm.
@@ -59,6 +46,17 @@ class Table:
 
             ``use_footnotes =True``, default.
             Will label footnotes.
+
+    :param file_path: Path to .html or .cvs file, URL or list object that is used as input
+    :type file_path: str | list
+    :param table_number: Number of the table that we want to input if there are several at the given address/path
+    :type table_number: int
+    """
+
+    def __init__(self, file_path, table_number=1, **kwargs):
+        """
+        Will initialize the table object, with all 'None' properties.
+        After reading-in of the raw table from a source the table will be analyzed.
 
         :param file_path: Path to .html or .cvs file, URL or list object that is used as input
         :type file_path: str | list
@@ -973,8 +971,8 @@ class Table:
     def __str__(self):
         """As the user wants to see it"""
         log.info("Printing table: {}".format(self.file_path))
-        output = as_string(self.pre_cleaned_table)
-        return output
+        t = list_as_PrettyTable(self.category_table)
+        return str(t)
 
     def __repr__(self):
         """As the developer wants to see it"""
