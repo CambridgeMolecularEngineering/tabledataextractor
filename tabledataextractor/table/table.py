@@ -6,19 +6,19 @@ Raw, processed and final labelled table.
 
 """
 
-import sys
 import logging
-import numpy as np
 import re
+
+import numpy as np
 from sympy import Symbol
 from sympy import factor_list
+
 from tabledataextractor.input import from_any
-from tabledataextractor.output.print import print_table, list_as_PrettyTable
 from tabledataextractor.output.print import as_string
+from tabledataextractor.output.print import print_table, list_as_PrettyTable
 from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
-
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -66,8 +66,8 @@ class Table:
         """
 
         log.info('Initialization of table: "{}"'.format(file_path))
-        self.file_path = file_path
-        self.table_number = table_number
+        self.__file_path = file_path
+        self.__table_number = table_number
 
         # default settings
         self.configs = dict()
@@ -87,7 +87,7 @@ class Table:
         log.info('Configuration parameters are: {}'.format(self.configs))
 
         # read-in the raw table from any source
-        self.raw_table = from_any.create_table(self.file_path, table_number)
+        self.raw_table = from_any.create_table(self.__file_path, table_number)
         # check if everything is ok with the raw table
         if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
             msg = 'Input was not properly converted to numpy array.'
@@ -101,14 +101,14 @@ class Table:
             raise InputTableError(msg)
 
         # initializing empty elements
-        self.cc1 = None
-        self.cc2 = None
-        self.cc3 = None
-        self.cc4 = None
+        self.__cc1 = None
+        self.__cc2 = None
+        self.__cc3 = None
+        self.__cc4 = None
         self.category_table = []
         self.pre_cleaned_table = None
-        self.pre_cleaned_table_empty = None
-        self.raw_table_empty = None
+        self.__pre_cleaned_table_empty = None
+        self.__raw_table_empty = None
         self.labels = None
         self.stub_header = None
         self.row_header = None
@@ -127,12 +127,12 @@ class Table:
         """
 
         # mask, 'cell = True' if cell is empty
-        self.raw_table_empty = self.empty_cells(self.raw_table)
+        self.__raw_table_empty = self.empty_cells(self.raw_table)
 
         # pre-cleaning table
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
-        self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        self.__pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # TESTING
         # self.print()
@@ -140,7 +140,7 @@ class Table:
         # prefixing of duplicate labels in the header region
         if self.configs['use_prefixing']:
             self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
-            self.pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+            self.__pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -148,15 +148,15 @@ class Table:
         self.label_sections()
 
         # making regions proper elements of the table object
-        if self.cc1 and self.cc2 and self.cc3 and self.cc4:
-            self.stub_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc1[1]:self.cc2[1] + 1]
-            self.row_header = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc1[1]:self.cc2[1] + 1]
-            self.col_header = self.pre_cleaned_table[self.cc1[0]:self.cc2[0] + 1, self.cc3[1]:self.cc4[1] + 1]
-            self.data = self.pre_cleaned_table[self.cc3[0]:self.cc4[0] + 1, self.cc3[1]:self.cc4[1] + 1]
+        if self.__cc1 and self.__cc2 and self.__cc3 and self.__cc4:
+            self.stub_header = self.pre_cleaned_table[self.__cc1[0]:self.__cc2[0] + 1, self.__cc1[1]:self.__cc2[1] + 1]
+            self.row_header = self.pre_cleaned_table[self.__cc3[0]:self.__cc4[0] + 1, self.__cc1[1]:self.__cc2[1] + 1]
+            self.col_header = self.pre_cleaned_table[self.__cc1[0]:self.__cc2[0] + 1, self.__cc3[1]:self.__cc4[1] + 1]
+            self.data = self.pre_cleaned_table[self.__cc3[0]:self.__cc4[0] + 1, self.__cc3[1]:self.__cc4[1] + 1]
 
             # categorization
-            self.category_table = self.build_category_table(self.pre_cleaned_table, self.cc1, self.cc2, self.cc3,
-                                                            self.cc4)
+            self.category_table = self.build_category_table(self.pre_cleaned_table, self.__cc1, self.__cc2, self.__cc3,
+                                                            self.__cc4)
 
     def transpose(self):
         """
@@ -167,14 +167,14 @@ class Table:
         self.raw_table = self.raw_table.T
         self.transposed = True
         # self.print()
-        self.cc1 = None
-        self.cc2 = None
-        self.cc3 = None
-        self.cc4 = None
+        self.__cc1 = None
+        self.__cc2 = None
+        self.__cc3 = None
+        self.__cc4 = None
         self.category_table = []
         self.pre_cleaned_table = None
-        self.pre_cleaned_table_empty = None
-        self.raw_table_empty = None
+        self.__pre_cleaned_table_empty = None
+        self.__raw_table_empty = None
         self.labels = None
         self.stub_header = None
         self.row_header = None
@@ -243,7 +243,6 @@ class Table:
             unique_prefix = False
             prefixed = False
             row_index = 0
-            duplicated_row = []
             new_row = []
             for row_index, row in enumerate(table):
                 duplicated_row = []
@@ -353,14 +352,14 @@ class Table:
             # counting the number of full cells
             # if n_empty < n_full terminate, this is our goal row
             n_full = 0
-            n_columns = len(self.pre_cleaned_table_empty[row_index])
-            for empty in self.pre_cleaned_table_empty[row_index]:
+            n_columns = len(self.__pre_cleaned_table_empty[row_index])
+            for empty in self.__pre_cleaned_table_empty[row_index]:
                 if not empty:
                     n_full += 1
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
 
-    def find_cc1_cc2(self,cc4,table):
+    def find_cc1_cc2(self, cc4, table):
         """
         Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
@@ -368,9 +367,7 @@ class Table:
 
         :param cc4: Tuple, position of CC4 cell found with find_cc4()
         :param table: table which will be used, has to be passed explicitly
-        :param use_max_data_area: If set to True the maximum data area for CC2 will be used, according to Embley et al. However, this is an unsafe setting and the default 'False' is usually better.
         :type cc4: Tuple
-        :type use_max_data_area: boolean
         """
 
         # Initialize
@@ -413,7 +410,7 @@ class Table:
             else:
                 return False
 
-        def table_slice_cc2(table,r2,r_max,c1,c2):
+        def table_slice_cc2(table, r2, r_max, c1, c2):
             """
             Function to cut the correct slices out of array for CC2 in find_cc1_cc2().
             Cuts out the next row and column header candidates from the pre-cleaned table.
@@ -428,34 +425,35 @@ class Table:
 
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
-            if r2+1 == r_max and c1 == c2:
-                section_1 = table[r2+1, c1]
-            elif r2+1 == r_max and c1 != c2:
-                section_1 = table[r2+1, c1:c2+1]
-            elif r2+1 != r_max and c1 != c2:
-                section_1 = table[r2+1:r_max+1, c1:c2+1]
+            if r2 + 1 == r_max and c1 == c2:
+                section_1 = table[r2 + 1, c1]
+            elif r2 + 1 == r_max and c1 != c2:
+                section_1 = table[r2 + 1, c1:c2 + 1]
+            elif r2 + 1 != r_max and c1 != c2:
+                section_1 = table[r2 + 1:r_max + 1, c1:c2 + 1]
             elif r2 + 1 != r_max and c1 == c2:
-                section_1 = table[r2 + 1:r_max+1, c1]
+                section_1 = table[r2 + 1:r_max + 1, c1]
             else:
-                log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2+1, r_max, c1, c2))
+                log.critical("Not defined section_1, r2+1= {}, r_max= {}, c1= {}, c2= {}".format(r2 + 1, r_max, c1, c2))
                 section_1 = None
 
             # contrary to the published pseudocode the row maximum is r2, not r2-1
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
-            if r1 == r2 and c2+1 == c_max:
-                section_2 = table[r1, c2+1]
-            elif r1 == r2 and c2+1 != c_max:
-                section_2 = table[r1, c2+1 : c_max+1]
-            elif r1 != r2 and c2+1 != c_max:
-                section_2 = table[r1: r2+1, c2+1: c_max+1]
-            elif r1 != r2 and c2+1 == c_max:
-                section_2 = table[r1: r2+1, c2+1]
+            if r1 == r2 and c2 + 1 == c_max:
+                section_2 = table[r1, c2 + 1]
+            elif r1 == r2 and c2 + 1 != c_max:
+                section_2 = table[r1, c2 + 1: c_max + 1]
+            elif r1 != r2 and c2 + 1 != c_max:
+                section_2 = table[r1: r2 + 1, c2 + 1: c_max + 1]
+            elif r1 != r2 and c2 + 1 == c_max:
+                section_2 = table[r1: r2 + 1, c2 + 1]
             else:
-                log.critical("Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2-1, r1, c2+1, c_max))
+                log.critical(
+                    "Not defined section_2, r2-1= {}, r1= {}, c2+1= {}, c_max= {}".format(r2 - 1, r1, c2 + 1, c_max))
                 section_2 = None
 
-            return section_1,section_2
+            return section_1, section_2
 
         def table_slice_1_cc1(table, r1, r2, c2, c_max):
             """
@@ -465,16 +463,18 @@ class Table:
             # one more row and column index than in the published pseudocode is needed,
             # since the a:b notation in python doesn't include b
             # contrary to the published pseudocode, the correct range is [r1:r2,c2+1:c_max] and not [r1+1:r2,c2+1:c_max]
-            if r1 == r2 and c2+1 == c_max:
-                section = table[r1, c2+1]
-            elif r1 == r2 and c2+1 != c_max:
-                section = table[r1, c2+1:c_max+1]
-            elif r1 != r2 and c2+1 != c_max:
-                section = table[r1: r2+1, c2 + 1:c_max+1]
-            elif r1 != r2 and c2+1 == c_max:
-                section = table[r1: r2+1, c2 + 1]
+            if r1 == r2 and c2 + 1 == c_max:
+                section = table[r1, c2 + 1]
+            elif r1 == r2 and c2 + 1 != c_max:
+                section = table[r1, c2 + 1:c_max + 1]
+            elif r1 != r2 and c2 + 1 != c_max:
+                section = table[r1: r2 + 1, c2 + 1:c_max + 1]
+            elif r1 != r2 and c2 + 1 == c_max:
+                section = table[r1: r2 + 1, c2 + 1]
             else:
-                log.critical("Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1+1, r2, c2+1, c_max))
+                log.critical(
+                    "Not defined section 1 for cc1, r1+1= {}, r2= {}, c2+1= {}, c_max= {}".format(r1 + 1, r2, c2 + 1,
+                                                                                                  c_max))
                 section = None
             return section
 
@@ -489,13 +489,15 @@ class Table:
             if r2 == r_max and c1 == c2:
                 section = table[r2, c1]
             elif r2 == r_max and c1 != c2:
-                section = table[r2, c1 : c2+1 ]
+                section = table[r2, c1: c2 + 1]
             elif r2 != r_max and c1 != c2:
-                section = table[r2 : r_max+1, c1 : c2+1 ]
+                section = table[r2: r_max + 1, c1: c2 + 1]
             elif r2 != r_max and c1 == c2:
-                section = table[r2 : r_max+1, c1]
+                section = table[r2: r_max + 1, c1]
             else:
-                log.critical("Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2+1, c2, c1+1, r_max))
+                log.critical(
+                    "Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2 + 1, c2, c1 + 1,
+                                                                                                  r_max))
                 section = None
             return section
 
@@ -520,7 +522,7 @@ class Table:
                 if self.configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
-                    log.debug("Data area:\n{}".format(table[r2+1:r_max+1, c2+1:c_max+1]))
+                    log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
                     if data_area >= max_area:
                         max_area = data_area
                         cc2 = (r2, c2)
@@ -572,7 +574,11 @@ class Table:
                     cc2 = (r2, c2)
                     break
 
-        log.debug("Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max, c_max, c1, c2, r1, r2, cc2))
+        log.debug(
+            "Ended loop with:  r_max= {}, c_max= {}, c1= {}, c2= {}, r1= {}, r2= {}, cc2= {}\n\n\n\n".format(r_max,
+                                                                                                             c_max, c1,
+                                                                                                             c2, r1, r2,
+                                                                                                             cc2))
 
         # re-initialization of r2 and c2 from cc2; missing in the pseudocode
         r2 = cc2[0]
@@ -588,7 +594,6 @@ class Table:
 
         log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(table, r2, r_max, c1, c2)))
         while not duplicate_rows(table_slice_2_cc1(table, r2, r_max, c1, c2)) and c1 <= c2:
-
             log.debug("Potentially duplicate rows:\n{}".format(table_slice_2_cc1(table, r2, r_max, c1, c2)))
             log.debug("Duplicate rows= {}".format(duplicate_rows(table_slice_2_cc1(table, r2, r_max, c1, c2))))
             c1 = c1 + 1
@@ -603,7 +608,7 @@ class Table:
         assert not duplicate_columns(table_slice_1_cc1(table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
         assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
         assert r1 >= 0 and c1 >= 0
-        cc1 = (r1-1, c1-1)
+        cc1 = (r1 - 1, c1 - 1)
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
         if not self.configs['use_title_row']:
@@ -615,7 +620,7 @@ class Table:
 
         return cc1, cc2
 
-    def find_cc3(self,cc2):
+    def find_cc3(self, cc2):
         """
         Searches for cell 'CC3', as the leftmost cell of the first filled row of the data region.
 
@@ -636,18 +641,18 @@ class Table:
 
         # OPTION 1
         # searching from the top of table for first half-full row, starting with first row below the header:
-        n_rows = len(self.pre_cleaned_table[cc2[0]+1:])
+        n_rows = len(self.pre_cleaned_table[cc2[0] + 1:])
         log.debug("n_rows= {}".format(n_rows))
-        for row_index in range(cc2[0]+1,cc2[0]+1+n_rows, 1):
+        for row_index in range(cc2[0] + 1, cc2[0] + 1 + n_rows, 1):
             n_full = 0
-            n_columns = len(self.pre_cleaned_table[row_index,cc2[1]+1:])
+            n_columns = len(self.pre_cleaned_table[row_index, cc2[1] + 1:])
             log.debug("n_columns= {}".format(n_columns))
-            for column_index in range(cc2[1]+1,cc2[1]+1+n_columns,1):
-                empty = self.pre_cleaned_table_empty[row_index,column_index]
+            for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
+                empty = self.__pre_cleaned_table_empty[row_index, column_index]
                 if not empty:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
-                    return (row_index, cc2[1]+1)
+                    return row_index, cc2[1] + 1
         raise SystemError("No CC3 critical cell found! No data region defined.")
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
@@ -657,7 +662,7 @@ class Table:
         Searches for the topmost non-empty row.
         :return: int
         """
-        for row_index, empty_row in enumerate(self.pre_cleaned_table_empty):
+        for row_index, empty_row in enumerate(self.__pre_cleaned_table_empty):
             if not empty_row.all():
                 return row_index
 
@@ -666,12 +671,12 @@ class Table:
         Searches for all non-empty cells that have not been labelled previously.
         :return: Tuple
         """
-        for row_index,row in enumerate(self.labels):
-            for column_index,cell in enumerate(row):
-                if cell == '/' and not self.pre_cleaned_table_empty[row_index,column_index]:
-                    yield row_index,column_index
+        for row_index, row in enumerate(self.labels):
+            for column_index, cell in enumerate(row):
+                if cell == '/' and not self.__pre_cleaned_table_empty[row_index, column_index]:
+                    yield row_index, column_index
 
-    def find_FNprefix(self,cc4):
+    def find_FNprefix(self, cc4):
         """
         FNprefix  = \*, #, ., o, †; possibly followed by "." or ")".
         Searches only below the data region.
@@ -687,7 +692,7 @@ class Table:
                 fn_prefix.append(fn_prefix_index)
         return fn_prefix
 
-    def find_FNtext(self,fn_prefix):
+    def find_FNtext(self, fn_prefix):
         """
         All the cells following a footnote marker in the same row as an fn_prefix cell.
 
@@ -698,12 +703,12 @@ class Table:
         fn_text = []
         for fn_prefix_cell in fn_prefix:
             # append all non-empty cells following fn_prefix index in the same row
-            for column_index in range(fn_prefix_cell[1]+1,np.shape(self.pre_cleaned_table)[1]):
-                if not self.pre_cleaned_table_empty[fn_prefix_cell[0],column_index]:
-                    fn_text.append((fn_prefix_cell[0],column_index))
+            for column_index in range(fn_prefix_cell[1] + 1, np.shape(self.pre_cleaned_table)[1]):
+                if not self.__pre_cleaned_table_empty[fn_prefix_cell[0], column_index]:
+                    fn_text.append((fn_prefix_cell[0], column_index))
         return fn_text
 
-    def find_FNprefix_FNtext(self,cc4):
+    def find_FNprefix_FNtext(self, cc4):
         """
         FNprefix  = \*, #, ., o, †; possibly followed by "." or ")", followed by FNtext in the same cell.
         FNtext can be started by any word character '\w', '[' or ']'
@@ -720,7 +725,7 @@ class Table:
                 fn_prefix_fn_text.append(fn_prefix_fn_text_index)
         return fn_prefix_fn_text
 
-    def find_FNref(self,fn_prefix,fn_prefix_fn_text):
+    def find_FNref(self, fn_prefix, fn_prefix_fn_text):
         """
         Searches the entire table above each footnote for the previously detected and isolated footnote markers.
 
@@ -729,49 +734,52 @@ class Table:
             2. if prefix is a-z:    a) matches if (anything)+space+prefix OR b) prefix
             3. else:                matches if found anywhere in any cell
 
-        :param FNprefix:
-        :param FNprefix_FNtext:
+        :param fn_prefix:
+        :param fn_prefix_fn_text:
         :return: List((int,int))
         """
         fn_refs = []
 
-        for footnote in fn_prefix+fn_prefix_fn_text:
+        for footnote in fn_prefix + fn_prefix_fn_text:
 
             # Case 1a If prefix is number, general
-            if re.fullmatch(pattern='[\d]{1,2}',string=footnote[2][0]):
+            if re.fullmatch(pattern='[\d]{1,2}', string=footnote[2][0]):
                 log.debug("Footnote prefix {} is number".format(footnote[2][0]))
-                fn_ref_parser_1a = CellParser('(^.+\s)('+footnote[2][0]+')(\s.+)?$')
+                fn_ref_parser_1a = CellParser('(^.+\s)(' + footnote[2][0] + ')(\s.+)?$')
                 for fn_ref in fn_ref_parser_1a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
                     fn_refs.append(fn_ref)
 
-            # Case 1b If prefix is number and not in 'Data' region
-                fn_ref_parser_1b = CellParser('^('+footnote[2][0]+')$')
+                # Case 1b If prefix is number and not in 'Data' region
+                fn_ref_parser_1b = CellParser('^(' + footnote[2][0] + ')$')
                 for fn_ref in fn_ref_parser_1b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
-                     if self.labels[fn_ref[0],fn_ref[1]] != 'Data':
-                        log.debug("Footnote prefix {} is number, and is in {} region".format(footnote[2][0], self.labels[fn_ref[0],fn_ref[1]]))
+                    if self.labels[fn_ref[0], fn_ref[1]] != 'Data':
+                        log.debug("Footnote prefix {} is number, and is in {} region".format(footnote[2][0],
+                                                                                             self.labels[
+                                                                                                 fn_ref[0], fn_ref[1]]))
                         fn_refs.append(fn_ref)
 
             # Case 2a If prefix is a-z:
-            elif re.fullmatch(pattern='[a-zA-Z]',string=footnote[2][0]):
+            elif re.fullmatch(pattern='[a-zA-Z]', string=footnote[2][0]):
                 log.debug("Footnote prefix {} is letter".format(footnote[2][0]))
-                fn_ref_parser_2a = CellParser('(^.+\s)('+footnote[2][0]+')(\s.+)?$')
+                fn_ref_parser_2a = CellParser('(^.+\s)(' + footnote[2][0] + ')(\s.+)?$')
                 for fn_ref in fn_ref_parser_2a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
                     fn_refs.append(fn_ref)
 
-            # Case 2b If prefix is a-z and alone in the cell
-                fn_ref_parser_2b = CellParser('^('+footnote[2][0]+')$')
+                # Case 2b If prefix is a-z and alone in the cell
+                fn_ref_parser_2b = CellParser('^(' + footnote[2][0] + ')$')
                 for fn_ref in fn_ref_parser_2b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
                     log.debug("Footnote prefix {} is letter and is alone in cell.".format(footnote[2][0]))
                     fn_refs.append(fn_ref)
 
             # Case 3, everything else
             else:
-                fn_ref_parser = CellParser('('+re.escape(footnote[2][0])+')')
+                fn_ref_parser = CellParser('(' + re.escape(footnote[2][0]) + ')')
                 for fn_ref in fn_ref_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
                     fn_refs.append(fn_ref)
         return fn_refs
 
-    def empty_cells(self,table):
+    @staticmethod
+    def empty_cells(table):
         """
         Returns a mask with 'True' for all empty cells in the original array and 'False' for non-empty cells.
         The regular expression below, which defines an empty cell can be tweaked.
@@ -779,10 +787,11 @@ class Table:
         empty = np.full_like(table, fill_value=False, dtype=bool)
         empty_parser = CellParser(r'^([\s\-\–\"]+)?$')
         for empty_cell in empty_parser.parse(table, method='fullmatch'):
-            empty[empty_cell[0],empty_cell[1]] = True
+            empty[empty_cell[0], empty_cell[1]] = True
         return empty
 
-    def empty_string(self, string):
+    @staticmethod
+    def empty_string(string):
         """
         Returns 'True' if a particular string is empty, which is defined with a regular expression
         :param string:
@@ -801,25 +810,25 @@ class Table:
 
         # find empty rows and delete them
         empty_rows = []
-        for row_index,row in enumerate(self.raw_table_empty):
+        for row_index, row in enumerate(self.__raw_table_empty):
             if False not in row:
                 empty_rows.append(row_index)
         log.info("Empty rows {} deleted.".format(empty_rows))
-        self.pre_cleaned_table = np.delete(self.pre_cleaned_table,empty_rows, axis=0)
+        self.pre_cleaned_table = np.delete(self.pre_cleaned_table, empty_rows, axis=0)
 
         # find empty columns and delete them
         empty_columns = []
-        for column_index,column in enumerate(self.raw_table_empty.T):
+        for column_index, column in enumerate(self.__raw_table_empty.T):
             if False not in column:
                 empty_columns.append(column_index)
         log.info("Empty columns {} deleted.".format(empty_columns))
-        self.pre_cleaned_table = np.delete(self.pre_cleaned_table,empty_columns, axis=1)
+        self.pre_cleaned_table = np.delete(self.pre_cleaned_table, empty_columns, axis=1)
 
         # delete duplicate rows that extend over the whole table
-        _, indices = np.unique(self.pre_cleaned_table,axis=0,return_index=True)
+        _, indices = np.unique(self.pre_cleaned_table, axis=0, return_index=True)
         # for logging only, which rows have been removed
         removed_rows = []
-        for row_index in range(0,len(self.pre_cleaned_table)):
+        for row_index in range(0, len(self.pre_cleaned_table)):
             if row_index not in indices:
                 removed_rows.append(row_index)
         log.info("Duplicate rows {} removed.".format(removed_rows))
@@ -835,8 +844,9 @@ class Table:
                 removed_columns.append(column_index)
         log.info("Duplicate columns {} removed.".format(removed_columns))
         # deletion:
-        self.pre_cleaned_table = self.pre_cleaned_table[:,np.sort(indices)]
-        log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),np.shape(self.pre_cleaned_table)))
+        self.pre_cleaned_table = self.pre_cleaned_table[:, np.sort(indices)]
+        log.info(
+            "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self.pre_cleaned_table)))
 
     def label_sections(self):
         """
@@ -849,22 +859,23 @@ class Table:
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
-        self.cc4 = cc4
+        self.__cc4 = cc4
 
         try:
             cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
             self.labels[cc1] = 'CC1'
             self.labels[cc2] = 'CC2'
-            self.cc1 = cc1
-            self.cc2 = cc2
+            self.__cc1 = cc1
+            self.__cc2 = cc2
         # this is ugly but defining a custom exception raises an error, due to the assertion in find_cc1_cc2()
         # TODO make the exceptions nice and proper
         except:
             msg = "\n==================================================================================\n" \
                   "!!!!!!! ERROR: Main MIPS Algorithm failed. Maybe the input table is bad    !!!!!!!  \n" \
                   "==================================================================================\n"
-            print("Table({}, table_number={}, transposed={})".format(self.file_path, self.table_number, self.transposed))
+            print(
+                "Table({}, table_number={}, transposed={})".format(self.__file_path, self.__table_number, self.transposed))
             print(msg)
             log.critical(msg)
             return None
@@ -872,13 +883,13 @@ class Table:
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
-        self.cc3 = cc3
+        self.__cc3 = cc3
 
         self.labels[title_row, :] = 'TableTitle'
-        self.labels[cc1[0]:cc2[0]+1, cc1[1]:cc2[1]+1] = 'StubHeader'
-        self.labels[cc3[0]:cc4[0]+1, cc1[1]:cc2[1]+1] = 'RowHeader'
-        self.labels[cc1[0]:cc2[0]+1, cc3[1]:cc4[1]+1] = 'ColHeader'
-        self.labels[cc3[0]:cc4[0]+1, cc3[1]:cc4[1]+1] = 'Data'
+        self.labels[cc1[0]:cc2[0] + 1, cc1[1]:cc2[1] + 1] = 'StubHeader'
+        self.labels[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1] = 'RowHeader'
+        self.labels[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1] = 'ColHeader'
+        self.labels[cc3[0]:cc4[0] + 1, cc3[1]:cc4[1] + 1] = 'Data'
 
         # Footnotes
         if self.configs['use_footnotes']:
@@ -909,7 +920,8 @@ class Table:
         for note_cell in self.find_note_cells():
             self.labels[note_cell] = 'Note'
 
-    def categorize_header(self, header):
+    @staticmethod
+    def categorize_header(header):
         """
         Performs header categorization (calls the SymPy fact function) for a given table.
 
@@ -959,25 +971,29 @@ class Table:
         return category_table
 
     def print(self):
-        log.info("Printing table: {}".format(self.file_path))
+        log.info("Printing table: {}".format(self.__file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
         # print_table(self.labels)
 
     def to_csv(self, file_path):
-        log.info("Saving raw table to .csv to file: {}".format(self.file_path))
+        log.info("Saving raw table to .csv to file: {}".format(self.__file_path))
         write_to_csv(self.raw_table, file_path=file_path)
+
+    def to_pandas(self):
+        log.info("Converting table to Pandas DataFrame: {}".format(self.__file_path))
+        return to_pandas(self)
 
     def __str__(self):
         """As the user wants to see it"""
-        log.info("Printing table: {}".format(self.file_path))
+        log.info("Printing table: {}".format(self.__file_path))
         t = list_as_PrettyTable(self.category_table)
         return str(t)
 
     def __repr__(self):
         """As the developer wants to see it"""
-        intro = "Table({}, table_number={}, transposed={})".format(self.file_path, self.table_number, self.transposed)
-        log.info("Repr. table: {}".format(self.file_path))
+        intro = "Table({}, table_number={}, transposed={})".format(self.__file_path, self.__table_number, self.transposed)
+        log.info("Repr. table: {}".format(self.__file_path))
         array_width = np.shape(self.pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
         results_string = as_string(
@@ -993,6 +1009,7 @@ class InputTableError(Exception):
     """
     Use when something is wrong with the provided input.
     """
+
     def __init__(self, message):
         self.message = message
 
@@ -1001,5 +1018,6 @@ class InputError(Exception):
     """
     Use when something is wrong with the commands called
     """
+
     def __init__(self, message):
         self.message = message
