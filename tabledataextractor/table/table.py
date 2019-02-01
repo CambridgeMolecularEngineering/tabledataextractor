@@ -21,7 +21,7 @@ from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.WARNING)
 
 
 class Table:
