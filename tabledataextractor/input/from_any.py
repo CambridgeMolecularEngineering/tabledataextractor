@@ -11,7 +11,7 @@ from tabledataextractor.input import from_list
 import logging
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
 
 def url(name):
