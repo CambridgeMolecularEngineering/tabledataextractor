@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
 
 def write_to_csv(table, file_path):

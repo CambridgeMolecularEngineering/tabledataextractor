@@ -8,7 +8,7 @@ import numpy as np
 from prettytable import PrettyTable
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
 
 def print_table(table):
