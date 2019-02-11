@@ -89,7 +89,3 @@ class StringParser:
         else:
             return False
 
-
-
-
-

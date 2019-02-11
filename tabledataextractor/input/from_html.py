@@ -138,7 +138,7 @@ def configure_selenium(browser='Firefox'):
         return None
 
 
-def read_url(url,table_number=1):
+def read_url(url, table_number=1):
     """
     Reads in a table from an URL and returns a numpy array.
 
