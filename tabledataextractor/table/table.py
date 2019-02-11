@@ -970,6 +970,21 @@ class Table:
         category_table = build_category_table(dataframe)
         return category_table
 
+    def contains(self, pattern):
+        """
+        Returns true if table contains a particular string
+        :param pattern: Regular expression for input
+        :return: True/False
+        """
+        parser = StringParser(pattern)
+        for row in self.category_table:
+            string = row[0] + ' '
+            string += ' '.join(row[1]) + ' '
+            string += ' '.join(row[2])
+            if parser.parse(string, method='search'):
+                return True
+        return False
+
     def print(self):
         log.info("Printing table: {}".format(self.__file_path))
         print_table(self.raw_table)
