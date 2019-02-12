@@ -653,7 +653,8 @@ class Table:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
                     return row_index, cc2[1] + 1
-        raise SystemError("No CC3 critical cell found! No data region defined.")
+        # raise SystemError("No CC3 critical cell found! No data region defined.")
+        raise TDEError("No CC3 critical cell found! No data region defined.")
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
 
@@ -1036,3 +1037,30 @@ class InputError(Exception):
 
     def __init__(self, message):
         self.message = message
+
+
+class TDEError(Exception):
+    """
+    Use when TableDataExtractor fails. Graceful exit.
+    """
+
+    def __init__(self, message):
+        self.message = message
+        self.__cc1 = None
+        self.__cc2 = None
+        self.__cc3 = None
+        self.__cc4 = None
+        self.category_table = []
+        self.pre_cleaned_table = None
+        self.__pre_cleaned_table_empty = None
+        self.__raw_table_empty = None
+        self.labels = None
+        self.stub_header = None
+        self.row_header = None
+        self.col_header = None
+        self.title_row = None
+        self.data = None
+
+
+
+
