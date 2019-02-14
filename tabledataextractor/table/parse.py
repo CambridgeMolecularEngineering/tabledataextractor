@@ -13,7 +13,7 @@ log.setLevel(logging.WARNING)
 
 class CellParser:
 
-    def __init__(self,pattern):
+    def __init__(self, pattern):
         """
         :param pattern: Regex pattern which defines the cell parser. Use grouping, since matching strings will be returned
             explicitly.
@@ -23,7 +23,7 @@ class CellParser:
         assert isinstance(pattern, str)
         self.pattern = pattern
 
-    def parse(self,table,method='match'):
+    def parse(self, table, method='match'):
         """
         Inputs a Table object and yields a tuple with the index of the next matching cell, as well as the string that
         was matched.
@@ -36,7 +36,7 @@ class CellParser:
         """
 
         # check if table is of correct type
-        assert isinstance(table,np.ndarray)
+        assert isinstance(table, np.ndarray)
 
         result = None
         prog = re.compile(self.pattern)

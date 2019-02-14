@@ -23,17 +23,17 @@ def print_table(table):
     cell_width = np.zeros(n_columns, dtype=int)
 
     # find the maximum cell width for each column i
-    for i,column in enumerate(table.T):
+    for i, column in enumerate(table.T):
         for cell in column:
             if len(cell) > cell_width[i]:
                 cell_width[i] = len(cell)
 
     # print each row
     for row in table:
-        for i,cell in enumerate(row):
-            print("{:{cell_width}} ".format(cell,cell_width=cell_width[i]+1),end='',flush=True)
-        print("\n",end='',flush=True)
-    print("\n",flush=True)
+        for i, cell in enumerate(row):
+            print("{:{cell_width}} ".format(cell,cell_width=cell_width[i]+1), end='', flush=True)
+        print("\n", end='', flush=True)
+    print("\n", flush=True)
 
 
 def as_string(table):
@@ -56,8 +56,8 @@ def as_string(table):
 
     # print each row
     for row in table:
-        for i,cell in enumerate(row):
-            output += "{:{cell_width}} ".format(cell,cell_width=cell_width[i]+1)
+        for i, cell in enumerate(row):
+            output += "{:{cell_width}} ".format(cell, cell_width=cell_width[i]+1)
         output += "\n"
     output += "\n"
     return output

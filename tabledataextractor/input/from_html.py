@@ -14,6 +14,7 @@ from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.ie.options import Options as IeOptions
 import copy
 import logging
+from tabledataextractor.exceptions import InputError
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
@@ -161,12 +162,16 @@ def read_url(url, table_number=1):
         array = makearray(html_table)
         log.info("Package 'requests' was used.")
         return array
-    except:
+    except Exception:
         driver = configure_selenium()
         driver.get(url)
         html_file = driver.page_source
         html_soup = BeautifulSoup(html_file, features='lxml')
-        html_table = html_soup.find_all("table")[table_number-1]
-        array = makearray(html_table)
-        log.info("Package 'selenium' was used.")
-        return array
+        try:
+            html_table = html_soup.find_all("table")[table_number-1]
+        except IndexError:
+            raise InputError("table_number={} is out of range".format(table_number))
+        else:
+            array = makearray(html_table)
+            log.info("Package 'selenium' was used.")
+            return array
