@@ -4,6 +4,7 @@ Analyzes the input and calls the appropriate input module.
 """
 
 from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 import os.path
 from tabledataextractor.input import from_html
 from tabledataextractor.input import from_csv
@@ -18,7 +19,7 @@ def url(name):
     try:
         URLValidator()(name)
         return True
-    except:
+    except ValidationError:
         return False
 
 
@@ -65,7 +66,7 @@ def create_table(name_key, table_number=1):
         return from_csv.read(name_key)
 
     else:
-        msg = 'Input is invalid'
+        msg = 'Input is invalid. Supported are: path to .html or .cvs file, URL or python list object'
         log.critical(msg)
         raise TypeError(msg, str(name_key))
 

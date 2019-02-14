@@ -19,6 +19,7 @@ from tabledataextractor.output.print import print_table, list_as_PrettyTable
 from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
+from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
@@ -81,24 +82,25 @@ class Table:
             if key in self.configs:
                 self.configs[key] = value
             else:
-                msg = 'keyword {} does not exist.'.format(key)
+                msg = 'Keyword "{}" does not exist.'.format(key)
                 log.critical(msg)
                 raise InputError(msg)
         log.info('Configuration parameters are: {}'.format(self.configs))
 
         # read-in the raw table from any source
-        self.raw_table = from_any.create_table(self.__file_path, table_number)
-        # check if everything is ok with the raw table
-        if not isinstance(self.raw_table, np.ndarray) or self.raw_table.dtype != '<U60':
-            msg = 'Input was not properly converted to numpy array.'
-            log.critical(msg)
-            raise InputTableError(msg)
+        try:
+            self.raw_table = from_any.create_table(self.__file_path, table_number)
+        except TypeError as e:
+            raise
+        else:
+            # check if everything is ok with the raw table
+            assert isinstance(self.raw_table, np.ndarray) and self.raw_table.dtype == '<U60'
 
         # check that array has dimension greater than 1 in both dimensions
         if self.raw_table.ndim == 1:
-            msg = 'Table has only one row or column.'
+            msg = 'Input table has only one row or column.'
             log.critical(msg)
-            raise InputTableError(msg)
+            raise InputError(msg)
 
         # initializing empty elements
         self.__cc1 = None
@@ -134,9 +136,6 @@ class Table:
         self.pre_clean()
         self.__pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
-        # TESTING
-        # self.print()
-
         # prefixing of duplicate labels in the header region
         if self.configs['use_prefixing']:
             self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
@@ -166,7 +165,6 @@ class Table:
         """
         self.raw_table = self.raw_table.T
         self.transposed = True
-        # self.print()
         self.__cc1 = None
         self.__cc2 = None
         self.__cc3 = None
@@ -284,7 +282,7 @@ class Table:
         log.info("Prefixing. Attempt to run main MIPS algorithm.")
         try:
             cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), table)
-        except:
+        except (MIPSError, TypeError):
             log.error("Prefixing was not performed due to failure of MIPS algorithm.")
             return table
 
@@ -322,7 +320,7 @@ class Table:
             # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
             try:
                 cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
-            except:
+            except (MIPSError, TypeError):
                 log.info("Prefixing was not performed because it destroyed the table")
                 return table
             # return prefixed_table only if the prefixing has not made the header to start lower,
@@ -605,10 +603,13 @@ class Table:
         # however, this should never happen since the final headers CANNOT have duplicate rows/columns,
         # by definition of cc2.
         # hence, the assertions:
-        assert not duplicate_columns(table_slice_1_cc1(table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
-        assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
-        assert r1 >= 0 and c1 >= 0
-        cc1 = (r1 - 1, c1 - 1)
+        try:
+            assert not duplicate_columns(table_slice_1_cc1(table, r1=0, r2=cc2[0], c2=cc2[1], c_max=c_max))
+            assert not duplicate_rows(table_slice_2_cc1(table, r2=cc2[0], r_max=r_max, c1=0, c2=cc2[1]))
+            assert r1 >= 0 and c1 >= 0
+            cc1 = (r1 - 1, c1 - 1)
+        except AssertionError:
+            raise MIPSError("Error in find_cc1_cc2")
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
         if not self.configs['use_title_row']:
@@ -653,8 +654,7 @@ class Table:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
                     return row_index, cc2[1] + 1
-        # raise SystemError("No CC3 critical cell found! No data region defined.")
-        raise TDEError("No CC3 critical cell found! No data region defined.")
+        raise MIPSError("No CC3 critical cell found! No data region defined.")
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
 
@@ -864,22 +864,19 @@ class Table:
 
         try:
             cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
+        except (MIPSError, TypeError) as e:
+            msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad! " \
+                  "Table({}, table_number={}, transposed={})".format(self.__file_path,
+                                                                     self.__table_number,
+                                                                     self.transposed)
+            log.critical(msg)
+            raise MIPSError(msg)
+        else:
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
             self.labels[cc1] = 'CC1'
             self.labels[cc2] = 'CC2'
             self.__cc1 = cc1
             self.__cc2 = cc2
-        # this is ugly but defining a custom exception raises an error, due to the assertion in find_cc1_cc2()
-        # TODO make the exceptions nice and proper
-        except:
-            msg = "\n==================================================================================\n" \
-                  "!!!!!!! ERROR: Main MIPS Algorithm failed. Maybe the input table is bad    !!!!!!!  \n" \
-                  "==================================================================================\n"
-            print(
-                "Table({}, table_number={}, transposed={})".format(self.__file_path, self.__table_number, self.transposed))
-            print(msg)
-            log.critical(msg)
-            return None
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
@@ -987,10 +984,15 @@ class Table:
         return False
 
     def print(self):
+        """Prints raw table, cleaned table and labels."""
         log.info("Printing table: {}".format(self.__file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
-        # print_table(self.labels)
+        print_table(self.labels)
+
+    def print_raw_table(self):
+        """Prints raw input table"""
+        print_table(self.raw_table)
 
     def to_csv(self, file_path):
         log.info("Saving raw table to .csv to file: {}".format(self.__file_path))
@@ -1021,45 +1023,7 @@ class Table:
         return intro + "\n\n" + input_string + results_string + str(t)
 
 
-class InputTableError(Exception):
-    """
-    Use when something is wrong with the provided input.
-    """
 
-    def __init__(self, message):
-        self.message = message
-
-
-class InputError(Exception):
-    """
-    Use when something is wrong with the commands called
-    """
-
-    def __init__(self, message):
-        self.message = message
-
-
-class TDEError(Exception):
-    """
-    Use when TableDataExtractor fails. Graceful exit.
-    """
-
-    def __init__(self, message):
-        self.message = message
-        self.__cc1 = None
-        self.__cc2 = None
-        self.__cc3 = None
-        self.__cc4 = None
-        self.category_table = []
-        self.pre_cleaned_table = None
-        self.__pre_cleaned_table_empty = None
-        self.__raw_table_empty = None
-        self.labels = None
-        self.stub_header = None
-        self.row_header = None
-        self.col_header = None
-        self.title_row = None
-        self.data = None
 
 
 
