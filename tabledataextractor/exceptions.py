@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Exceptions defined for TableDataExtractor... te
+Exceptions defined for TableDataExtractor... tes
 """
 
 
