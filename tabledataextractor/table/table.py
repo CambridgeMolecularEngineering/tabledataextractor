@@ -865,10 +865,7 @@ class Table:
         try:
             cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
         except (MIPSError, TypeError) as e:
-            msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad! " \
-                  "Table({}, table_number={}, transposed={})".format(self.__file_path,
-                                                                     self.__table_number,
-                                                                     self.transposed)
+            msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad!"
             log.critical(msg)
             raise MIPSError(msg)
         else:
