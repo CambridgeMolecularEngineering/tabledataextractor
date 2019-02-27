@@ -41,8 +41,8 @@ class CellParser:
         result = None
         prog = re.compile(self.pattern)
 
-        for row_index,row in enumerate(table):
-            for column_index,cell in enumerate(row):
+        for row_index, row in enumerate(table):
+            for column_index, cell in enumerate(row):
                 if method == 'match':
                     result = prog.match(cell)
                 elif method == 'fullmatch':
@@ -50,7 +50,7 @@ class CellParser:
                 elif method == 'search':
                     result = prog.search(cell)
                 if result:
-                    yield row_index,column_index,result.groups()
+                    yield row_index, column_index, result.groups()
 
 
 class StringParser:

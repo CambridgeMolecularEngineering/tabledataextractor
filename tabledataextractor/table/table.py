@@ -20,6 +20,7 @@ from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
 from tabledataextractor.exceptions import TDEError, InputError, MIPSError
+from tabledataextractor.table.footnotes import Footnote
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
@@ -693,6 +694,22 @@ class Table:
                 fn_prefix.append(fn_prefix_index)
         return fn_prefix
 
+    def footnotes(self):
+        """
+        Finds a footnote and yields a Footnote() object will all the appropriate properties.
+        A footnote is defined with::
+
+            FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
+
+        A search is performed only below the data region.
+        """
+        #: finds a footnote cell that possibly contains some text as well
+        fn_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s?([\w\[\]\s\:]+)?')
+        for fn in fn_parser.parse(self.pre_cleaned_table):
+            if fn[0] > self.__cc4[0]:
+                footnote = Footnote(self, prefix_string=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
+                yield footnote
+
     def find_FNtext(self, fn_prefix):
         """
         All the cells following a footnote marker in the same row as an fn_prefix cell.
@@ -910,6 +927,10 @@ class Table:
                     self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
                 else:
                     self.labels[fn_ref[0], fn_ref[1]] = 'FNref'
+
+            # TODO Deploy new footnote system
+            for fn in self.footnotes():
+                print(fn)
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
