@@ -34,8 +34,8 @@ class Footnote:
         self.pre_cleaned_table = np.copy(self._table.pre_cleaned_table)
         self.prefix = prefix
         self.prefix_cell = prefix_cell
-        self.text_cell = self.prefix_cell if text is not None else self._find_text_cell()
-        self.text = text if text is not None else self._find_text()
+        self.text_cell = self.prefix_cell if text else self._find_text_cell()
+        self.text = text if text else self._find_text()
         self.reference_cells = self._find_reference_cells()
         self.references = self._find_references()
 
@@ -123,8 +123,8 @@ class Footnote:
 
     def __str__(self):
         return "Prefix: {:4}   Text: {:60}   Ref. Cells: {}   " \
-               "References: {}".format(str(self.prefix),
-                                       str(self.text),
+               "References: {}".format("'"+str(self.prefix)+"'",
+                                       "'"+str(self.text)+"'",
                                        str(self.reference_cells),
                                        str(self.references))
 

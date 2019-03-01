@@ -63,7 +63,6 @@ class Table:
         :type file_path: str | list
         :param table_number: Number of the table that we want to input if there are several at the given address/path
         :type table_number: int
-        :type kwargs: dict
         """
 
         log.info('Initialization of table: "{}"'.format(file_path))
@@ -689,7 +688,7 @@ class Table:
         A search is performed only below the data region.
         """
         #: finds a footnote cell that possibly contains some text as well
-        fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?([\w\[\]\s\:]+)?\.?\s?$')
+        fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
         for fn in fn_parser.parse(self.pre_cleaned_table):
             if fn[0] > self._cc4[0]:
                 footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
