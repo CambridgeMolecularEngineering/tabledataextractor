@@ -7,7 +7,6 @@ Raw, processed and final labelled table.
 """
 
 import logging
-import re
 
 import numpy as np
 from sympy import Symbol
@@ -46,8 +45,8 @@ class Table:
             ``use_prefixing = True``, default.
             Will perform the prefixing steps if row or column index cells are not unique.
 
-            ``use_footnotes =True``, default.
-            Will label footnotes.
+            ``use_footnotes = True``, default.
+            Will copy the footnote text into the appropriate cells of the table and remove the footnote prefix.
 
     :param file_path: Path to .html or .cvs file, URL or list object that is used as input
     :type file_path: str | list
@@ -68,8 +67,8 @@ class Table:
         """
 
         log.info('Initialization of table: "{}"'.format(file_path))
-        self.__file_path = file_path
-        self.__table_number = table_number
+        self._file_path = file_path
+        self._table_number = table_number
 
         # default settings
         self.configs = dict()
@@ -90,7 +89,7 @@ class Table:
 
         # read-in the raw table from any source
         try:
-            self.raw_table = from_any.create_table(self.__file_path, table_number)
+            self.raw_table = from_any.create_table(self._file_path, table_number)
         except TypeError as e:
             raise
         else:
@@ -104,14 +103,14 @@ class Table:
             raise InputError(msg)
 
         # initializing empty elements
-        self.__cc1 = None
-        self.__cc2 = None
-        self.__cc3 = None
-        self.__cc4 = None
+        self._cc1 = None
+        self._cc2 = None
+        self._cc3 = None
+        self._cc4 = None
         self.category_table = []
         self.pre_cleaned_table = None
-        self.__pre_cleaned_table_empty = None
-        self.__raw_table_empty = None
+        self._pre_cleaned_table_empty = None
+        self._raw_table_empty = None
         self.labels = None
         self.stub_header = None
         self.row_header = None
@@ -119,6 +118,7 @@ class Table:
         self.title_row = None
         self.data = None
         self.transposed = False
+        self.footnotes = []
 
         # run the table analysis
         self.analyze_table()
@@ -130,17 +130,17 @@ class Table:
         """
 
         # mask, 'cell = True' if cell is empty
-        self.__raw_table_empty = self.empty_cells(self.raw_table)
+        self._raw_table_empty = self.empty_cells(self.raw_table)
 
         # pre-cleaning table
         self.pre_cleaned_table = np.copy(self.raw_table)
         self.pre_clean()
-        self.__pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # prefixing of duplicate labels in the header region
         if self.configs['use_prefixing']:
             self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
-            self.__pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+            self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
@@ -148,15 +148,15 @@ class Table:
         self.label_sections()
 
         # making regions proper elements of the table object
-        if self.__cc1 and self.__cc2 and self.__cc3 and self.__cc4:
-            self.stub_header = self.pre_cleaned_table[self.__cc1[0]:self.__cc2[0] + 1, self.__cc1[1]:self.__cc2[1] + 1]
-            self.row_header = self.pre_cleaned_table[self.__cc3[0]:self.__cc4[0] + 1, self.__cc1[1]:self.__cc2[1] + 1]
-            self.col_header = self.pre_cleaned_table[self.__cc1[0]:self.__cc2[0] + 1, self.__cc3[1]:self.__cc4[1] + 1]
-            self.data = self.pre_cleaned_table[self.__cc3[0]:self.__cc4[0] + 1, self.__cc3[1]:self.__cc4[1] + 1]
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            self.stub_header = self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1]
+            self.row_header = self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1]
+            self.col_header = self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+            self.data = self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
 
             # categorization
-            self.category_table = self.build_category_table(self.pre_cleaned_table, self.__cc1, self.__cc2, self.__cc3,
-                                                            self.__cc4)
+            self.category_table = self.build_category_table(self.pre_cleaned_table, self._cc1, self._cc2, self._cc3,
+                                                            self._cc4)
 
     def transpose(self):
         """
@@ -166,19 +166,20 @@ class Table:
         """
         self.raw_table = self.raw_table.T
         self.transposed = True
-        self.__cc1 = None
-        self.__cc2 = None
-        self.__cc3 = None
-        self.__cc4 = None
+        self._cc1 = None
+        self._cc2 = None
+        self._cc3 = None
+        self._cc4 = None
         self.category_table = []
         self.pre_cleaned_table = None
-        self.__pre_cleaned_table_empty = None
-        self.__raw_table_empty = None
+        self._pre_cleaned_table_empty = None
+        self._raw_table_empty = None
         self.labels = None
         self.stub_header = None
         self.row_header = None
         self.col_header = None
         self.data = None
+        self.footnotes = []
         self.analyze_table()
 
     def prefix_duplicate_labels(self, table):
@@ -351,8 +352,8 @@ class Table:
             # counting the number of full cells
             # if n_empty < n_full terminate, this is our goal row
             n_full = 0
-            n_columns = len(self.__pre_cleaned_table_empty[row_index])
-            for empty in self.__pre_cleaned_table_empty[row_index]:
+            n_columns = len(self._pre_cleaned_table_empty[row_index])
+            for empty in self._pre_cleaned_table_empty[row_index]:
                 if not empty:
                     n_full += 1
                 if n_full > int(n_columns / 2):
@@ -650,7 +651,7 @@ class Table:
             n_columns = len(self.pre_cleaned_table[row_index, cc2[1] + 1:])
             log.debug("n_columns= {}".format(n_columns))
             for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
-                empty = self.__pre_cleaned_table_empty[row_index, column_index]
+                empty = self._pre_cleaned_table_empty[row_index, column_index]
                 if not empty:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
@@ -664,7 +665,7 @@ class Table:
         Searches for the topmost non-empty row.
         :return: int
         """
-        for row_index, empty_row in enumerate(self.__pre_cleaned_table_empty):
+        for row_index, empty_row in enumerate(self._pre_cleaned_table_empty):
             if not empty_row.all():
                 return row_index
 
@@ -675,26 +676,10 @@ class Table:
         """
         for row_index, row in enumerate(self.labels):
             for column_index, cell in enumerate(row):
-                if cell == '/' and not self.__pre_cleaned_table_empty[row_index, column_index]:
+                if cell == '/' and not self._pre_cleaned_table_empty[row_index, column_index]:
                     yield row_index, column_index
 
-    def find_FNprefix(self, cc4):
-        """
-        FNprefix  = \*, #, ., o, †; possibly followed by "." or ")".
-        Searches only below the data region.
-
-        :param cc4: end of data region
-        :type cc4: (int,int)
-        :return: List of cell indexes that match the FNprefix
-        """
-        fn_prefix = []
-        fn_prefix_parser = CellParser('^([*#\.o†\da-z][\.\)]?)$')
-        for fn_prefix_index in fn_prefix_parser.parse(self.pre_cleaned_table):
-            if fn_prefix_index[0] > cc4[0]:
-                fn_prefix.append(fn_prefix_index)
-        return fn_prefix
-
-    def footnotes(self):
+    def find_footnotes(self):
         """
         Finds a footnote and yields a Footnote() object will all the appropriate properties.
         A footnote is defined with::
@@ -704,97 +689,11 @@ class Table:
         A search is performed only below the data region.
         """
         #: finds a footnote cell that possibly contains some text as well
-        fn_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s?([\w\[\]\s\:]+)?')
+        fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?([\w\[\]\s\:]+)?\.?\s?$')
         for fn in fn_parser.parse(self.pre_cleaned_table):
-            if fn[0] > self.__cc4[0]:
-                footnote = Footnote(self, prefix_string=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
+            if fn[0] > self._cc4[0]:
+                footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
                 yield footnote
-
-    def find_FNtext(self, fn_prefix):
-        """
-        All the cells following a footnote marker in the same row as an fn_prefix cell.
-
-        :param fn_prefix: List of FNprefix cells, indexes
-        :type fn_prefix: list[(int,int)]
-        :return: List of FNtext cells, indexes
-        """
-        fn_text = []
-        for fn_prefix_cell in fn_prefix:
-            # append all non-empty cells following fn_prefix index in the same row
-            for column_index in range(fn_prefix_cell[1] + 1, np.shape(self.pre_cleaned_table)[1]):
-                if not self.__pre_cleaned_table_empty[fn_prefix_cell[0], column_index]:
-                    fn_text.append((fn_prefix_cell[0], column_index))
-        return fn_text
-
-    def find_FNprefix_FNtext(self, cc4):
-        """
-        FNprefix  = \*, #, ., o, †; possibly followed by "." or ")", followed by FNtext in the same cell.
-        FNtext can be started by any word character '\w', '[' or ']'
-        Searches only below the data region.
-
-        :param cc4: end of data region
-        :type cc4: (int,int)
-        :return: List of cell indexes that match the FNprefix+FNtext
-        """
-        fn_prefix_fn_text = []
-        fn_prefix_fn_text_parser = CellParser('^([*#\.o†\da-z][\.\)]?)\s([\w\[\]\s]+)')
-        for fn_prefix_fn_text_index in fn_prefix_fn_text_parser.parse(self.pre_cleaned_table):
-            if fn_prefix_fn_text_index[0] > cc4[0]:
-                fn_prefix_fn_text.append(fn_prefix_fn_text_index)
-        return fn_prefix_fn_text
-
-    def find_FNref(self, fn_prefix, fn_prefix_fn_text):
-        """
-        Searches the entire table above each footnote for the previously detected and isolated footnote markers.
-
-        Rules for matching:
-            1. if prefix is number: a) matches if (anything)+space+prefix OR b) prefix(if not in data region)
-            2. if prefix is a-z:    a) matches if (anything)+space+prefix OR b) prefix
-            3. else:                matches if found anywhere in any cell
-
-        :param fn_prefix:
-        :param fn_prefix_fn_text:
-        :return: List((int,int))
-        """
-        fn_refs = []
-
-        for footnote in fn_prefix + fn_prefix_fn_text:
-
-            # Case 1a If prefix is number, general
-            if re.fullmatch(pattern='[\d]{1,2}', string=footnote[2][0]):
-                log.debug("Footnote prefix {} is number".format(footnote[2][0]))
-                fn_ref_parser_1a = CellParser('(^.+\s)(' + footnote[2][0] + ')(\s.+)?$')
-                for fn_ref in fn_ref_parser_1a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
-                    fn_refs.append(fn_ref)
-
-                # Case 1b If prefix is number and not in 'Data' region
-                fn_ref_parser_1b = CellParser('^(' + footnote[2][0] + ')$')
-                for fn_ref in fn_ref_parser_1b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
-                    if self.labels[fn_ref[0], fn_ref[1]] != 'Data':
-                        log.debug("Footnote prefix {} is number, and is in {} region".format(footnote[2][0],
-                                                                                             self.labels[
-                                                                                                 fn_ref[0], fn_ref[1]]))
-                        fn_refs.append(fn_ref)
-
-            # Case 2a If prefix is a-z:
-            elif re.fullmatch(pattern='[a-zA-Z]', string=footnote[2][0]):
-                log.debug("Footnote prefix {} is letter".format(footnote[2][0]))
-                fn_ref_parser_2a = CellParser('(^.+\s)(' + footnote[2][0] + ')(\s.+)?$')
-                for fn_ref in fn_ref_parser_2a.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
-                    fn_refs.append(fn_ref)
-
-                # Case 2b If prefix is a-z and alone in the cell
-                fn_ref_parser_2b = CellParser('^(' + footnote[2][0] + ')$')
-                for fn_ref in fn_ref_parser_2b.parse(self.pre_cleaned_table[0:footnote[0]], method='match'):
-                    log.debug("Footnote prefix {} is letter and is alone in cell.".format(footnote[2][0]))
-                    fn_refs.append(fn_ref)
-
-            # Case 3, everything else
-            else:
-                fn_ref_parser = CellParser('(' + re.escape(footnote[2][0]) + ')')
-                for fn_ref in fn_ref_parser.parse(self.pre_cleaned_table[0:footnote[0]], method='search'):
-                    fn_refs.append(fn_ref)
-        return fn_refs
 
     @staticmethod
     def empty_cells(table):
@@ -828,7 +727,7 @@ class Table:
 
         # find empty rows and delete them
         empty_rows = []
-        for row_index, row in enumerate(self.__raw_table_empty):
+        for row_index, row in enumerate(self._raw_table_empty):
             if False not in row:
                 empty_rows.append(row_index)
         log.info("Empty rows {} deleted.".format(empty_rows))
@@ -836,7 +735,7 @@ class Table:
 
         # find empty columns and delete them
         empty_columns = []
-        for column_index, column in enumerate(self.__raw_table_empty.T):
+        for column_index, column in enumerate(self._raw_table_empty.T):
             if False not in column:
                 empty_columns.append(column_index)
         log.info("Empty columns {} deleted.".format(empty_columns))
@@ -877,11 +776,18 @@ class Table:
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
-        self.__cc4 = cc4
+        self._cc4 = cc4
+
+        for footnote in self.find_footnotes():
+            self.footnotes.append(footnote)
+            # update the pre-cleaned table
+            if self.configs['use_footnotes']:
+                self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+                self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         try:
             cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
-        except (MIPSError, TypeError) as e:
+        except (MIPSError, TypeError):
             msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad!"
             log.critical(msg)
             raise MIPSError(msg)
@@ -889,13 +795,13 @@ class Table:
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
             self.labels[cc1] = 'CC1'
             self.labels[cc2] = 'CC2'
-            self.__cc1 = cc1
-            self.__cc2 = cc2
+            self._cc1 = cc1
+            self._cc2 = cc2
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
-        self.__cc3 = cc3
+        self._cc3 = cc3
 
         self.labels[title_row, :] = 'TableTitle'
         self.labels[cc1[0]:cc2[0] + 1, cc1[1]:cc2[1] + 1] = 'StubHeader'
@@ -903,34 +809,12 @@ class Table:
         self.labels[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1] = 'ColHeader'
         self.labels[cc3[0]:cc4[0] + 1, cc3[1]:cc4[1] + 1] = 'Data'
 
-        # Footnotes
-        if self.configs['use_footnotes']:
-            fn_prefix = self.find_FNprefix(cc4)
-            log.info("FNPrefix Cells = {}".format(fn_prefix))
-            for fn_prefix_index in fn_prefix:
-                self.labels[fn_prefix_index[0], fn_prefix_index[1]] = 'FNprefix'
-
-            fn_text = self.find_FNtext(fn_prefix)
-            log.info("FNtext Cells = {}".format(fn_text))
-            for fn_text_index in fn_text:
-                self.labels[fn_text_index] = 'FNtext'
-
-            fn_prefix_fn_text = self.find_FNprefix_FNtext(cc4)
-            log.info("FNPrefix&FNtext Cells = {}".format(fn_prefix_fn_text))
-            for fn_prefix_fn_text_index in fn_prefix_fn_text:
-                self.labels[fn_prefix_fn_text_index[0], fn_prefix_fn_text_index[1]] = 'FNprefix & FNtext'
-
-            fn_refs = self.find_FNref(fn_prefix, fn_prefix_fn_text)
-            log.info("FNref Cells = {}".format(fn_refs))
-            for fn_ref in fn_refs:
-                if self.labels[fn_ref[0], fn_ref[1]] != '/':
-                    self.labels[fn_ref[0], fn_ref[1]] = self.labels[fn_ref[0], fn_ref[1]] + ' & FNref'
-                else:
-                    self.labels[fn_ref[0], fn_ref[1]] = 'FNref'
-
-            # TODO Deploy new footnote system
-            for fn in self.footnotes():
-                print(fn)
+        for footnote in self.footnotes:
+            self.labels[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
+            if footnote.text_cell is not None:
+                self.labels[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if self.labels[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
+            for ref_cell in footnote.reference_cells:
+                self.labels[ref_cell[0], ref_cell[1]] = 'FNref' if self.labels[ref_cell[0], ref_cell[1]] == '/' else self.labels[ref_cell[0], ref_cell[1]] + ' & FNref'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
         for note_cell in self.find_note_cells():
@@ -1003,7 +887,7 @@ class Table:
 
     def print(self):
         """Prints raw table, cleaned table and labels."""
-        log.info("Printing table: {}".format(self.__file_path))
+        log.info("Printing table: {}".format(self._file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
         print_table(self.labels)
@@ -1013,23 +897,23 @@ class Table:
         print_table(self.raw_table)
 
     def to_csv(self, file_path):
-        log.info("Saving raw table to .csv to file: {}".format(self.__file_path))
+        log.info("Saving raw table to .csv to file: {}".format(self._file_path))
         write_to_csv(self.raw_table, file_path=file_path)
 
     def to_pandas(self):
-        log.info("Converting table to Pandas DataFrame: {}".format(self.__file_path))
+        log.info("Converting table to Pandas DataFrame: {}".format(self._file_path))
         return to_pandas(self)
 
     def __str__(self):
         """As the user wants to see it"""
-        log.info("Printing table: {}".format(self.__file_path))
+        log.info("Printing table: {}".format(self._file_path))
         t = list_as_PrettyTable(self.category_table)
         return str(t)
 
     def __repr__(self):
         """As the developer wants to see it"""
-        intro = "Table({}, table_number={}, transposed={})".format(self.__file_path, self.__table_number, self.transposed)
-        log.info("Repr. table: {}".format(self.__file_path))
+        intro = "Table({}, table_number={}, transposed={})".format(self._file_path, self._table_number, self.transposed)
+        log.info("Repr. table: {}".format(self._file_path))
         array_width = np.shape(self.pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
         results_string = as_string(

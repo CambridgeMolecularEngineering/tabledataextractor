@@ -52,6 +52,46 @@ class CellParser:
                 if result:
                     yield row_index, column_index, result.groups()
 
+    def cut(self, table, method='match'):
+        """
+        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as a string
+        that is obtained from the original string by cutting out the match string
+
+        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :type method: str
+        :param table: Input table to be parsed, of type 'numpy.ndarray'
+        :type table: numpy.ndarray
+        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
+        """
+
+        # check if table is of correct type
+        assert isinstance(table, np.ndarray)
+
+        prog = re.compile(self.pattern)
+        for result in self.parse(table, method):
+            yield result[0], result[1], prog.sub("", table[result[:2]])
+
+    def replace(self, table, repl, method='match'):
+        """
+        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as a string
+        that is obtained from the original string by cutting out the match string and replacing it with another string
+
+        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :type method: str
+        :param table: Input table to be parsed, of type 'numpy.ndarray'
+        :type table: numpy.ndarray
+        :param repl: Replacement string that will be included instead of the patters
+        :type repl:str
+        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
+        """
+
+        # check if table is of correct type
+        assert isinstance(table, np.ndarray)
+
+        prog = re.compile(self.pattern)
+        for result in self.parse(table, method):
+            yield result[0], result[1], prog.sub(repl, table[result[:2]])
+
 
 class StringParser:
 
@@ -89,3 +129,18 @@ class StringParser:
         else:
             return False
 
+    def cut(self, string):
+        """
+        Inputs a string and returns the same string with the pattern cut out
+
+        :param string:
+        :param method:
+        :return: str
+        """
+
+        # check if string is of correct type
+        assert isinstance(string, str)
+
+        prog = re.compile(self.pattern)
+        result = prog.sub(string, "")
+        return result

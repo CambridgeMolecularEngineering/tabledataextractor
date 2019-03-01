@@ -252,6 +252,7 @@ class TestTableLabels(unittest.TestCase):
         log.debug("Test complete table labelling: {}".format(input_path))
         table = Table(input_path)
         print(repr(table))
+        [print(footnote) for footnote in table.footnotes]
         result = table.labels.tolist()
         self.assertListEqual(expected, result)
 
