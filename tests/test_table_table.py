@@ -29,6 +29,7 @@ class TableCC4(Table):
         self.labels[cc4] = 'CC4'
         log.info("Table Cell CC4 = {}".format(cc4))
 
+
 class TestCC4(unittest.TestCase):
 
     def do_table(self, input_path, expected):
@@ -156,6 +157,7 @@ class TestCC1CC2(unittest.TestCase):
         expected = (1,0),(2,0)
         self.do_table(input_path, expected)
 
+
 class TestCC3(unittest.TestCase):
 
     def do_table(self, input_path, expected):
@@ -208,7 +210,7 @@ class TestDuplicateLabelPrefixing(unittest.TestCase):
 
     def do_table(self, input_path, expected_path):
         log.debug("Test duplicate label prefixing: {}".format(input_path))
-        table = Table(input_path)
+        table = Table(input_path, use_footnotes=False)
         print_table(table.raw_table)
         print_table(table.pre_cleaned_table)
         result = table.pre_cleaned_table.tolist()
@@ -250,9 +252,8 @@ class TestTableLabels(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test complete table labelling: {}".format(input_path))
-        table = Table(input_path)
+        table = Table(input_path, use_footnotes=False)
         print(repr(table))
-        [print(footnote) for footnote in table.footnotes]
         result = table.labels.tolist()
         self.assertListEqual(expected, result)
 
@@ -344,7 +345,7 @@ class TestCategorizationTable(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test Categorization Table: {}".format(input_path))
-        table = Table(input_path)
+        table = Table(input_path, use_footnotes=False)
         print(repr(table))
         result = table.category_table
         self.assertListEqual(expected, result)
@@ -419,7 +420,7 @@ class TestSingleRowColumnTable(unittest.TestCase):
         log.debug("Test single column/row table: {}".format(input_path))
 
         # Table labels
-        table = Table(input_path)
+        table = Table(input_path, use_footnotes=False)
         print(repr(table))
         result = table.labels.tolist()
         self.assertListEqual(expected, result)
