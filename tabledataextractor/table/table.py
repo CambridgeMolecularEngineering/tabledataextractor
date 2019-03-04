@@ -233,7 +233,7 @@ class Table:
                         flag = 0
                 elif flag == 1:
                     temp[r, c] = left_fill
-                if len(temp)-1 > c and empty_row(temp.T[c+1]):
+                if len(temp.T)-1 > c and empty_row(temp.T[c+1]):
                     flag = 0
 
         # running MIPS to find the data region
