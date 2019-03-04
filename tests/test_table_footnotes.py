@@ -45,7 +45,7 @@ class TableF(Table):
 class TestFootnote(unittest.TestCase):
 
     def test_table_use_footnotes(self):
-        table = TableF("./data/table_example_footnotes.csv", use_footnotes=True)
+        table = TableF("./tests/data/table_example_footnotes.csv", use_footnotes=True, use_spanning_cells=False)
         table.print()
 
         print(table.footnotes[0])
@@ -104,7 +104,7 @@ class TestFootnote(unittest.TestCase):
         self.assertListEqual(expected, pre_cleaned_table)
 
     def test_table_dont_use_footnotes(self):
-        table = TableF("./data/table_example_footnotes.csv", use_footnotes=False)
+        table = TableF("./tests/data/table_example_footnotes.csv", use_footnotes=False, use_spanning_cells=False)
         table.print()
 
         print(table.footnotes[0])

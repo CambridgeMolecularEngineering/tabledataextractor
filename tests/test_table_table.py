@@ -20,8 +20,8 @@ log.setLevel(logging.DEBUG)
 
 class TableCC4(Table):
     """Derivative of Table used to isolate testing for CC4"""
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def label_sections(self):
         """Labels only CC4"""
@@ -34,7 +34,7 @@ class TestCC4(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test CC4, Table: {}".format(input_path))
-        table = TableCC4(input_path)
+        table = TableCC4(input_path, use_spanning_cells=False)
         table.print()
         result = table.find_cc4()
         log.debug("Result = {}".format(result))
@@ -83,8 +83,8 @@ class TestCC4(unittest.TestCase):
 
 class TableCC1CC2(Table):
     """Derivative of Table used to isolate testing for CC1 and CC2"""
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def label_sections(self):
         """Label CC1 and CC2 and stop."""
@@ -97,8 +97,8 @@ class TableCC1CC2(Table):
 
 class TableCC3(Table):
     """Derivative of Table used to isolate testing for CC3"""
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def label_sections(self):
         """Label CC3."""
@@ -114,7 +114,7 @@ class TestCC1CC2(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test CC1 & CC2, Table: {}".format(input_path))
-        table = TableCC1CC2(input_path)
+        table = TableCC1CC2(input_path, use_spanning_cells=False)
         table.print()
         result = table.find_cc1_cc2(table.find_cc4(), table.pre_cleaned_table)
         log.debug("Result = {}".format(result))
@@ -162,7 +162,7 @@ class TestCC3(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test CC3, Table: {}".format(input_path))
-        table = TableCC3(input_path)
+        table = TableCC3(input_path, use_spanning_cells=False)
         result = table.label_sections()
         log.debug("Result = {}".format(result))
         table.print()
@@ -210,7 +210,7 @@ class TestDuplicateLabelPrefixing(unittest.TestCase):
 
     def do_table(self, input_path, expected_path):
         log.debug("Test duplicate label prefixing: {}".format(input_path))
-        table = Table(input_path, use_footnotes=False)
+        table = Table(input_path, use_footnotes=False, use_spanning_cells=False)
         print_table(table.raw_table)
         print_table(table.pre_cleaned_table)
         result = table.pre_cleaned_table.tolist()
@@ -252,7 +252,7 @@ class TestTableLabels(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test complete table labelling: {}".format(input_path))
-        table = Table(input_path, use_footnotes=False)
+        table = Table(input_path, use_footnotes=False, use_spanning_cells=False)
         print(repr(table))
         result = table.labels.tolist()
         self.assertListEqual(expected, result)
@@ -345,7 +345,7 @@ class TestCategorizationTable(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test Categorization Table: {}".format(input_path))
-        table = Table(input_path, use_footnotes=False)
+        table = Table(input_path, use_footnotes=False, use_spanning_cells=False)
         print(repr(table))
         result = table.category_table
         self.assertListEqual(expected, result)
@@ -420,7 +420,7 @@ class TestSingleRowColumnTable(unittest.TestCase):
         log.debug("Test single column/row table: {}".format(input_path))
 
         # Table labels
-        table = Table(input_path, use_footnotes=False)
+        table = Table(input_path, use_footnotes=False, use_spanning_cells=False)
         print(repr(table))
         result = table.labels.tolist()
         self.assertListEqual(expected, result)

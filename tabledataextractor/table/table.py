@@ -76,6 +76,7 @@ class Table:
         self.configs['use_notes_in_first_col'] = True
         self.configs['use_prefixing'] = True
         self.configs['use_footnotes'] = True
+        self.configs['use_spanning_cells'] = True
         # setting the config tags based on kwargs input
         for key, value in kwargs.items():
             if key in self.configs:
@@ -136,6 +137,10 @@ class Table:
         self.pre_clean()
         self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
+        if self.configs['use_spanning_cells']:
+            self.pre_cleaned_table = self.duplicate_spanning_cells(self.pre_cleaned_table)
+            self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+
         # prefixing of duplicate labels in the header region
         if self.configs['use_prefixing']:
             self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
@@ -180,6 +185,81 @@ class Table:
         self.data = None
         self.footnotes = []
         self.analyze_table()
+
+    def duplicate_spanning_cells(self, table):
+        """
+        Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for csv files where
+        information has been lost, or, if the source table is not properly formatted.
+
+        Cells outside the row/column header (such as data cells) will not be duplicated.
+        MIPS is run to perform a check for that.
+
+        Algorithm according to Nagy and Seth, 2016
+
+        :param table: Table to use as input
+        :type table: Numpy array
+        :return:
+        """
+
+        def empty_row(array):
+            """Returns 'True' if the whole row is truly empty"""
+            for element in array:
+                if element:
+                    return False
+            return True
+
+        log.info("Spanning cells. Attempt to run main spanning cell algorithm.")
+        temp = table.copy()
+        top_fill = None
+        left_fill = None
+        for c in range(0, len(temp.T)):
+            flag = 0
+            for r in range(len(temp)):
+                if temp[r, c]:
+                    top_fill = temp[r, c]
+                    flag = 1
+                elif flag == 1:
+                    temp[r, c] = top_fill
+                if len(temp)-1 > r and empty_row(temp[r+1]):
+                    flag = 0
+        for r in range(len(temp)):
+            flag = 0
+            for c in range(len(temp.T)):
+                if temp[r, c]:
+                    if (len(temp)-1 > r and temp[r+1, c] != temp[r, c]) or temp[r-1, c] != temp[r, c]:
+                        left_fill = temp[r, c]
+                        flag = 1
+                    else:
+                        flag = 0
+                elif flag == 1:
+                    temp[r, c] = left_fill
+                if len(temp)-1 > c and empty_row(temp.T[c+1]):
+                    flag = 0
+
+        # running MIPS to find the data region
+        log.info("Spanning cells. Attempt to run main MIPS algorithm.")
+        # disable title row temporarily
+        old_title_row_setting = self.configs['use_title_row']
+        self.configs['use_title_row'] = False
+        try:
+            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), temp)
+        except (MIPSError, TypeError):
+            log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
+            return table
+        finally:
+            self.configs['use_title_row'] = old_title_row_setting
+
+        updated = table.copy()
+        # update the original table with values from the updated table if the cells are in the header regions
+        # update column header
+        for col_header_index in range(cc1[0], cc2[0]+1):
+            updated[col_header_index, :] = temp[col_header_index, :]
+
+        # update row header
+        for row_header_index in range(cc1[1], cc2[1]+1):
+            updated[:, row_header_index] = temp[:, row_header_index]
+
+        return updated
 
     def prefix_duplicate_labels(self, table):
         """
