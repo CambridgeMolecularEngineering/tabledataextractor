@@ -72,11 +72,12 @@ class Table:
         # default settings
         self.configs = dict()
         self.configs['use_title_row'] = True
-        self.configs['use_max_data_area'] = False
         self.configs['use_notes_in_first_col'] = True
         self.configs['use_prefixing'] = True
         self.configs['use_footnotes'] = True
         self.configs['use_spanning_cells'] = True
+        self.configs['use_header_extension'] = True
+        self.configs['use_max_data_area'] = False
         # setting the config tags based on kwargs input
         for key, value in kwargs.items():
             if key in self.configs:
@@ -702,6 +703,47 @@ class Table:
 
         return cc1, cc2
 
+    def header_extension(self, cc1):
+        """
+        Extends the header after main MIPS run.
+        According to Nagy and Seth, 2016, "Table Headers: An entrance to the data mine"
+        :return:
+        """
+
+        cc1_new_row = None
+        cc1_new_col = None
+
+        # add row above the identified column header if it does not consist of cells with identical values and if it
+        # adds at least one non-blank cell that has a value different from the cell immediately below it
+        current_row = self.pre_cleaned_table[cc1[0], :]
+        for row_index in range(cc1[0]-1, -1, -1):
+            if len(np.unique(self.pre_cleaned_table[row_index, :])) == 1:
+                cc1_new_row = row_index+1
+            else:
+                for col_index, cell in enumerate(self.pre_cleaned_table[row_index, :]):
+                    if cell != current_row[col_index] and not self._pre_cleaned_table_empty[row_index, col_index]:
+                        current_row = self.pre_cleaned_table[row_index, :]
+                        cc1_new_row = row_index
+                        break
+        if cc1_new_row is None:
+            cc1_new_row = cc1[0]
+
+        # now do the same for the row headers
+        current_col = self.pre_cleaned_table[:, cc1[1]]
+        for col_index in range(cc1[1]-1, -1, -1):
+            if len(np.unique(self.pre_cleaned_table[:, col_index])) == 1:
+                cc1_new_col = col_index+1
+            else:
+                for row_index, cell in enumerate(self.pre_cleaned_table[:, col_index]):
+                    if cell != current_col[row_index] and not self._pre_cleaned_table_empty[row_index, col_index]:
+                        current_col = self.pre_cleaned_table[:, col_index]
+                        cc1_new_col = col_index
+                        break
+        if cc1_new_col is None:
+            cc1_new_col = cc1[1]
+
+        return cc1_new_row, cc1_new_col
+
     def find_cc3(self, cc2):
         """
         Searches for cell 'CC3', as the leftmost cell of the first filled row of the data region.
@@ -872,10 +914,12 @@ class Table:
             raise MIPSError(msg)
         else:
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
-            self.labels[cc1] = 'CC1'
-            self.labels[cc2] = 'CC2'
             self._cc1 = cc1
             self._cc2 = cc2
+
+        # provisions for header extension
+        if self.configs['use_header_extension']:
+            self._cc1 = self.header_extension(self._cc1)
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
@@ -883,10 +927,10 @@ class Table:
         self._cc3 = cc3
 
         self.labels[title_row, :] = 'TableTitle'
-        self.labels[cc1[0]:cc2[0] + 1, cc1[1]:cc2[1] + 1] = 'StubHeader'
-        self.labels[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1] = 'RowHeader'
-        self.labels[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1] = 'ColHeader'
-        self.labels[cc3[0]:cc4[0] + 1, cc3[1]:cc4[1] + 1] = 'Data'
+        self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'StubHeader'
+        self.labels[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'RowHeader'
+        self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'ColHeader'
+        self.labels[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'Data'
 
         for footnote in self.footnotes:
             self.labels[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
