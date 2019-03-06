@@ -981,23 +981,31 @@ class Table:
         :param table: input table to split up, numpy array
         """
 
-        # TODO Think about the transposed table
-        # TODO Make some sort of connection with the outside
+        # first, the column header
+        i = 0
+        # the last row of the column/stub header is not used, as it will be determined as
+        # data region by the main MIPS algorithm
+        for col_index, column in enumerate(self.col_header[:-1].T):
+            # the first match is backwards and forwards looking
+            if i == 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+                yield Table(self.pre_cleaned_table[:, 0:col_index+1].tolist())
+                i += 1
+            # every other match is only forwards looking
+            if i > 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+                yield Table(self.pre_cleaned_table[:, col_index+1:col_index+i*col_index+2].tolist())
+                i += 1
 
-        # General test that needs to be performed to see if we want to do splitting at all
-        if self.stub_header in self.col_header:
-            i = 0
-            # the last row of the column/stub header is not used, as it will be determined as
-            # data region by the main MIPS algorithm
-            for col_index, column in enumerate(self.col_header[:-1].T):
-                # the first match is backwards and forwards looking
-                if i == 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
-                    yield Table(self.pre_cleaned_table[:, 0:col_index+1].tolist())
-                    i += 1
-                # every other match is only forwards looking
-                if i > 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
-                    yield Table(self.pre_cleaned_table[:, col_index+1:col_index+i*col_index+2].tolist())
-                    i += 1
+        # now the same thing for the row header
+        i = 0
+        for row_index, row in enumerate(self.row_header[:, :-1]):
+            # the first match is backwards and forwards looking
+            if i == 0 and row and np.array_equal(row, self.stub_header[0, :-1]):
+                yield Table(self.pre_cleaned_table[0:row_index+1, :].tolist())
+                i += 1
+            # every other match is only forwards looking
+            if i > 0 and row and np.array_equal(row, self.stub_header[0, :-1]):
+                yield Table(self.pre_cleaned_table[row_index+1:row_index+i*row_index+2, :].tolist())
+                i += 1
 
     def build_category_table(self, table, cc1, cc2, cc3, cc4):
         """
