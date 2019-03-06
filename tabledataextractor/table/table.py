@@ -10,7 +10,7 @@ import logging
 
 import numpy as np
 from sympy import Symbol
-from sympy import factor_list
+from sympy import factor_list, factor
 
 from tabledataextractor.input import from_any
 from tabledataextractor.output.print import as_string
@@ -969,6 +969,35 @@ class Table:
         log.debug("Factorization, initial header: {}".format(expression))
         log.debug("Factorization, factorized header: {}".format(f))
         return f
+
+    def subtables(self):
+        """
+        Splits table into subtables. Yields Table() objects.
+
+        Algorithm:
+            If the stub header is repeated in the column header section the table is split up before
+            the repeated element.
+
+        :param table: input table to split up, numpy array
+        """
+
+        # TODO Think about the transposed table
+        # TODO Make some sort of connection with the outside
+
+        # General test that needs to be performed to see if we want to do splitting at all
+        if self.stub_header in self.col_header:
+            i = 0
+            # the last row of the column/stub header is not used, as it will be determined as
+            # data region by the main MIPS algorithm
+            for col_index, column in enumerate(self.col_header[:-1].T):
+                # the first match is backwards and forwards looking
+                if i == 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+                    yield Table(self.pre_cleaned_table[:, 0:col_index+1].tolist())
+                    i += 1
+                # every other match is only forwards looking
+                if i > 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+                    yield Table(self.pre_cleaned_table[:, col_index+1:col_index+i*col_index+2].tolist())
+                    i += 1
 
     def build_category_table(self, table, cc1, cc2, cc3, cc4):
         """
