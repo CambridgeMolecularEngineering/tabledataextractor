@@ -981,6 +981,10 @@ class Table:
         :param table: input table to split up, numpy array
         """
 
+        # TODO Write new unittests
+        # TODO Pack it nicer, table.subtitles should give a list of subtitles and not point to the generator
+        # TODO Run all of the other test tables and check it the subtables are returning something wrong.
+
         # first, the column header
         i = 0
         # the last row of the column/stub header is not used, as it will be determined as
