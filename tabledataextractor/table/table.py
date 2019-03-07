@@ -970,20 +970,14 @@ class Table:
         log.debug("Factorization, factorized header: {}".format(f))
         return f
 
-    def subtables(self):
+    def split_table(self):
         """
         Splits table into subtables. Yields Table() objects.
 
         Algorithm:
             If the stub header is repeated in the column header section the table is split up before
             the repeated element.
-
-        :param table: input table to split up, numpy array
         """
-
-        # TODO Write new unittests
-        # TODO Pack it nicer, table.subtitles should give a list of subtitles and not point to the generator
-        # TODO Run all of the other test tables and check it the subtables are returning something wrong.
 
         # first, the column header
         i = 0
@@ -991,11 +985,15 @@ class Table:
         # data region by the main MIPS algorithm
         for col_index, column in enumerate(self.col_header[:-1].T):
             # the first match is backwards and forwards looking
-            if i == 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+            if i == 0 and column.size > 0 and \
+                    self.stub_header[:-1].T[0].size > 0 and \
+                    np.array_equal(column, self.stub_header[:-1].T[0]):
                 yield Table(self.pre_cleaned_table[:, 0:col_index+1].tolist())
                 i += 1
             # every other match is only forwards looking
-            if i > 0 and column and np.array_equal(column, self.stub_header[:-1].T[0]):
+            if i > 0 and column.size > 0 and \
+                    self.stub_header[:-1].T[0].size > 0 and \
+                    np.array_equal(column, self.stub_header[:-1].T[0]):
                 yield Table(self.pre_cleaned_table[:, col_index+1:col_index+i*col_index+2].tolist())
                 i += 1
 
@@ -1003,13 +1001,35 @@ class Table:
         i = 0
         for row_index, row in enumerate(self.row_header[:, :-1]):
             # the first match is backwards and forwards looking
-            if i == 0 and row and np.array_equal(row, self.stub_header[0, :-1]):
+            if i == 0 and row.size > 0 and \
+                    self.stub_header[0, :-1].size > 0 and \
+                    np.array_equal(row, self.stub_header[0, :-1]):
                 yield Table(self.pre_cleaned_table[0:row_index+1, :].tolist())
                 i += 1
             # every other match is only forwards looking
-            if i > 0 and row and np.array_equal(row, self.stub_header[0, :-1]):
+            if i > 0 and row.size > 0 and \
+                    self.stub_header[0, :-1].size > 0 \
+                    and np.array_equal(row, self.stub_header[0, :-1]):
                 yield Table(self.pre_cleaned_table[row_index+1:row_index+i*row_index+2, :].tolist())
                 i += 1
+
+    @property
+    def subtables(self):
+        """List of all subtables, Table() objects"""
+        tables = []
+        g = self.split_table()
+        while True:
+            try:
+                subtable = next(g, None)
+            except MIPSError as e:
+                log.exception("Subtable MIPS failure {}".format(e.args))
+                break
+            else:
+                if subtable is None:
+                    break
+                else:
+                    tables.append(subtable)
+        return tables
 
     def build_category_table(self, table, cc1, cc2, cc3, cc4):
         """
