@@ -36,12 +36,6 @@ class Table:
             ``use_max_data_area = False``, default. If True the max data area will be used to determine CC2 in the main MIPS algorithm.
             It is probably never necessary to set this to True.
 
-            ``use_notes_in_first_col = True``, default.
-            Sometimes, if the data cells can be uniquely indexed with the second column in the table,
-            the first column will be recognized as 'Notes', which is correct and expected behaviour.
-            However, by putting this to 'False' the first column of the table will always be part of the
-            row index.
-
             ``use_prefixing = True``, default.
             Will perform the prefixing steps if row or column index cells are not unique.
 
@@ -72,7 +66,6 @@ class Table:
         # default settings
         self.configs = dict()
         self.configs['use_title_row'] = True
-        self.configs['use_notes_in_first_col'] = True
         self.configs['use_prefixing'] = True
         self.configs['use_footnotes'] = True
         self.configs['use_spanning_cells'] = True
@@ -696,10 +689,6 @@ class Table:
         # provision for using the uppermost row possible for cc1, if titles are turned of
         if not self.configs['use_title_row']:
             cc1 = (0, cc1[1])
-
-        # provision for using the first column as row header, disables a 'Notes' section in the first column
-        if not self.configs['use_notes_in_first_col']:
-            cc1 = (cc1[0], 0)
 
         return cc1, cc2
 

@@ -61,12 +61,5 @@ class TestSubtables(unittest.TestCase):
         self.assertTrue(not table.subtables)
 
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()
