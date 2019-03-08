@@ -13,13 +13,13 @@ from sympy import Symbol
 from sympy import factor_list, factor
 
 from tabledataextractor.input import from_any
-from tabledataextractor.output.print import as_string
-from tabledataextractor.output.print import print_table, list_as_PrettyTable
+from tabledataextractor.output.print import as_string, print_table, list_as_PrettyTable
 from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import CellParser, StringParser
 from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
+from tabledataextractor.table.history import History
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
@@ -27,35 +27,34 @@ log.setLevel(logging.WARNING)
 
 class Table:
     """
-    Initialized by converting the input to a numpy array form and performing all
-    appropriate labelling steps.
+    Initializes a Table by converting the input to a standardized category table format.
 
      Optional configuration keywords:
-            ``use_title_row = True``, default. A title row will be assumed if possible.
 
-            ``use_max_data_area = False``, default. If True the max data area will be used to determine CC2 in the main MIPS algorithm.
-            It is probably never necessary to set this to True.
+            ``use_title_row = True``, default.
+            A title row will be assumed if possible.
 
             ``use_prefixing = True``, default.
             Will perform the prefixing steps if row or column index cells are not unique.
 
+            ``use_spanning_cells = True``, default.
+
+            ``use_header_extension = True``, default.
+
             ``use_footnotes = True``, default.
             Will copy the footnote text into the appropriate cells of the table and remove the footnote prefix.
 
-    :param file_path: Path to .html or .cvs file, URL or list object that is used as input
-    :type file_path: str | list
-    :param table_number: Number of the table that we want to input if there are several at the given address/path
-    :type table_number: int
+            ``use_max_data_area = False``, default.
+            If ``True`` the max data area will be used to determine CC2 in the main MIPS algorithm.
+            It is probably never necessary to set this to True.
+
     """
 
     def __init__(self, file_path, table_number=1, **kwargs):
         """
-        Will initialize the table object, with all 'None' properties.
-        After reading-in of the raw table from a source the table will be analyzed.
-
         :param file_path: Path to .html or .cvs file, URL or list object that is used as input
         :type file_path: str | list
-        :param table_number: Number of the table that we want to input if there are several at the given address/path
+        :param table_number: Number of table to read, if there are several at the given url, or in the html file
         :type table_number: int
         """
 
@@ -113,6 +112,7 @@ class Table:
         self.data = None
         self.transposed = False
         self.footnotes = []
+        self.history = History()
 
         # run the table analysis
         self.analyze_table()
@@ -125,6 +125,12 @@ class Table:
 
         # mask, 'cell = True' if cell is empty
         self._raw_table_empty = self.empty_cells(self.raw_table)
+
+        # check if array is empty
+        if self._raw_table_empty.all():
+            msg = 'Input table is empty.'
+            log.critical(msg)
+            raise InputError(msg)
 
         # pre-cleaning table
         self.pre_cleaned_table = np.copy(self.raw_table)
@@ -178,6 +184,7 @@ class Table:
         self.col_header = None
         self.data = None
         self.footnotes = []
+        self.history = History()
         self.analyze_table()
 
     def duplicate_spanning_cells(self, table):
@@ -252,6 +259,11 @@ class Table:
         # update row header
         for row_header_index in range(cc1[1], cc2[1]+1):
             updated[:, row_header_index] = temp[:, row_header_index]
+
+        # log
+        if not np.array_equal(updated, table):
+            self.history._spanning_cells_extended = True
+            log.info("METHOD. Spanning cells extended.")
 
         return updated
 
@@ -403,6 +415,8 @@ class Table:
             # but it cannot start lower, because that would mean that we have removed some of the hierarchy and added
             # hierarchy from the left/above into a column/row
             if cc1_new[0] <= cc1[0] and cc1_new[1] <= cc1[1]:
+                self.history._prefixing_performed = True
+                log.info("METHOD. Prefixing was performed.")
                 return prefixed_table
             else:
                 return table
@@ -688,7 +702,12 @@ class Table:
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
         if not self.configs['use_title_row']:
-            cc1 = (0, cc1[1])
+            if cc1[0] != 0:
+                log.info("METHOD. Title row removed, cc1 was shifted from {} to {}".format(cc1, (0, cc1[1])))
+                cc1 = (0, cc1[1])
+                self.history._title_row_removed = True
+        else:
+            self.history._title_row_removed = False
 
         return cc1, cc2
 
@@ -731,7 +750,14 @@ class Table:
         if cc1_new_col is None:
             cc1_new_col = cc1[1]
 
-        return cc1_new_row, cc1_new_col
+        cc1_new = (cc1_new_row, cc1_new_col)
+
+        # log
+        if not cc1_new == cc1:
+            self.history._header_extended = True
+            log.info("METHOD. Header extended.")
+
+        return cc1_new
 
     def find_cc3(self, cc2):
         """
@@ -880,8 +906,9 @@ class Table:
         Labelling of all classification table elements.
         """
 
-        title_row = self.find_title_row()
-        self.title_row = title_row
+        if self.configs['use_title_row']:
+            title_row = self.find_title_row()
+            self.title_row = title_row
 
         cc4 = self.find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
@@ -890,10 +917,12 @@ class Table:
 
         for footnote in self.find_footnotes():
             self.footnotes.append(footnote)
-            # update the pre-cleaned table
             if self.configs['use_footnotes']:
-                self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+                if not np.array_equal(self.pre_cleaned_table, footnote.pre_cleaned_table):
+                    self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+                    self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+                    self.history._footnotes_copied = True
+                    log.info("METHOD. Footnotes copied into cells.")
 
         try:
             cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
@@ -909,13 +938,16 @@ class Table:
         # provisions for header extension
         if self.configs['use_header_extension']:
             self._cc1 = self.header_extension(self._cc1)
+            log.info("Header extension, new cc1 = {}".format(self._cc1))
 
         cc3 = self.find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
         self._cc3 = cc3
 
-        self.labels[title_row, :] = 'TableTitle'
+        if self.configs['use_title_row']:
+            self.labels[title_row, :] = 'TableTitle'
+
         self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'StubHeader'
         self.labels[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'RowHeader'
         self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'ColHeader'
