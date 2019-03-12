@@ -22,7 +22,7 @@ from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
+log.setLevel(logging.DEBUG)
 
 
 class Table:
@@ -209,13 +209,21 @@ class Table:
                     return False
             return True
 
+        # running MIPS to find the data region
+        log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
+        try:
+            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), self.pre_cleaned_table)
+        except (MIPSError, TypeError):
+            log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
+            return table
+
         log.info("Spanning cells. Attempt to run main spanning cell algorithm.")
         temp = table.copy()
         top_fill = None
         left_fill = None
         for c in range(0, len(temp.T)):
             flag = 0
-            for r in range(len(temp)):
+            for r in range(cc1[0], len(temp)):
                 if temp[r, c]:
                     top_fill = temp[r, c]
                     flag = 1
@@ -223,7 +231,7 @@ class Table:
                     temp[r, c] = top_fill
                 if len(temp)-1 > r and empty_row(temp[r+1]):
                     flag = 0
-        for r in range(len(temp)):
+        for r in range(cc1[0], len(temp)):
             flag = 0
             for c in range(len(temp.T)):
                 if temp[r, c]:
@@ -237,13 +245,23 @@ class Table:
                 if len(temp.T)-1 > c and empty_row(temp.T[c+1]):
                     flag = 0
 
-        # running MIPS to find the data region
+        # Finding the header regions to make sure the spanning cells additions are not applied in the data region
+        # Then, the main MIPS algorithm has to be run
+        temp2 = np.copy(temp)
+        diff_row_length = 0
+        diff_col_length = 0
+        if self.configs['use_prefixing']:
+            temp2 = self.prefix_duplicate_labels(temp)
+            # reset the prefixing flag
+            self.history._prefixing_performed = False
+            diff_row_length = len(temp2) - len(temp)
+            diff_col_length = len(temp2.T) - len(temp.T)
         log.info("Spanning cells. Attempt to run main MIPS algorithm.")
         # disable title row temporarily
         old_title_row_setting = self.configs['use_title_row']
         self.configs['use_title_row'] = False
         try:
-            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), temp)
+            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), temp2)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -253,11 +271,11 @@ class Table:
         updated = table.copy()
         # update the original table with values from the updated table if the cells are in the header regions
         # update column header
-        for col_header_index in range(cc1[0], cc2[0]+1):
+        for col_header_index in range(cc1[0], cc2[0]+1-diff_row_length):
             updated[col_header_index, :] = temp[col_header_index, :]
 
         # update row header
-        for row_header_index in range(cc1[1], cc2[1]+1):
+        for row_header_index in range(cc1[1], cc2[1]+1-diff_col_length):
             updated[:, row_header_index] = temp[:, row_header_index]
 
         # log

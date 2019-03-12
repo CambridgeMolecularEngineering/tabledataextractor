@@ -51,7 +51,7 @@ class History:
         out += "title_row_removed       = {}".format(self.title_row_removed)
         out += "\n" + "prefixing_performed     = {}".format(self.prefixing_performed)
         out += "\n" + "footnotes_copied        = {}".format(self.footnotes_copied)
-        out += "\n" + "spanning cells extended = {}".format(self.spanning_cells_extended)
+        out += "\n" + "spanning_cells_extended = {}".format(self.spanning_cells_extended)
         out += "\n" + "header_extended         = {}".format(self.header_extended)
         return out
 
