@@ -743,7 +743,8 @@ class Table:
         # adds at least one non-blank cell that has a value different from the cell immediately below it
         current_row = self.pre_cleaned_table[cc1[0], :]
         for row_index in range(cc1[0]-1, -1, -1):
-            if len(np.unique(self.pre_cleaned_table[row_index, :])) == 1:
+            # start after the first column to allow for a title
+            if len(np.unique(self.pre_cleaned_table[row_index, 1:])) == 1:
                 cc1_new_row = row_index+1
             else:
                 for col_index, cell in enumerate(self.pre_cleaned_table[row_index, :]):
