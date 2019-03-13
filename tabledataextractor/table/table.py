@@ -747,7 +747,11 @@ class Table:
                 cc1_new_row = row_index+1
             else:
                 for col_index, cell in enumerate(self.pre_cleaned_table[row_index, :]):
-                    if cell != current_row[col_index] and not self._pre_cleaned_table_empty[row_index, col_index]:
+                    # remove the first row from this check to preserve a title,
+                    # if the title is the only non-empty element of the row
+                    if col_index != 0 and \
+                            cell != current_row[col_index] and \
+                            not self._pre_cleaned_table_empty[row_index, col_index]:
                         current_row = self.pre_cleaned_table[row_index, :]
                         cc1_new_row = row_index
                         break

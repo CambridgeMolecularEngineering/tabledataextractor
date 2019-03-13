@@ -19,7 +19,7 @@ class TestSpanningCells(unittest.TestCase):
     def test_default_config(self):
         table = Table("./tests/data/te_04.csv")
         table.print()
-        pre_cleaned_table = [['Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate', 'Pupils in comprehensive schools and with leaving certificate'],
+        pre_cleaned_table = [['Pupils in comprehensive schools and with leaving certificate', '', '', '', '', '', '', '', ''],
                              ['Year', 'School', 'Pupils', 'Pupils', 'Pupils', 'Pupils', 'Pupils', 'Grade 1','Leaving certificates'],
                              ['Year', 'School', 'Pre-primary', 'Grades', 'Grades', 'Additional', 'Total', 'Grade 1', 'Leaving certificates'],
                              ['Year', 'School', 'Pre-primary', '6 Jan', '9 Jul', 'Additional', 'Total', 'Grade 1', 'Leaving certificates'],

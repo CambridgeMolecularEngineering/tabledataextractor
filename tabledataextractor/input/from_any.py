@@ -51,7 +51,13 @@ def create_table(name_key, table_number=1):
 
     if isinstance(name_key, list):
         log.info("Input is list type.")
-        return from_list.read(name_key)
+        if len(name_key) > 0:
+            return from_list.read(name_key)
+        else:
+            msg = 'Input is invalid. ' \
+                  'Supported are: path to .html or .cvs file, URL or multidimensional python list object'
+            log.critical(msg)
+            raise TypeError(msg, str(name_key))
 
     elif url(name_key):
         log.info("Url: {}".format(name_key))
@@ -66,7 +72,7 @@ def create_table(name_key, table_number=1):
         return from_csv.read(name_key)
 
     else:
-        msg = 'Input is invalid. Supported are: path to .html or .cvs file, URL or python list object'
+        msg = 'Input is invalid. Supported are: path to .html or .cvs file, URL or multidimensional python list object'
         log.critical(msg)
         raise TypeError(msg, str(name_key))
 
