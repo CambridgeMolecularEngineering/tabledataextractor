@@ -22,7 +22,7 @@ from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
 
 class Table:
