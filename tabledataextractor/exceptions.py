@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Exceptions defined for TableDataExtractor
+Exceptions defined for TableDataExtractor.
 """
 
 
@@ -25,3 +25,4 @@ class MIPSError(TDEError):
     """
     def __init__(self, message):
         self.message = message
+

@@ -10,7 +10,7 @@ jm2111@cam.ac.uk
 import logging
 
 __title__ = 'TableDataExtractor'
-__version__ = '1.0'
+__version__ = '1.1'
 __author__ = 'Juraj Mavračić'
 __email__ = 'jm2111@cam.ac.uk'
 __license__ = 'proprietary'  # ?

@@ -1,2 +1,2 @@
 # tabledataextractor
-Extracts and indexes data from tables.
+Extracts data from tables with complicated structures.
