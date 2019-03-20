@@ -1,19 +1,19 @@
 Output
 ========
 
-tabledataextractor.output.print
+Print to screen
 -----------------------------------
 
 .. automodule:: tabledataextractor.output.print
     :members:
 
-tabledataextractor.output.to_csv
+Save to file
 ----------------------------------
 
 .. automodule:: tabledataextractor.output.to_csv
     :members:
 
-tabledataextractor.output.to_pandas
+Convert to Pandas DataFrame
 ------------------------------------
 
 .. automodule:: tabledataextractor.output.to_pandas

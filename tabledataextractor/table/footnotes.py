@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Footnote handling
+Footnote handling.
 
 .. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
 
@@ -18,25 +18,40 @@ log.setLevel(logging.DEBUG)
 class Footnote:
     """
     Defines a footnote found in the provided table.
-    Contains elements of the footnote:
-        * prefix, prefix_cell
-        * text, text_cell
-        * references (raw), reference_cells
+    Contains elements of a footnote.
+
+    Will construct the footnote and find all associated elements
+
+    :param table: table to work on
+    :type table: ~tabledataextractor.table.table.Table
+    :param prefix: Prefix that has been identified as footnote prefix
+    :type prefix: str
+    :param prefix_cell: Index of the cell containing the associated prefix
+    :type prefix_cell: (int, int)
+    :param text: Optional. Text associated with the found footnote prefix
+    :type text: str
     """
 
     def __init__(self, table, prefix, prefix_cell, text):
-        """
-        Will construct the footnote and find all associated elements
-        :param table: TDE Table() object
-        :type Table: Table()
-        """
         self._table = table
         self.pre_cleaned_table = np.copy(self._table.pre_cleaned_table)
+
+        #: Prefix string, e.g., `"a)"`.
         self.prefix = prefix
+
+        #: Cell index of the prefix, e.g., `(7,0)`.
         self.prefix_cell = prefix_cell
+
+        #: Cell of the footnote text, e.g., `(7,1)`.
         self.text_cell = self.prefix_cell if text else self._find_text_cell()
+
+        #: Footnote text, e.g., `"This is the text of a footnote"`.
         self.text = text if text else self._find_text()
+
+        #: Cell indexes of the cells containing the footnote references within the table.
         self.reference_cells = self._find_reference_cells()
+
+        #: Cell content of the cells contatining the footnote references within the table.
         self.references = self._find_references()
 
     def _find_text_cell(self):
@@ -65,6 +80,7 @@ class Footnote:
             Case 3. else:                matches if found anywhere in any cell
 
         :return: List((int,int))
+
         """
         # indices of the references
         fn_refs = []

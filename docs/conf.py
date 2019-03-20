@@ -24,7 +24,7 @@ copyright = u'2018, Juraj Mavračić'
 author = u'Juraj Mavračić'
 
 # The short X.Y version
-version = u'1.1'
+version = u'1.5'
 # The full version, including alpha/beta/rc tags
 release = u'2019'
 
@@ -49,6 +49,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
     'm2r',
     'nbsphinx',
     'nbsphinx_link',
@@ -76,7 +77,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',  '**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -87,21 +88,21 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
 html_theme_options = {
-    "sidebar_width": "20ch",
-    "page_width": "100ch",
-    "fixed_sidebar": 'true',
-    'github_user': 'JurajMa',
-    'github_repo': 'tabledataextractor',
-    'github_banner': 'true',
-    'github_button': 'true',
-    'description': 'Extract information from tables'
+#    "sidebar_width": "20ch",
+#    "page_width": "100ch",
+#    "fixed_sidebar": 'true',
+#    'github_user': 'JurajMa',
+#    'github_repo': 'tabledataextractor',
+#    'github_banner': 'true',
+#    'github_button': 'true',
+#    'description': 'Extract information from tables'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

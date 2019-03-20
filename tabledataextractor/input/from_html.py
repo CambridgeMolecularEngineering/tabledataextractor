@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Reads an html formatted table.
+Reads an `html` formatted table.
 """
 
 
@@ -22,13 +22,13 @@ log.setLevel(logging.WARNING)
 
 def makearray(html_table):
     """
-    Creates a numpy array from an html file, taking rowspan and colspan into account.
+    Creates a numpy array from an `.html` file, taking `rowspan` and `colspan` into account.
 
     Modified from:
         John Ricco, https://johnricco.github.io/2017/04/04/python-html/, *Using Python to scrape HTML tables with merged cells*
 
-    Added functionality for duplicating cell content for cells with rowspan/colspan.
-    The table has to be n*m, rectangular, with the same number of columns in every row.
+    Added functionality for duplicating cell content for cells with `rowspan`/`colspan`.
+    The table has to be :math:`n*m`, rectangular, with the same number of columns in every row.
     """
     n_cols = 0
     n_rows = 0
@@ -119,8 +119,8 @@ def makearray(html_table):
     return array
 
 
-def read_file(file_path,table_number=1):
-    """Method used to read an .html file and return a numpy array"""
+def read_file(file_path, table_number=1):
+    """Reads an .html file and returns a numpy array."""
     file = open(file_path, encoding='UTF-8')
     html_soup = BeautifulSoup(file, features='lxml')
     file.close()
@@ -130,6 +130,14 @@ def read_file(file_path,table_number=1):
 
 
 def configure_selenium(browser='Firefox'):
+    """
+    Configuration for `Selenium <https://selenium-python.readthedocs.io/>`_. Sets the path to ``geckodriver.exe``
+
+    :param browser: Which browser to use
+    :type browser: str
+    :return: Selenium driver
+
+    """
     if browser == 'Firefox':
         options = FirefoxOptions()
         options.headless = True
@@ -141,7 +149,7 @@ def configure_selenium(browser='Firefox'):
 
 def read_url(url, table_number=1):
     """
-    Reads in a table from an URL and returns a numpy array.
+    Reads in a table from an URL and returns a numpy array. Will try `Requests <http://docs.python-requests.org/en/master/>`_ first. If it doesn't succeed, `Selenium <https://selenium-python.readthedocs.io/>`_ will be used.
 
     :param url: Url of the page where the table is located
     :type url: str

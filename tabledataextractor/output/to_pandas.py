@@ -8,10 +8,11 @@ import pandas as pd
 
 def to_pandas(table):
     """
-    Creates a Pandas DataFrame from a Table object.
+    Creates a `Pandas <http://pandas.pydata.org/>`_ `DataFrame` object from a :class:`~tabledataextractor.table.table.Table` object.
 
-    :param table: Table object
-    :return:
+    :param table: Input table
+    :type table: ~tabledataextractor.table.table.Table
+    :return: :class:`pandas.DataFrame`
     """
     index_row = pd.MultiIndex.from_arrays(table.row_header.T)
     index_col = pd.MultiIndex.from_arrays(table.col_header)
@@ -21,8 +22,8 @@ def to_pandas(table):
 
 def find_multiindex_level(row_number, column_number, df):
     """
-    Helping function for build_category_table().
-    Finds the Pandas MultiIndex level in a given Pandas DataFrame, for a particular data value.
+    Helping function for ``build_category_table()``.
+    Finds the `Pandas` `MultiIndex level` in a given `Pandas` `DataFrame`, for a particular data value.
     """
     result_index = []
     if hasattr(df.index, 'labels'):
@@ -41,10 +42,10 @@ def find_multiindex_level(row_number, column_number, df):
 
 def print_category_table(df):
     """
-    Prints the category table to screen, from Pandas DataFrame input
+    Prints the category table to screen, from `Pandas DataFrame` input
 
     :param df: Pandas DataFrame input
-    :return:
+    :type df: pandas.DataFrame
     """
     values = df.values  # data is converted to numpy array
     print("{:11s} {:10s} {:36s} {:20s}".format("Cell_ID", "Data", "Row Categories", "Column Categories"))
@@ -56,10 +57,11 @@ def print_category_table(df):
 
 def build_category_table(df):
     """
-    Builds category table in form of list, from Pandas DataFrame input
+    Builds the category table in form of a Python list, from `Pandas DataFrame` input
 
     :param df: Pandas DataFrame input
-    :return: category_table, List
+    :type df: pandas.DataFrame
+    :return: category_table as Python list
     """
     values = df.values  # data is converted to numpy array
     category_table = []

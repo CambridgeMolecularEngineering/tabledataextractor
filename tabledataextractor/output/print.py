@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Reads a csv formatted table.
+Functions for printing to screen in a nice format.
 """
 
 import logging
@@ -17,7 +17,6 @@ def print_table(table):
 
     :param table: input numpy array for printing
     :type table: ndarray
-    :return:
     """
     n_columns = table.shape[1]
     cell_width = np.zeros(n_columns, dtype=int)
@@ -42,7 +41,7 @@ def as_string(table):
 
     :param table: input numpy array
     :type table: ndarray
-    :return:
+    :return: string
     """
     n_columns = table.shape[1]
     cell_width = np.zeros(n_columns, dtype=int)
@@ -65,10 +64,11 @@ def as_string(table):
 
 def list_as_PrettyTable(table_list):
     """
-    Turns list into PrettyTable object, ready for printing
+    Turns list into :class:`PrettyTable` object, ready for printing.
 
     :param table_list: list to be printed
-    :return:
+    :return: table as `PrettyTable <https://pypi.org/project/PrettyTable/>`_
+
     """
     t = PrettyTable()
     t.field_names = ["Data", "Row Categories", "Column Categories"]

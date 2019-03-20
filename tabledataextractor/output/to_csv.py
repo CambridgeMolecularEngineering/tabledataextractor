@@ -13,12 +13,11 @@ log.setLevel(logging.WARNING)
 
 def write_to_csv(table, file_path):
     """
-    Writes a numpy array table to a .csv file
+    Writes a numpy array table to a .csv file.
     Overrides existing files.
 
     :param file_path: Output location
     :type file_path: str
-    :return:
     """
     if os.path.exists(file_path):
         log.info("File: {} overwritten.".format(file_path))
