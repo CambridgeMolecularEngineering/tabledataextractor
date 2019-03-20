@@ -46,16 +46,15 @@ class Table:
         * ``use_max_data_area = False``
             If ``True`` the max data area will be used to determine the cell `CC2` in the main MIPS algorithm. It is probably never necessary to set this to True.
 
+    :param file_path: Path to .html or .cvs file, URL or list object that is used as input
+    :type file_path: str | list
+    :param table_number: Number of table to read, if there are several at the given url, or in the html file
+    :type table_number: int
+
     """
 
     def __init__(self, file_path, table_number=1, **kwargs):
-        """
-        :param file_path: Path to .html or .cvs file, URL or list object that is used as input
-        :type file_path: str | list
-        :param table_number: Number of table to read, if there are several at the given url, or in the html file
-        :type table_number: int
-        """
-
+        """Runs required `TableDataExtractor` algorithms automatically upon initialization."""
         log.info('Initialization of table: "{}"'.format(file_path))
         self._file_path = file_path
         self._table_number = table_number
