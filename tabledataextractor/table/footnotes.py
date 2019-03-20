@@ -19,8 +19,7 @@ class Footnote:
     """
     Defines a footnote found in the provided table.
     Contains elements of a footnote.
-
-    Will construct the footnote and find all associated elements
+    Will construct the footnote and find all associated elements.
 
     :param table: table to work on
     :type table: ~tabledataextractor.table.table.Table
@@ -55,14 +54,14 @@ class Footnote:
         self.references = self._find_references()
 
     def _find_text_cell(self):
-        """Finds the cell index containing the text associated with the prefix"""
+        """Finds the cell index containing the text associated with the prefix."""
         for column_index in range(self.prefix_cell[1] + 1, np.shape(self.pre_cleaned_table)[1]):
             if not self._table._pre_cleaned_table_empty[self.prefix_cell[0], column_index]:
                 return self.prefix_cell[0], column_index
             return None
 
     def _find_text(self):
-        """Finds the text associated with the prefix, only one cell can contain the text"""
+        """Finds the text associated with the prefix, only one cell can contain the text."""
         if self.text_cell is not None:
             return str(self.pre_cleaned_table[self.text_cell])
         else:
@@ -71,15 +70,19 @@ class Footnote:
     def _find_reference_cells(self):
         """
         Searches the entire table above each footnote for the previously detected footnote prefix.
-        Updates the internal version of the pre-cleaned table, by cutting out the footnote prefix out of the reference cell.
+        Updates the footnote-internal version of the `pre-cleaned table`, by cutting out the footnote prefix out of the reference cell.
 
-        Rules for matching::
+        Rules for matching:
 
-            Case 1. if prefix is number: a) matches if (anything)+space+prefix
-            Case 2. if prefix is a-z:    a) matches if (anything)+space+prefix OR b) prefix
-            Case 3. else:                matches if found anywhere in any cell
+            1. if prefix is `number`:
+                a) matches if `(anything)+space+prefix`
+            2. if prefix is `a-z`:
+                a) matches if `(anything)+space+prefix` OR
+                b) matches if `prefix`
+            3. else:
+                a) matches if found anywhere in any cell
 
-        :return: List((int,int))
+        :return: [(int,int)]
 
         """
         # indices of the references
