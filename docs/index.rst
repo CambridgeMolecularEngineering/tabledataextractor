@@ -6,6 +6,21 @@
 Welcome to TableDataExtractor!
 ==============================================
 
+.. TODO Add pypi status/version badge once the code is included in Pip
+
+.. image:: https://travis-ci.com/CambridgeMolecularEngineering/tabledataextractor.svg?token=QWAzgYdPbGciePvYMQM3&branch=master
+   :target: https://travis-ci.com/CambridgeMolecularEngineering/tabledataextractor.svg?token=QWAzgYdPbGciePvYMQM3&branch=master
+   :alt: build status
+
+.. image:: https://readthedocs.com/projects/cambridgemolecularengineering-tabledataextractor/badge/?version=latest
+   :target: https://readthedocs.com/projects/cambridgemolecularengineering-tabledataextractor/badge/?version=latest
+   :alt: docs status
+
+.. image:: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+   :target: https://creativecommons.org/licenses/by/4.0/
+   :alt: CC BY 4.0 (Creative Commons Attribution 4.0 International)
+
+
 Input a table as unstructured **.csv** file, **python list**, **.html** file, or **url** and output a standardized table where each row corresponds to a single data entry in the original table.
 TableDataExtractor will take care of complicated header structures in row and column headers, which includes:
 
@@ -76,7 +91,7 @@ Importing Table 2 from 'https://link.springer.com/article/10.1007%2Fs10853-012-6
    :maxdepth: 1
    :caption: Contents:
 
-   examples
+   basic_functionality.nblink
    source_code/source_code
 
 
@@ -85,4 +100,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

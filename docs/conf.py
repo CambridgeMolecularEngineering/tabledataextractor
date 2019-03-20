@@ -14,6 +14,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../'))
 
 
@@ -103,6 +104,14 @@ html_theme_options = {
 #    'github_banner': 'true',
 #    'github_button': 'true',
 #    'description': 'Extract information from tables'
+}
+
+html_context = {
+    "display_github": True,  # Integrate GitHub
+    "github_user": "CambridgeMolecularEngineering",  # Username
+    "github_repo": "tabledataextractor",  # Repo name
+    "github_version": "master",  # Version
+    "conf_py_path": "/docs/",  # Path in the checkout to the docs root
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
