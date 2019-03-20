@@ -6,7 +6,7 @@ Exceptions defined for TableDataExtractor.
 
 class TDEError(Exception):
     """
-    Base class for exceptions in TableDataExtractor
+    Base class for exceptions in TableDataExtractor.
     """
 
 
@@ -21,7 +21,7 @@ class InputError(TDEError):
 class MIPSError(TDEError):
     """
     Exception raised for failure of the main MIPS algorithm.
-    Usually means that the table is broken, not well structured.
+    Usually signals that the table is broken or not well structured.
     """
     def __init__(self, message):
         self.message = message

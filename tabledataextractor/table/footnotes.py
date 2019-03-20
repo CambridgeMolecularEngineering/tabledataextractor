@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Footnote handling
+Footnote handling.
 
 .. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
 
@@ -18,36 +18,50 @@ log.setLevel(logging.DEBUG)
 class Footnote:
     """
     Defines a footnote found in the provided table.
-    Contains elements of the footnote:
-        * prefix, prefix_cell
-        * text, text_cell
-        * references (raw), reference_cells
+    Contains elements of a footnote.
+    Will construct the footnote and find all associated elements.
+
+    :param table: table to work on
+    :type table: ~tabledataextractor.table.table.Table
+    :param prefix: Prefix that has been identified as footnote prefix
+    :type prefix: str
+    :param prefix_cell: Index of the cell containing the associated prefix
+    :type prefix_cell: (int, int)
+    :param text: Optional. Text associated with the found footnote prefix
+    :type text: str
     """
 
     def __init__(self, table, prefix, prefix_cell, text):
-        """
-        Will construct the footnote and find all associated elements
-        :param table: TDE Table() object
-        :type Table: Table()
-        """
         self._table = table
         self.pre_cleaned_table = np.copy(self._table.pre_cleaned_table)
+
+        #: Prefix string, e.g., `"a)"`.
         self.prefix = prefix
+
+        #: Cell index of the prefix, e.g., `(7,0)`.
         self.prefix_cell = prefix_cell
+
+        #: Cell of the footnote text, e.g., `(7,1)`.
         self.text_cell = self.prefix_cell if text else self._find_text_cell()
+
+        #: Footnote text, e.g., `"This is the text of a footnote"`.
         self.text = text if text else self._find_text()
+
+        #: Cell indexes of the cells containing the footnote references within the table.
         self.reference_cells = self._find_reference_cells()
+
+        #: Cell content of the cells contatining the footnote references within the table.
         self.references = self._find_references()
 
     def _find_text_cell(self):
-        """Finds the cell index containing the text associated with the prefix"""
+        """Finds the cell index containing the text associated with the prefix."""
         for column_index in range(self.prefix_cell[1] + 1, np.shape(self.pre_cleaned_table)[1]):
             if not self._table._pre_cleaned_table_empty[self.prefix_cell[0], column_index]:
                 return self.prefix_cell[0], column_index
             return None
 
     def _find_text(self):
-        """Finds the text associated with the prefix, only one cell can contain the text"""
+        """Finds the text associated with the prefix, only one cell can contain the text."""
         if self.text_cell is not None:
             return str(self.pre_cleaned_table[self.text_cell])
         else:
@@ -56,15 +70,20 @@ class Footnote:
     def _find_reference_cells(self):
         """
         Searches the entire table above each footnote for the previously detected footnote prefix.
-        Updates the internal version of the pre-cleaned table, by cutting out the footnote prefix out of the reference cell.
+        Updates the footnote-internal version of the `pre-cleaned table`, by cutting out the footnote prefix out of the reference cell.
 
-        Rules for matching::
+        Rules for matching:
 
-            Case 1. if prefix is number: a) matches if (anything)+space+prefix
-            Case 2. if prefix is a-z:    a) matches if (anything)+space+prefix OR b) prefix
-            Case 3. else:                matches if found anywhere in any cell
+            1. if prefix is `number`:
+                a) matches if `(anything)+space+prefix`
+            2. if prefix is `a-z`:
+                a) matches if `(anything)+space+prefix` OR
+                b) matches if `prefix`
+            3. else:
+                a) matches if found anywhere in any cell
 
-        :return: List((int,int))
+        :return: [(int,int)]
+
         """
         # indices of the references
         fn_refs = []

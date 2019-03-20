@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Indicates which methods have been used on the table.
+Indicates to the user which methods have been used on the table.
 This should be checked for testing on a sample dataset, to justify the choice of settings for the given domain.
 
 .. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
@@ -15,7 +15,7 @@ log.setLevel(logging.DEBUG)
 
 class History:
     """
-    Stores ``True``/``False``, indicating if a method has been used on the particular ``Table()`` instance.
+    Stores `True`/`False` for each property, indicating if a method has been used on the particular :class:`~tabledataextractor.table.table.Table` instance.
     """
 
     def __init__(self):
@@ -28,22 +28,31 @@ class History:
 
     @property
     def title_row_removed(self):
+        """Indicates whether a title row has been removed from the table."""
         return self._title_row_removed
 
     @property
     def prefixing_performed(self):
+        """Indicates whether prefixing has been performed on the table."""
         return self._prefixing_performed
 
     @property
     def footnotes_copied(self):
+        """Indicates whether footnotes have been copied into the table cells."""
         return self._footnotes_copied
 
     @property
     def spanning_cells_extended(self):
+        """
+        Indicates whether the content of cells has been duplicated into neighbouring cells,
+        in case of cells that are merged cells (spanning cells).
+        """
         return self._spanning_cells_extended
 
     @property
     def header_extended(self):
+        """Indicates whether the header has been extended beyond the result obtained by the MIPS
+         (*Minimum Indexing Point Search*) algorithm."""
         return self._header_extended
 
     def __repr__(self):

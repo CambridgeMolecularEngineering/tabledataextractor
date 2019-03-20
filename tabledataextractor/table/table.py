@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Raw, processed and final labelled table.
+Represents a table in a highly standardized format.
 
 .. codeauthor:: Juraj Mavračić <jm2111@cam.ac.uk>
 
@@ -27,26 +27,24 @@ log.setLevel(logging.WARNING)
 
 class Table:
     """
-    Initializes a Table by converting the input to a standardized category table format.
+    Main `TableDataExtractor` object that includes the raw (input), cleaned (processes) and labelled tables.
+    Represents the table input (.csv, .html, python list, url) in a highly standardized `category table` format,
+    using the MIPS (*Minimum Indexing Point Search*) algorithm.
 
-     Optional configuration keywords:
+    Optional configuration keywords (defaults):
 
-            ``use_title_row = True``, default.
+        * ``use_title_row = True``
             A title row will be assumed if possible.
-
-            ``use_prefixing = True``, default.
+        * ``use_prefixing = True``
             Will perform the prefixing steps if row or column index cells are not unique.
-
-            ``use_spanning_cells = True``, default.
-
-            ``use_header_extension = True``, default.
-
-            ``use_footnotes = True``, default.
+        * ``use_spanning_cells = True``
+            Will duplicate spanning cells in the row and column header regions if needed.
+        * ``use_header_extension = True``
+            Will extend the row and column header beyond the MIPS-defined headers, if needed.
+        * ``use_footnotes = True``
             Will copy the footnote text into the appropriate cells of the table and remove the footnote prefix.
-
-            ``use_max_data_area = False``, default.
-            If ``True`` the max data area will be used to determine CC2 in the main MIPS algorithm.
-            It is probably never necessary to set this to True.
+        * ``use_max_data_area = False``
+            If ``True`` the max data area will be used to determine the cell `CC2` in the main MIPS algorithm. It is probably never necessary to set this to True.
 
     """
 
@@ -62,14 +60,14 @@ class Table:
         self._file_path = file_path
         self._table_number = table_number
 
-        # default settings
-        self.configs = dict()
-        self.configs['use_title_row'] = True
-        self.configs['use_prefixing'] = True
-        self.configs['use_footnotes'] = True
-        self.configs['use_spanning_cells'] = True
-        self.configs['use_header_extension'] = True
-        self.configs['use_max_data_area'] = False
+        #: Settings for table instance.
+        self.configs = {'use_title_row': True,
+                        'use_prefixing': True,
+                        'use_footnotes': True,
+                        'use_spanning_cells': True,
+                        'use_header_extension': True,
+                        'use_max_data_area': False}
+
         # setting the config tags based on kwargs input
         for key, value in kwargs.items():
             if key in self.configs:
@@ -82,6 +80,7 @@ class Table:
 
         # read-in the raw table from any source
         try:
+            #: Input table, as provided to `TableDataExtractor`.
             self.raw_table = from_any.create_table(self._file_path, table_number)
         except TypeError as e:
             raise
@@ -100,18 +99,29 @@ class Table:
         self._cc2 = None
         self._cc3 = None
         self._cc4 = None
+        #: Standardized table as Python List. Contains one row for each data point in the original table.
         self.category_table = []
+        #: Cleaned-up table as :class:`numpy.ndarray`. This table is used for labelling the table regions, finding data-cells and building the category table.
         self.pre_cleaned_table = None
         self._pre_cleaned_table_empty = None
         self._raw_table_empty = None
+        #: Labels as Python List.
         self.labels = None
+        #: Stub header of the table as Python List.
         self.stub_header = None
+        #: Row header of the table as Python List.
         self.row_header = None
+        #: Column header of the table as Python List.
         self.col_header = None
+        #: Title row of the table as Python list.
         self.title_row = None
+        #: Data region of the table as Python list.
         self.data = None
+        #: Indicates if the table has been transposed, `True`/`False`.
         self.transposed = False
+        #: List of footnotes in the table. Each footnote is an instance of :class:`~tabledataextractor.table.footnotes.Footnote`.
         self.footnotes = []
+        #: Indicates which algorithms have been applied to the table by TableDataExtractor. Instance of :class:`~tabledataextractor.table.history.History`.
         self.history = History()
 
         # run the table analysis
@@ -119,8 +129,8 @@ class Table:
 
     def analyze_table(self):
         """
-        Performs the analysis of the input table.
-        Is run automatically on initialization of the table object, but can be re-run manually if needed.
+        Performs the analysis of the input table
+        and is run automatically on initialization of the table object, but can be re-run manually if needed.
         """
 
         # mask, 'cell = True' if cell is empty
@@ -164,7 +174,7 @@ class Table:
 
     def transpose(self):
         """
-        Transposes the raw_table and calls the analyze_table() function again.
+        Transposes the :class:`~tabledataextractor.Table.raw_table` and calls the :class:`~tabledataextractor.Table.analyze_table` function again.
         In this way, if working interactively from a Jupyter notebook, it is possible to input a table and then
         transpose it.
         """
@@ -189,7 +199,7 @@ class Table:
 
     def duplicate_spanning_cells(self, table):
         """
-        Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for csv files where
+        Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for `.csv` files where
         information has been lost, or, if the source table is not properly formatted.
 
         Cells outside the row/column header (such as data cells) will not be duplicated.
@@ -199,7 +209,7 @@ class Table:
 
         :param table: Table to use as input
         :type table: Numpy array
-        :return:
+        :return: Table with spanning cells copied, if necessary. Alternatively, returns the original table.
         """
 
         def empty_row(array):
@@ -290,24 +300,23 @@ class Table:
         Prefixes duplicate labels in first row or column where this is possible,
         by adding a new row/column containing the preceding (to the left or above) unique labels, if available.
 
-        The algorithm for column headers:
-
-            1. Run MIPS, to find the old header region, without prefixing
-            2. For row in table, start with first row of the table
-                a) can *meaningful* prefixing in this row been done?
-                    * YES --> do prefixing and go to 3, prefixing of only one row is possible; accept prefixing only if prefixed rows/cells are above the end of the header (not in the data region), the prefixed cells can still be above the header
-                    * NO  --> go to 2, next row
-
-            3. run MIPS to get new header region
-            4. accept prefixing only if the prefixing has not made the header region start lower than before
-
         Nested prefixing is not supported.
 
         The algorithm is not completely selective and there might be cases where it's application is undesirable.
-        However, on average, it is supposed to significantly improve table-region classification.
+        However, on standard datasets it significantly improves table-region classification.
+
+        Algorithm for column headers:
+
+        1. Run MIPS, to find the old header region, without prefixing.
+        2. For row in table, can *meaningful* prefixing in this row been done?
+            * yes --> do prefixing and go to 3, prefixing of only one row is possible; accept prefixing only if prefixed rows/cells are above the end of the header (not in the data region), the prefixed cells can still be above the header
+            * no  --> go to 2, next row
+        3. run MIPS to get the new header region
+        4. accept prefixing only if the prefixing has not made the header region start lower than before
 
         :param table: Table to use as input and to do the prefixing on
-        :return prefixed_table: Table with added rows/columns with prefixes, or, input table, if no prefixing was done
+        :return: Table with added rows/columns with prefixes, or, input table, if no prefixing was done
+
         """
 
         def unique(data, row_or_column):
@@ -443,13 +452,13 @@ class Table:
 
     def find_cc4(self):
         """
-        Searches for cell 'CC4'.
+        Searches for critical cell `CC4`.
 
         Searching from the bottom of the pre-cleaned table for the last row with a minority of empty cells.
         Rows with at most a few empty cells are assumed to be part of the data region rather than notes or footnotes rows
-        (which usually have only one or two non-empty cells).
+        (which usually only have one or two non-empty cells).
 
-        :return: (int,int)
+        :return: cc4
         """
         # searching from the bottom of original table:
         n_rows = len(self.pre_cleaned_table)
@@ -466,13 +475,16 @@ class Table:
 
     def find_cc1_cc2(self, cc4, table):
         """
-        Searches for cells 'CC2' and 'CC3' using the MIPS algorithm published by Embley et. al.
+        Main MIPS (*Minimum Indexing Point Search*) algorithm, according to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
+        Searches for critical cells `CC2` and `CC3`.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
         every data cell.
 
-        :param cc4: Tuple, position of CC4 cell found with find_cc4()
-        :param table: table which will be used, has to be passed explicitly
-        :type cc4: Tuple
+        :param cc4: Position of `CC4` cell found with find_cc4()
+        :param table: table to search for `CC1` and `CC2`
+        :type table: numpy array
+        :type cc4: (int, int)
+        :return: cc1, cc2
         """
 
         # Initialize
@@ -732,8 +744,9 @@ class Table:
     def header_extension(self, cc1):
         """
         Extends the header after main MIPS run.
-        According to Nagy and Seth, 2016, "Table Headers: An entrance to the data mine"
-        :return:
+        According to Nagy and Seth, 2016, *"Table Headers: An entrance to the data mine"*.
+
+        :return: cc1_new
         """
 
         cc1_new_row = None
@@ -784,22 +797,24 @@ class Table:
 
     def find_cc3(self, cc2):
         """
-        Searches for cell 'CC3', as the leftmost cell of the first filled row of the data region.
+        Searches for critical cell `CC3`, as the leftmost cell of the first filled row of the data region.
 
-        :param cc2: Tuple, position of CC2 cell found with find_cc4()
-        :type cc2: Tuple
-        :return: (int,int)
+        .. rubric:: Comment on implementation
+
+        There are two options on how to implement the search for `CC3`:
+
+            1. With the possibility of `Notes` rows directly below the header (default):
+                * the first half filled row below the header is considered as the start of the data region, just like for the `CC4` cell
+                * implemented by Embley et. al.
+            2. Without the possibility of `Notes` rows directly below the header:
+                * the first row below the header is considered as the start of the data region
+                * for scientific tables it might be more common that the first data row only has a single entry
+                * this can be chosen my commenting/uncommenting the code within this function
+
+        :param cc2: Tuple, position of `CC2` cell found with find_cc4()
+        :type cc2: (int,int)
+        :return: cc3
         """
-
-        # Comment on implementation:
-        #   There are two options on how to implement the search for CC3:
-        #   1. With the possibility of 'Notes' rows directly below the header:
-        #       - the first half filled row below the header is considered as the start of the data region,
-        #         just like for the CC4 cell
-        #   2. Without the possibility of 'Notes' ros directly below the header:
-        #       - the first row below the header is considered as the start of the data region
-        #   Option 1 is implemented by Embley et. al. However, for scientific tables it might be more common
-        #   that the first data row has only 1 entry. Therefore we might have to choose option 2.
 
         # OPTION 1
         # searching from the top of table for first half-full row, starting with first row below the header:
@@ -822,6 +837,7 @@ class Table:
     def find_title_row(self):
         """
         Searches for the topmost non-empty row.
+
         :return: int
         """
         for row_index, empty_row in enumerate(self._pre_cleaned_table_empty):
@@ -830,7 +846,8 @@ class Table:
 
     def find_note_cells(self):
         """
-        Searches for all non-empty cells that have not been labelled previously.
+        Searches for all non-empty cells that have not been labelled differently.
+
         :return: Tuple
         """
         for row_index, row in enumerate(self.labels):
@@ -857,8 +874,8 @@ class Table:
     @staticmethod
     def empty_cells(table):
         """
-        Returns a mask with 'True' for all empty cells in the original array and 'False' for non-empty cells.
-        The regular expression below, which defines an empty cell can be tweaked.
+        Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
+        The regular expression within this function, which defines an empty cell, can be tweaked.
         """
         empty = np.full_like(table, fill_value=False, dtype=bool)
         empty_parser = CellParser(r'^([\s\-\–\"]+)?$')
@@ -869,19 +886,18 @@ class Table:
     @staticmethod
     def empty_string(string):
         """
-        Returns 'True' if a particular string is empty, which is defined with a regular expression
-        :param string:
-        :return:
+        Returns `True` if a particular string is empty, which is defined with a regular expression.
+
+        :param string: Input string for testing
+        :type string: str
+        :return: True/False
         """
         empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
         return empty_parser.parse(string, method='fullmatch')
 
     def pre_clean(self):
         """
-        Remove empty and duplicate rows and columns that extend over the whole table.
-        Replace 'None' cells with spaces.
-
-        :return:
+        Removes empty and duplicate rows and columns that extend over the whole table.
         """
 
         # find empty rows and delete them
@@ -990,9 +1006,9 @@ class Table:
     @staticmethod
     def categorize_header(header):
         """
-        Performs header categorization (calls the SymPy fact function) for a given table.
+        Performs header categorization (calls the `SymPy` `fact` function) for a given table.
 
-        :param header: Header region, Numpy array
+        :param header: header region, Numpy array
         :return: factor_list
         """
 
@@ -1016,11 +1032,12 @@ class Table:
 
     def split_table(self):
         """
-        Splits table into subtables. Yields Table() objects.
+        Splits table into subtables. Yields :class:`~tabledataextractor.table.table.Table` objects.
 
         Algorithm:
             If the stub header is repeated in the column header section the table is split up before
             the repeated element.
+
         """
 
         # first, the column header
@@ -1059,7 +1076,7 @@ class Table:
 
     @property
     def subtables(self):
-        """List of all subtables, Table() objects"""
+        """List of all subtables. Each subtable is an instance of :class:`~tabledataextractor.table.table.Table`."""
         tables = []
         g = self.split_table()
         while True:
@@ -1078,13 +1095,14 @@ class Table:
     def build_category_table(self, table, cc1, cc2, cc3, cc4):
         """
         Build category table for given input table.
+        Uses a Pandas data frame is to create the category table.
 
         :param table: Table on which to perform the categorization
-        :param cc1: key cell
-        :param cc2: key cell
-        :param cc3: key cell
-        :param cc4: key cell
-        :return: category table as numpy array, Pandas data frame is used to create it
+        :param cc1: key MIPS cell
+        :param cc2: key MIPS cell
+        :param cc3: key MIPS cell
+        :param cc4: key MIPS cell
+        :return: category table as numpy array
         """
 
         # Obsolete code, original header factorization, according to Embley et al.
@@ -1100,7 +1118,8 @@ class Table:
 
     def contains(self, pattern):
         """
-        Returns true if table contains a particular string
+        Returns true if table contains a particular string.
+
         :param pattern: Regular expression for input
         :return: True/False
         """
@@ -1114,14 +1133,14 @@ class Table:
         return False
 
     def print(self):
-        """Prints raw table, cleaned table and labels."""
+        """Prints raw table, cleaned table and labels nicely."""
         log.info("Printing table: {}".format(self._file_path))
         print_table(self.raw_table)
         print_table(self.pre_cleaned_table)
         print_table(self.labels)
 
     def print_raw_table(self):
-        """Prints raw input table"""
+        """Prints raw input table nicely."""
         print_table(self.raw_table)
 
     def to_csv(self, file_path):

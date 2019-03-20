@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tools for parsing the table based on Regex expressions etc.
+Tools for parsing the table based on regular expressions.
 """
 
 import logging
@@ -12,27 +12,28 @@ log.setLevel(logging.WARNING)
 
 
 class CellParser:
+    """
+    :param pattern: Regular expression pattern which defines the cell parser. Use `grouping`, since matching strings will be returned explicitly.
+    :type pattern: str
 
+    """
     def __init__(self, pattern):
-        """
-        :param pattern: Regex pattern which defines the cell parser. Use grouping, since matching strings will be returned
-            explicitly.
-        :type pattern: str
-        """
+
         log.info('Initialization of CellParser with regex pattern: "{}"'.format(pattern))
         assert isinstance(pattern, str)
         self.pattern = pattern
 
     def parse(self, table, method='match'):
         """
-        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as the string that
+        Inputs a table and yields a tuple with the index of the next matching cell, as well as the string that
         was matched.
 
-        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :param method:  `search`, `match` or `fullmatch`; Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
-        :param table: Input table to be parsed, of type 'numpy.ndarray'
+        :param table: Input table to be parsed
         :type table: numpy.ndarray
-        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
+        :yield: (int, int, str) with index of cells and the strings of the groups that were matched
+
         """
 
         # check if table is of correct type
@@ -54,16 +55,16 @@ class CellParser:
 
     def cut(self, table, method='match'):
         """
-        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as a string
-        that is obtained from the original string by cutting out the match string
+        Inputs a table and yields a tuple with the index of the next matching cell, as well as a string
+        that is obtained from the original string by cutting out the match string.
 
-        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :param method:  `search`, `match` or `fullmatch`; see Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
         :param table: Input table to be parsed, of type 'numpy.ndarray'
         :type table: numpy.ndarray
-        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
-        """
+        :yield: (int, int, str) with index of cells and the strings of the groups that were matched
 
+        """
         # check if table is of correct type
         assert isinstance(table, np.ndarray)
 
@@ -73,16 +74,17 @@ class CellParser:
 
     def replace(self, table, repl, method='match'):
         """
-        Inputs a Table object and yields a tuple with the index of the next matching cell, as well as a string
-        that is obtained from the original string by cutting out the match string and replacing it with another string
+        Inputs a table and yields a tuple with the index of the next matching cell, as well as a string
+        that is obtained from the original string by cutting out the match string and replacing it with another string.
 
-        :param method:  'search', 'match' or 'fullmatch'; see python re documentation
+        :param method: `search`, `match` or `fullmatch`; see Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
-        :param table: Input table to be parsed, of type 'numpy.ndarray'
+        :param table: Input table to be parsed
         :type table: numpy.ndarray
         :param repl: Replacement string that will be included instead of the patters
-        :type repl:str
-        :return: Tuple(int,int,str) with index of cells and the strings of the groups that were matched
+        :type repl: str
+        :yield: (int, int, str) with index of cells and the strings of the groups that were matched
+
         """
 
         # check if table is of correct type
@@ -94,22 +96,24 @@ class CellParser:
 
 
 class StringParser:
+    """
+    :param pattern: Regular expression pattern that defines the string parser.
+    :type pattern: str
 
+    """
     def __init__(self, pattern):
-        """
-        :param pattern: Regex pattern which defines the string parser. Returns True if pattern matches
-        :type pattern: str
-        """
         assert isinstance(pattern, str)
         self.pattern = pattern
 
     def parse(self, string, method='match'):
         """
-        Inputs a string and returns true if pattern matches
+        Inputs a string and returns `True` if pattern matches.
 
-        :param string:
-        :param method:
-        :return: str
+        :param string: Input string
+        :param method: `search`, `match` or `fullmatch`; see Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
+        :type string: str
+        :type method: str
+        :return: True/False
         """
 
         # check if string is of correct type
@@ -133,9 +137,9 @@ class StringParser:
         """
         Inputs a string and returns the same string with the pattern cut out
 
-        :param string:
-        :param method:
-        :return: str
+        :param string: Input string
+        :type string: str
+        :return: string with `pattern` cut out
         """
 
         # check if string is of correct type
