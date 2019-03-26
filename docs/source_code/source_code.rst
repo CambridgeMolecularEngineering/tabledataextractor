@@ -1,4 +1,4 @@
-Source Code
+API Docs
 =======================
 
 .. toctree::
