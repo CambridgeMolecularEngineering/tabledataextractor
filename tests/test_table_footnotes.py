@@ -21,20 +21,20 @@ class TableF(Table):
     def __init__(self, file_path, table_number=1, **kwargs):
         super().__init__(file_path, table_number, **kwargs)
 
-    def label_sections(self):
+    def _label_sections(self):
         """
         Labelling of all classification table elements.
         """
 
-        title_row = self.find_title_row()
+        title_row = self._find_title_row()
         self.title_row = title_row
 
-        cc4 = self.find_cc4()
+        cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
         self._cc4 = cc4
 
-        for footnote in self.find_footnotes():
+        for footnote in self._find_footnotes():
             self.footnotes.append(footnote)
             # update the pre-cleaned table
             if self.configs['use_footnotes']:

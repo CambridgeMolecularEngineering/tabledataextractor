@@ -143,22 +143,22 @@ class Table:
 
         # pre-cleaning table
         self.pre_cleaned_table = np.copy(self.raw_table)
-        self.pre_clean()
+        self._pre_clean()
         self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         if self.configs['use_spanning_cells']:
-            self.pre_cleaned_table = self.duplicate_spanning_cells(self.pre_cleaned_table)
+            self.pre_cleaned_table = self._duplicate_spanning_cells(self.pre_cleaned_table)
             self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # prefixing of duplicate labels in the header region
         if self.configs['use_prefixing']:
-            self.pre_cleaned_table = self.prefix_duplicate_labels(self.pre_cleaned_table)
+            self.pre_cleaned_table = self._prefix_duplicate_labels(self.pre_cleaned_table)
             self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
 
         # labelling
         self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
         self.labels[:, :] = '/'
-        self.label_sections()
+        self._label_sections()
 
         # making regions proper elements of the table object
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
@@ -168,8 +168,8 @@ class Table:
             self.data = self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
 
             # categorization
-            self.category_table = self.build_category_table(self.pre_cleaned_table, self._cc1, self._cc2, self._cc3,
-                                                            self._cc4)
+            self.category_table = self._build_category_table(self.pre_cleaned_table, self._cc1, self._cc2, self._cc3,
+                                                             self._cc4)
 
     def transpose(self):
         """
@@ -196,7 +196,7 @@ class Table:
         self.history = History()
         self._analyze_table()
 
-    def duplicate_spanning_cells(self, table):
+    def _duplicate_spanning_cells(self, table):
         """
         Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for `.csv` files where
         information has been lost, or, if the source table is not properly formatted.
@@ -221,7 +221,7 @@ class Table:
         # running MIPS to find the data region
         log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
         try:
-            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), self.pre_cleaned_table)
+            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), self.pre_cleaned_table)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -260,7 +260,7 @@ class Table:
         diff_row_length = 0
         diff_col_length = 0
         if self.configs['use_prefixing']:
-            temp2 = self.prefix_duplicate_labels(temp)
+            temp2 = self._prefix_duplicate_labels(temp)
             # reset the prefixing flag
             self.history._prefixing_performed = False
             diff_row_length = len(temp2) - len(temp)
@@ -270,7 +270,7 @@ class Table:
         old_title_row_setting = self.configs['use_title_row']
         self.configs['use_title_row'] = False
         try:
-            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), temp2)
+            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), temp2)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -294,7 +294,7 @@ class Table:
 
         return updated
 
-    def prefix_duplicate_labels(self, table):
+    def _prefix_duplicate_labels(self, table):
         """
         Prefixes duplicate labels in first row or column where this is possible,
         by adding a new row/column containing the preceding (to the left or above) unique labels, if available.
@@ -360,7 +360,7 @@ class Table:
                 new_row = []
                 for cell_index, cell in enumerate(row):
                     # append if unique or empty cell
-                    if unique(cell, row) or self.empty_string(cell):
+                    if unique(cell, row) or self._empty_string(cell):
                         duplicated_row.append(cell)
                         new_row.append("")
                     else:
@@ -369,7 +369,7 @@ class Table:
                         # as these will presumably be in the stub header region
                         for prefix in reversed(duplicated_row[1:]):
                             # use the prefix if it is unique and not empty
-                            if unique(prefix, row) and not self.empty_string(prefix):
+                            if unique(prefix, row) and not self._empty_string(prefix):
                                 unique_prefix = prefix
                                 break
                         # prefix the cell and append it to new row
@@ -394,7 +394,7 @@ class Table:
         # note, cc4 couldn't have changed
         log.info("Prefixing. Attempt to run main MIPS algorithm.")
         try:
-            cc1, cc2 = self.find_cc1_cc2(self.find_cc4(), table)
+            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), table)
         except (MIPSError, TypeError):
             log.error("Prefixing was not performed due to failure of MIPS algorithm.")
             return table
@@ -432,7 +432,7 @@ class Table:
         if prefixed:
             # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
             try:
-                cc1_new, cc2_new = self.find_cc1_cc2(self.find_cc4(), prefixed_table)
+                cc1_new, cc2_new = self._find_cc1_cc2(self._find_cc4(), prefixed_table)
             except (MIPSError, TypeError):
                 log.info("Prefixing was not performed because it destroyed the table")
                 return table
@@ -449,7 +449,7 @@ class Table:
         else:
             return table
 
-    def find_cc4(self):
+    def _find_cc4(self):
         """
         Searches for critical cell `CC4`.
 
@@ -472,14 +472,14 @@ class Table:
                 if n_full > int(n_columns / 2):
                     return row_index, n_columns - 1
 
-    def find_cc1_cc2(self, cc4, table):
+    def _find_cc1_cc2(self, cc4, table):
         """
         Main MIPS (*Minimum Indexing Point Search*) algorithm, according to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
         Searches for critical cells `CC2` and `CC3`.
         MIPS locates the critical cells that define the minimum row and column headers needed to index
         every data cell.
 
-        :param cc4: Position of `CC4` cell found with find_cc4()
+        :param cc4: Position of `CC4` cell found with _find_cc4()
         :param table: table to search for `CC1` and `CC2`
         :type table: numpy array
         :type cc4: (int, int)
@@ -528,7 +528,7 @@ class Table:
 
         def table_slice_cc2(table, r2, r_max, c1, c2):
             """
-            Function to cut the correct slices out of array for CC2 in find_cc1_cc2().
+            Function to cut the correct slices out of array for CC2 in _find_cc1_cc2().
             Cuts out the next row and column header candidates from the pre-cleaned table.
 
             :param table: pre-cleaned table
@@ -573,7 +573,7 @@ class Table:
 
         def table_slice_1_cc1(table, r1, r2, c2, c_max):
             """
-            Function to cut a correct slice out of array for CC1 in find_cc1_cc2().
+            Function to cut a correct slice out of array for CC1 in _find_cc1_cc2().
             Cuts out the column header.
             """
             # one more row and column index than in the published pseudocode is needed,
@@ -596,7 +596,7 @@ class Table:
 
         def table_slice_2_cc1(table, r2, r_max, c1, c2):
             """
-            Function to cut a correct slice out of array for CC1 in find_cc1_cc2().
+            Function to cut a correct slice out of array for CC1 in _find_cc1_cc2().
             Cuts out the row header.
             """
             # one more row and column index than in the published pseudocode is needed,
@@ -727,7 +727,7 @@ class Table:
             assert r1 >= 0 and c1 >= 0
             cc1 = (r1 - 1, c1 - 1)
         except AssertionError:
-            raise MIPSError("Error in find_cc1_cc2")
+            raise MIPSError("Error in _find_cc1_cc2")
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
         if not self.configs['use_title_row']:
@@ -740,7 +740,7 @@ class Table:
 
         return cc1, cc2
 
-    def header_extension(self, cc1):
+    def _header_extension(self, cc1):
         """
         Extends the header after main MIPS run.
         According to Nagy and Seth, 2016, *"Table Headers: An entrance to the data mine"*.
@@ -794,7 +794,7 @@ class Table:
 
         return cc1_new
 
-    def find_cc3(self, cc2):
+    def _find_cc3(self, cc2):
         """
         Searches for critical cell `CC3`, as the leftmost cell of the first filled row of the data region.
 
@@ -810,7 +810,7 @@ class Table:
                 * for scientific tables it might be more common that the first data row only has a single entry
                 * this can be chosen my commenting/uncommenting the code within this function
 
-        :param cc2: Tuple, position of `CC2` cell found with find_cc4()
+        :param cc2: Tuple, position of `CC2` cell found with _find_cc4()
         :type cc2: (int,int)
         :return: cc3
         """
@@ -833,7 +833,7 @@ class Table:
         # OPTION 2
         # return (cc2[0]+1,cc2[1]+1)
 
-    def find_title_row(self):
+    def _find_title_row(self):
         """
         Searches for the topmost non-empty row.
 
@@ -843,7 +843,7 @@ class Table:
             if not empty_row.all():
                 return row_index
 
-    def find_note_cells(self):
+    def _find_note_cells(self):
         """
         Searches for all non-empty cells that have not been labelled differently.
 
@@ -854,7 +854,7 @@ class Table:
                 if cell == '/' and not self._pre_cleaned_table_empty[row_index, column_index]:
                     yield row_index, column_index
 
-    def find_footnotes(self):
+    def _find_footnotes(self):
         """
         Finds a footnote and yields a Footnote() object will all the appropriate properties.
         A footnote is defined with::
@@ -883,7 +883,7 @@ class Table:
         return empty
 
     @staticmethod
-    def empty_string(string):
+    def _empty_string(string):
         """
         Returns `True` if a particular string is empty, which is defined with a regular expression.
 
@@ -894,7 +894,7 @@ class Table:
         empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
         return empty_parser.parse(string, method='fullmatch')
 
-    def pre_clean(self):
+    def _pre_clean(self):
         """
         Removes empty and duplicate rows and columns that extend over the whole table.
         """
@@ -939,21 +939,21 @@ class Table:
         log.info(
             "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self.pre_cleaned_table)))
 
-    def label_sections(self):
+    def _label_sections(self):
         """
         Labelling of all classification table elements.
         """
 
         if self.configs['use_title_row']:
-            title_row = self.find_title_row()
+            title_row = self._find_title_row()
             self.title_row = title_row
 
-        cc4 = self.find_cc4()
+        cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self.labels[cc4] = 'CC4'
         self._cc4 = cc4
 
-        for footnote in self.find_footnotes():
+        for footnote in self._find_footnotes():
             self.footnotes.append(footnote)
             if self.configs['use_footnotes']:
                 if not np.array_equal(self.pre_cleaned_table, footnote.pre_cleaned_table):
@@ -963,7 +963,7 @@ class Table:
                     log.info("METHOD. Footnotes copied into cells.")
 
         try:
-            cc1, cc2 = self.find_cc1_cc2(cc4, self.pre_cleaned_table)
+            cc1, cc2 = self._find_cc1_cc2(cc4, self.pre_cleaned_table)
         except (MIPSError, TypeError):
             msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad!"
             log.critical(msg)
@@ -975,10 +975,10 @@ class Table:
 
         # provisions for header extension
         if self.configs['use_header_extension']:
-            self._cc1 = self.header_extension(self._cc1)
+            self._cc1 = self._header_extension(self._cc1)
             log.info("Header extension, new cc1 = {}".format(self._cc1))
 
-        cc3 = self.find_cc3(cc2)
+        cc3 = self._find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         self.labels[cc3] = 'CC3'
         self._cc3 = cc3
@@ -999,11 +999,11 @@ class Table:
                 self.labels[ref_cell[0], ref_cell[1]] = 'FNref' if self.labels[ref_cell[0], ref_cell[1]] == '/' else self.labels[ref_cell[0], ref_cell[1]] + ' & FNref'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
-        for note_cell in self.find_note_cells():
+        for note_cell in self._find_note_cells():
             self.labels[note_cell] = 'Note'
 
     @staticmethod
-    def categorize_header(header):
+    def _categorize_header(header):
         """
         Performs header categorization (calls the `SymPy` `fact` function) for a given table.
 
@@ -1029,7 +1029,7 @@ class Table:
         log.debug("Factorization, factorized header: {}".format(f))
         return f
 
-    def split_table(self):
+    def _split_table(self):
         """
         Splits table into subtables. Yields :class:`~tabledataextractor.table.table.Table` objects.
 
@@ -1077,7 +1077,7 @@ class Table:
     def subtables(self):
         """List of all subtables. Each subtable is an instance of :class:`~tabledataextractor.table.table.Table`."""
         tables = []
-        g = self.split_table()
+        g = self._split_table()
         while True:
             try:
                 subtable = next(g, None)
@@ -1091,7 +1091,7 @@ class Table:
                     tables.append(subtable)
         return tables
 
-    def build_category_table(self, table, cc1, cc2, cc3, cc4):
+    def _build_category_table(self, table, cc1, cc2, cc3, cc4):
         """
         Build category table for given input table.
         Uses a Pandas data frame is to create the category table.
@@ -1107,8 +1107,8 @@ class Table:
         # Obsolete code, original header factorization, according to Embley et al.
         # column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
         # row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
-        # column_factors = self.categorize_header(column_header.T)
-        # row_factors = self.categorize_header(row_header)
+        # column_factors = self._categorize_header(column_header.T)
+        # row_factors = self._categorize_header(row_header)
 
         # Make the Pandas DataFrame
         dataframe = to_pandas(self)

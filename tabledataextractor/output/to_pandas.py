@@ -22,7 +22,7 @@ def to_pandas(table):
 
 def find_multiindex_level(row_number, column_number, df):
     """
-    Helping function for ``build_category_table()``.
+    Helping function for ``_build_category_table()``.
     Finds the `Pandas` `MultiIndex level` in a given `Pandas` `DataFrame`, for a particular data value.
     """
     result_index = []
