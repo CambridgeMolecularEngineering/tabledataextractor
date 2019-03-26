@@ -124,9 +124,9 @@ class Table:
         self.history = History()
 
         # run the table analysis
-        self.analyze_table()
+        self._analyze_table()
 
-    def analyze_table(self):
+    def _analyze_table(self):
         """
         Performs the analysis of the input table
         and is run automatically on initialization of the table object, but can be re-run manually if needed.
@@ -173,7 +173,7 @@ class Table:
 
     def transpose(self):
         """
-        Transposes the :class:`~tabledataextractor.Table.raw_table` and calls the :class:`~tabledataextractor.Table.analyze_table` function again.
+        Transposes the :class:`~tabledataextractor.Table.raw_table` and calls the :class:`~tabledataextractor.Table._analyze_table` function again.
         In this way, if working interactively from a Jupyter notebook, it is possible to input a table and then
         transpose it.
         """
@@ -194,7 +194,7 @@ class Table:
         self.data = None
         self.footnotes = []
         self.history = History()
-        self.analyze_table()
+        self._analyze_table()
 
     def duplicate_spanning_cells(self, table):
         """
