@@ -24,6 +24,7 @@ class History:
         self._footnotes_copied = False
         self._spanning_cells_extended = False
         self._header_extended = False
+        self._table_transposed = False
         log.info("History() object created.")
 
     @property
@@ -55,6 +56,11 @@ class History:
          (*Minimum Indexing Point Search*) algorithm."""
         return self._header_extended
 
+    @property
+    def table_transposed(self):
+        """Indicates whether the table has been transposed."""
+        return self._table_transposed
+
     def __repr__(self):
         out = str()
         out += "title_row_removed       = {}".format(self.title_row_removed)
@@ -62,6 +68,7 @@ class History:
         out += "\n" + "footnotes_copied        = {}".format(self.footnotes_copied)
         out += "\n" + "spanning_cells_extended = {}".format(self.spanning_cells_extended)
         out += "\n" + "header_extended         = {}".format(self.header_extended)
+        out += "\n" + "table_transposed        = {}".format(self._table_transposed)
         return out
 
 

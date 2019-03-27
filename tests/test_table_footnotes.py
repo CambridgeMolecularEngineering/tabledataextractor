@@ -31,15 +31,28 @@ class TableF(Table):
 
         cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
-        self.labels[cc4] = 'CC4'
         self._cc4 = cc4
 
         for footnote in self._find_footnotes():
             self.footnotes.append(footnote)
             # update the pre-cleaned table
-            if self.configs['use_footnotes']:
-                self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+            if self._configs['use_footnotes']:
+                self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
                 self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc4] = 'CC4'
+        for footnote in self.footnotes:
+            temp[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
+            if footnote.text_cell is not None:
+                temp[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if temp[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
+            for ref_cell in footnote.reference_cells:
+                temp[ref_cell[0], ref_cell[1]] = 'FNref' if temp[ref_cell[0], ref_cell[1]] == '/' else temp[ref_cell[0], ref_cell[1]] + ' & FNref'
+        return temp
 
 
 class TestFootnote(unittest.TestCase):

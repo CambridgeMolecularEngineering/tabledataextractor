@@ -59,63 +59,28 @@ class Table:
         self._file_path = file_path
         self._table_number = table_number
 
-        #: Settings for table instance.
-        self.configs = {'use_title_row': True,
-                        'use_prefixing': True,
-                        'use_footnotes': True,
-                        'use_spanning_cells': True,
-                        'use_header_extension': True,
-                        'use_max_data_area': False}
+        self._configs = {'use_title_row': True,
+                         'use_prefixing': True,
+                         'use_footnotes': True,
+                         'use_spanning_cells': True,
+                         'use_header_extension': True,
+                         'use_max_data_area': False}
 
-        # setting the config tags based on kwargs input
-        for key, value in kwargs.items():
-            if key in self.configs:
-                self.configs[key] = value
-            else:
-                msg = 'Keyword "{}" does not exist.'.format(key)
-                log.critical(msg)
-                raise InputError(msg)
-        log.info('Configuration parameters are: {}'.format(self.configs))
-
-        # read-in the raw table from any source
-        try:
-            #: Input table, as provided to `TableDataExtractor`.
-            self.raw_table = from_any.create_table(self._file_path, table_number)
-        except TypeError as e:
-            raise
-        else:
-            # check if everything is ok with the raw table
-            assert isinstance(self.raw_table, np.ndarray) and self.raw_table.dtype == '<U60'
-
-        # check that array has dimension greater than 1 in both dimensions
-        if self.raw_table.ndim == 1:
-            msg = 'Input table has only one row or column.'
-            log.critical(msg)
-            raise InputError(msg)
+        self._set_configs(**kwargs)
 
         # initializing empty elements
         self._cc1 = None
         self._cc2 = None
         self._cc3 = None
         self._cc4 = None
-        #: Standardized table as Python List. Contains one row for each data point in the original table.
-        self.category_table = []
-        #: Cleaned-up table as :class:`numpy.ndarray`. This table is used for labelling the table regions, finding data-cells and building the category table.
-        self.pre_cleaned_table = None
+        self._pre_cleaned_table = None
         self._pre_cleaned_table_empty = None
         self._raw_table_empty = None
-        #: Labels as Python List.
-        self.labels = None
-        #: Stub header of the table as Python List.
-        self.stub_header = None
-        #: Row header of the table as Python List.
-        self.row_header = None
-        #: Column header of the table as Python List.
-        self.col_header = None
+
+
         #: Title row of the table as Python list.
         self.title_row = None
-        #: Data region of the table as Python list.
-        self.data = None
+
         #: Indicates if the table has been transposed, `True`/`False`.
         self.transposed = False
         #: List of footnotes in the table. Each footnote is an instance of :class:`~tabledataextractor.table.footnotes.Footnote`.
@@ -125,6 +90,126 @@ class Table:
 
         # run the table analysis
         self._analyze_table()
+
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+
+        if self.configs['use_title_row']:
+            temp[self.title_row, :] = 'TableTitle'
+
+        temp[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'StubHeader'
+        temp[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'RowHeader'
+        temp[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'ColHeader'
+        temp[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'Data'
+
+        for footnote in self.footnotes:
+            temp[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
+            if footnote.text_cell is not None:
+                temp[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if temp[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
+            for ref_cell in footnote.reference_cells:
+                temp[ref_cell[0], ref_cell[1]] = 'FNref' if temp[ref_cell[0], ref_cell[1]] == '/' else temp[ref_cell[0], ref_cell[1]] + ' & FNref'
+
+        # all non-empty unlabelled cells at this point are labelled 'Note'
+        for note_cell in self._find_note_cells(temp):
+            temp[note_cell] = 'Note'
+        return temp
+
+    def _set_configs(self, **kwargs):
+        """Sets the configuration parameters based on the user input."""
+        for key, value in kwargs.items():
+            if key in self._configs:
+                self._configs[key] = value
+            else:
+                msg = 'Keyword "{}" does not exist.'.format(key)
+                log.critical(msg)
+                raise InputError(msg)
+        log.info('Configuration parameters are: {}'.format(self._configs))
+
+    @property
+    def configs(self):
+        """Dictionary of configuration keywords."""
+        return self._configs
+
+    @property
+    def raw_table(self):
+        """
+        Input table, as provided to `TableDataExtractor`.
+        """
+        try:
+            temp = from_any.create_table(self._file_path, self._table_number)
+        except TypeError as e:
+            raise
+        else:
+            assert isinstance(temp, np.ndarray) and temp.dtype == '<U60'
+            if temp.ndim == 1:
+                msg = 'Input table has only one row or column.'
+                log.critical(msg)
+                raise InputError(msg)
+            if not self.history._table_transposed:
+                return temp
+            else:
+                return temp.T
+
+    @property
+    def pre_cleaned_table(self):
+        """
+        Cleaned-up table as :class:`numpy.ndarray`.
+        This table is used for labelling the table regions, finding data-cells and building the category table.
+        """
+        return self._pre_cleaned_table
+
+    @property
+    def category_table(self):
+        """Standardized table, where each row corresponds to a single data point of the original table. Python list."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return self._build_category_table(self._pre_cleaned_table, self._cc1, self._cc2, self._cc3, self._cc4)
+        else:
+            msg = "Category table not built. Critical cells have not been found."
+            raise MIPSError(msg)
+
+    @property
+    def col_header(self):
+        """Column header of the table. Python list."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return self._pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+        else:
+            msg = "No column header. Critical cells have not been found."
+            raise MIPSError(msg)
+
+    @property
+    def row_header(self):
+        """Row header of the table. Python list."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1]
+        else:
+            msg = "No row header. Critical cells have not been found."
+            raise MIPSError(msg)
+
+    @property
+    def stub_header(self):
+        """Stub header of the table. Python list."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return self._pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1]
+        else:
+            msg = "No stub header. Critical cells have not been found."
+            raise MIPSError(msg)
+
+    @property
+    def data(self):
+        """Data region of the table. Python list."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+        else:
+            msg = "No data region. Critical cells have not been found."
+            raise MIPSError(msg)
+
+
+
+
+
 
     def _analyze_table(self):
         """
@@ -142,34 +227,25 @@ class Table:
             raise InputError(msg)
 
         # pre-cleaning table
-        self.pre_cleaned_table = np.copy(self.raw_table)
+        self._pre_cleaned_table = np.copy(self.raw_table)
         self._pre_clean()
-        self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
-        if self.configs['use_spanning_cells']:
-            self.pre_cleaned_table = self._duplicate_spanning_cells(self.pre_cleaned_table)
-            self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        if self._configs['use_spanning_cells']:
+            self._pre_cleaned_table = self._duplicate_spanning_cells(self._pre_cleaned_table)
+            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         # prefixing of duplicate labels in the header region
-        if self.configs['use_prefixing']:
-            self.pre_cleaned_table = self._prefix_duplicate_labels(self.pre_cleaned_table)
-            self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        if self._configs['use_prefixing']:
+            self._pre_cleaned_table = self._prefix_duplicate_labels(self._pre_cleaned_table)
+            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         # labelling
-        self.labels = np.empty_like(self.pre_cleaned_table, dtype="<U60")
-        self.labels[:, :] = '/'
+        # self.labels = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        # self.labels[:, :] = '/'
         self._label_sections()
 
-        # making regions proper elements of the table object
-        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
-            self.stub_header = self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1]
-            self.row_header = self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1]
-            self.col_header = self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1]
-            self.data = self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
 
-            # categorization
-            self.category_table = self._build_category_table(self.pre_cleaned_table, self._cc1, self._cc2, self._cc3,
-                                                             self._cc4)
 
     def transpose(self):
         """
@@ -177,23 +253,18 @@ class Table:
         In this way, if working interactively from a Jupyter notebook, it is possible to input a table and then
         transpose it.
         """
-        self.raw_table = self.raw_table.T
+        # self.raw_table = self.raw_table.T
+        self.history = History()
+        self.history._table_transposed = True
         self.transposed = True
         self._cc1 = None
         self._cc2 = None
         self._cc3 = None
         self._cc4 = None
-        self.category_table = []
-        self.pre_cleaned_table = None
+        self._pre_cleaned_table = None
         self._pre_cleaned_table_empty = None
         self._raw_table_empty = None
-        self.labels = None
-        self.stub_header = None
-        self.row_header = None
-        self.col_header = None
-        self.data = None
         self.footnotes = []
-        self.history = History()
         self._analyze_table()
 
     def _duplicate_spanning_cells(self, table):
@@ -221,7 +292,7 @@ class Table:
         # running MIPS to find the data region
         log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
         try:
-            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), self.pre_cleaned_table)
+            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), self._pre_cleaned_table)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -259,7 +330,7 @@ class Table:
         temp2 = np.copy(temp)
         diff_row_length = 0
         diff_col_length = 0
-        if self.configs['use_prefixing']:
+        if self._configs['use_prefixing']:
             temp2 = self._prefix_duplicate_labels(temp)
             # reset the prefixing flag
             self.history._prefixing_performed = False
@@ -267,15 +338,15 @@ class Table:
             diff_col_length = len(temp2.T) - len(temp.T)
         log.info("Spanning cells. Attempt to run main MIPS algorithm.")
         # disable title row temporarily
-        old_title_row_setting = self.configs['use_title_row']
-        self.configs['use_title_row'] = False
+        old_title_row_setting = self._configs['use_title_row']
+        self._configs['use_title_row'] = False
         try:
             cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), temp2)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
         finally:
-            self.configs['use_title_row'] = old_title_row_setting
+            self._configs['use_title_row'] = old_title_row_setting
 
         updated = table.copy()
         # update the original table with values from the updated table if the cells are in the header regions
@@ -460,7 +531,7 @@ class Table:
         :return: cc4
         """
         # searching from the bottom of original table:
-        n_rows = len(self.pre_cleaned_table)
+        n_rows = len(self._pre_cleaned_table)
         for row_index in range(n_rows - 1, -1, -1):
             # counting the number of full cells
             # if n_empty < n_full terminate, this is our goal row
@@ -635,7 +706,7 @@ class Table:
                       format(duplicate_rows(temp_section_1), duplicate_rows(temp_section_2)))
 
             if not duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
-                if self.configs['use_max_data_area']:
+                if self._configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *1: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -650,7 +721,7 @@ class Table:
                     r2 = r2 - 1
             elif duplicate_rows(temp_section_1) and not duplicate_columns(temp_section_2):
                 c2 = c2 + 1
-                if self.configs['use_max_data_area']:
+                if self._configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *2: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -664,7 +735,7 @@ class Table:
             elif duplicate_rows(temp_section_1) and duplicate_columns(temp_section_2):
                 c2 = c2 + 1
                 r2 = r2 + 1
-                if self.configs['use_max_data_area']:
+                if self._configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *3: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -677,7 +748,7 @@ class Table:
             # if none of those above is satisfied, just finish the loop
             else:
                 r2 = r2 + 1
-                if self.configs['use_max_data_area']:
+                if self._configs['use_max_data_area']:
                     data_area = (r_max - r2) * (c_max - c2)
                     log.debug("The data area of the new candidate C2= {} is *4: {}".format((r2, c2), data_area))
                     log.debug("Data area:\n{}".format(table[r2 + 1:r_max + 1, c2 + 1:c_max + 1]))
@@ -730,7 +801,7 @@ class Table:
             raise MIPSError("Error in _find_cc1_cc2")
 
         # provision for using the uppermost row possible for cc1, if titles are turned of
-        if not self.configs['use_title_row']:
+        if not self._configs['use_title_row']:
             if cc1[0] != 0:
                 log.info("METHOD. Title row removed, cc1 was shifted from {} to {}".format(cc1, (0, cc1[1])))
                 cc1 = (0, cc1[1])
@@ -753,33 +824,33 @@ class Table:
 
         # add row above the identified column header if it does not consist of cells with identical values and if it
         # adds at least one non-blank cell that has a value different from the cell immediately below it
-        current_row = self.pre_cleaned_table[cc1[0], :]
+        current_row = self._pre_cleaned_table[cc1[0], :]
         for row_index in range(cc1[0]-1, -1, -1):
             # start after the first column to allow for a title
-            if len(np.unique(self.pre_cleaned_table[row_index, 1:])) == 1:
+            if len(np.unique(self._pre_cleaned_table[row_index, 1:])) == 1:
                 cc1_new_row = row_index+1
             else:
-                for col_index, cell in enumerate(self.pre_cleaned_table[row_index, :]):
+                for col_index, cell in enumerate(self._pre_cleaned_table[row_index, :]):
                     # remove the first row from this check to preserve a title,
                     # if the title is the only non-empty element of the row
                     if col_index != 0 and \
                             cell != current_row[col_index] and \
                             not self._pre_cleaned_table_empty[row_index, col_index]:
-                        current_row = self.pre_cleaned_table[row_index, :]
+                        current_row = self._pre_cleaned_table[row_index, :]
                         cc1_new_row = row_index
                         break
         if cc1_new_row is None:
             cc1_new_row = cc1[0]
 
         # now do the same for the row headers
-        current_col = self.pre_cleaned_table[:, cc1[1]]
+        current_col = self._pre_cleaned_table[:, cc1[1]]
         for col_index in range(cc1[1]-1, -1, -1):
-            if len(np.unique(self.pre_cleaned_table[:, col_index])) == 1:
+            if len(np.unique(self._pre_cleaned_table[:, col_index])) == 1:
                 cc1_new_col = col_index+1
             else:
-                for row_index, cell in enumerate(self.pre_cleaned_table[:, col_index]):
+                for row_index, cell in enumerate(self._pre_cleaned_table[:, col_index]):
                     if cell != current_col[row_index] and not self._pre_cleaned_table_empty[row_index, col_index]:
-                        current_col = self.pre_cleaned_table[:, col_index]
+                        current_col = self._pre_cleaned_table[:, col_index]
                         cc1_new_col = col_index
                         break
         if cc1_new_col is None:
@@ -817,11 +888,11 @@ class Table:
 
         # OPTION 1
         # searching from the top of table for first half-full row, starting with first row below the header:
-        n_rows = len(self.pre_cleaned_table[cc2[0] + 1:])
+        n_rows = len(self._pre_cleaned_table[cc2[0] + 1:])
         log.debug("n_rows= {}".format(n_rows))
         for row_index in range(cc2[0] + 1, cc2[0] + 1 + n_rows, 1):
             n_full = 0
-            n_columns = len(self.pre_cleaned_table[row_index, cc2[1] + 1:])
+            n_columns = len(self._pre_cleaned_table[row_index, cc2[1] + 1:])
             log.debug("n_columns= {}".format(n_columns))
             for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
                 empty = self._pre_cleaned_table_empty[row_index, column_index]
@@ -843,13 +914,13 @@ class Table:
             if not empty_row.all():
                 return row_index
 
-    def _find_note_cells(self):
+    def _find_note_cells(self, labels_table):
         """
         Searches for all non-empty cells that have not been labelled differently.
 
         :return: Tuple
         """
-        for row_index, row in enumerate(self.labels):
+        for row_index, row in enumerate(labels_table):
             for column_index, cell in enumerate(row):
                 if cell == '/' and not self._pre_cleaned_table_empty[row_index, column_index]:
                     yield row_index, column_index
@@ -865,7 +936,7 @@ class Table:
         """
         #: finds a footnote cell that possibly contains some text as well
         fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
-        for fn in fn_parser.parse(self.pre_cleaned_table):
+        for fn in fn_parser.parse(self._pre_cleaned_table):
             if fn[0] > self._cc4[0]:
                 footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
                 yield footnote
@@ -905,7 +976,7 @@ class Table:
             if False not in row:
                 empty_rows.append(row_index)
         log.info("Empty rows {} deleted.".format(empty_rows))
-        self.pre_cleaned_table = np.delete(self.pre_cleaned_table, empty_rows, axis=0)
+        self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_rows, axis=0)
 
         # find empty columns and delete them
         empty_columns = []
@@ -913,57 +984,57 @@ class Table:
             if False not in column:
                 empty_columns.append(column_index)
         log.info("Empty columns {} deleted.".format(empty_columns))
-        self.pre_cleaned_table = np.delete(self.pre_cleaned_table, empty_columns, axis=1)
+        self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_columns, axis=1)
 
         # delete duplicate rows that extend over the whole table
-        _, indices = np.unique(self.pre_cleaned_table, axis=0, return_index=True)
+        _, indices = np.unique(self._pre_cleaned_table, axis=0, return_index=True)
         # for logging only, which rows have been removed
         removed_rows = []
-        for row_index in range(0, len(self.pre_cleaned_table)):
+        for row_index in range(0, len(self._pre_cleaned_table)):
             if row_index not in indices:
                 removed_rows.append(row_index)
         log.info("Duplicate rows {} removed.".format(removed_rows))
         # deletion:
-        self.pre_cleaned_table = self.pre_cleaned_table[np.sort(indices)]
+        self._pre_cleaned_table = self._pre_cleaned_table[np.sort(indices)]
 
         # delete duplicate columns that extend over the whole table
-        _, indices = np.unique(self.pre_cleaned_table, axis=1, return_index=True)
+        _, indices = np.unique(self._pre_cleaned_table, axis=1, return_index=True)
         # for logging only, which rows have been removed
         removed_columns = []
-        for column_index in range(0, len(self.pre_cleaned_table.T)):
+        for column_index in range(0, len(self._pre_cleaned_table.T)):
             if column_index not in indices:
                 removed_columns.append(column_index)
         log.info("Duplicate columns {} removed.".format(removed_columns))
         # deletion:
-        self.pre_cleaned_table = self.pre_cleaned_table[:, np.sort(indices)]
+        self._pre_cleaned_table = self._pre_cleaned_table[:, np.sort(indices)]
         log.info(
-            "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self.pre_cleaned_table)))
+            "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self._pre_cleaned_table)))
 
     def _label_sections(self):
         """
         Labelling of all classification table elements.
         """
 
-        if self.configs['use_title_row']:
+        if self._configs['use_title_row']:
             title_row = self._find_title_row()
             self.title_row = title_row
 
         cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
-        self.labels[cc4] = 'CC4'
+        # self.labels[cc4] = 'CC4'
         self._cc4 = cc4
 
         for footnote in self._find_footnotes():
             self.footnotes.append(footnote)
-            if self.configs['use_footnotes']:
-                if not np.array_equal(self.pre_cleaned_table, footnote.pre_cleaned_table):
-                    self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                    self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+            if self._configs['use_footnotes']:
+                if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
+                    self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+                    self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
                     self.history._footnotes_copied = True
                     log.info("METHOD. Footnotes copied into cells.")
 
         try:
-            cc1, cc2 = self._find_cc1_cc2(cc4, self.pre_cleaned_table)
+            cc1, cc2 = self._find_cc1_cc2(cc4, self._pre_cleaned_table)
         except (MIPSError, TypeError):
             msg = "ERROR: Main MIPS Algorithm failed. Maybe the input table is bad!"
             log.critical(msg)
@@ -974,33 +1045,16 @@ class Table:
             self._cc2 = cc2
 
         # provisions for header extension
-        if self.configs['use_header_extension']:
+        if self._configs['use_header_extension']:
             self._cc1 = self._header_extension(self._cc1)
             log.info("Header extension, new cc1 = {}".format(self._cc1))
 
         cc3 = self._find_cc3(cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
-        self.labels[cc3] = 'CC3'
+        # self.labels[cc3] = 'CC3'
         self._cc3 = cc3
 
-        if self.configs['use_title_row']:
-            self.labels[title_row, :] = 'TableTitle'
 
-        self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'StubHeader'
-        self.labels[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'RowHeader'
-        self.labels[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'ColHeader'
-        self.labels[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'Data'
-
-        for footnote in self.footnotes:
-            self.labels[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
-            if footnote.text_cell is not None:
-                self.labels[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if self.labels[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
-            for ref_cell in footnote.reference_cells:
-                self.labels[ref_cell[0], ref_cell[1]] = 'FNref' if self.labels[ref_cell[0], ref_cell[1]] == '/' else self.labels[ref_cell[0], ref_cell[1]] + ' & FNref'
-
-        # all non-empty unlabelled cells at this point are labelled 'Note'
-        for note_cell in self._find_note_cells():
-            self.labels[note_cell] = 'Note'
 
     @staticmethod
     def _categorize_header(header):
@@ -1048,13 +1102,13 @@ class Table:
             if i == 0 and column.size > 0 and \
                     self.stub_header[:-1].T[0].size > 0 and \
                     np.array_equal(column, self.stub_header[:-1].T[0]):
-                yield Table(self.pre_cleaned_table[:, 0:col_index+1].tolist())
+                yield Table(self._pre_cleaned_table[:, 0:col_index + 1].tolist())
                 i += 1
             # every other match is only forwards looking
             if i > 0 and column.size > 0 and \
                     self.stub_header[:-1].T[0].size > 0 and \
                     np.array_equal(column, self.stub_header[:-1].T[0]):
-                yield Table(self.pre_cleaned_table[:, col_index+1:col_index+i*col_index+2].tolist())
+                yield Table(self._pre_cleaned_table[:, col_index + 1:col_index + i * col_index + 2].tolist())
                 i += 1
 
         # now the same thing for the row header
@@ -1064,13 +1118,13 @@ class Table:
             if i == 0 and row.size > 0 and \
                     self.stub_header[0, :-1].size > 0 and \
                     np.array_equal(row, self.stub_header[0, :-1]):
-                yield Table(self.pre_cleaned_table[0:row_index+1, :].tolist())
+                yield Table(self._pre_cleaned_table[0:row_index + 1, :].tolist())
                 i += 1
             # every other match is only forwards looking
             if i > 0 and row.size > 0 and \
                     self.stub_header[0, :-1].size > 0 \
                     and np.array_equal(row, self.stub_header[0, :-1]):
-                yield Table(self.pre_cleaned_table[row_index+1:row_index+i*row_index+2, :].tolist())
+                yield Table(self._pre_cleaned_table[row_index + 1:row_index + i * row_index + 2, :].tolist())
                 i += 1
 
     @property
@@ -1135,7 +1189,7 @@ class Table:
         """Prints raw table, cleaned table and labels nicely."""
         log.info("Printing table: {}".format(self._file_path))
         print_table(self.raw_table)
-        print_table(self.pre_cleaned_table)
+        print_table(self._pre_cleaned_table)
         print_table(self.labels)
 
     def print_raw_table(self):
@@ -1160,11 +1214,11 @@ class Table:
         """As the developer wants to see it"""
         intro = "Table({}, table_number={}, transposed={})".format(self._file_path, self._table_number, self.transposed)
         log.info("Repr. table: {}".format(self._file_path))
-        array_width = np.shape(self.pre_cleaned_table)[1]
+        array_width = np.shape(self._pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
         results_string = as_string(
             np.concatenate(
-                (self.pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
+                (self._pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
             )
         )
         t = list_as_PrettyTable(self.category_table)

@@ -13,6 +13,7 @@ import logging
 from tabledataextractor import Table
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
+import numpy as np
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -25,9 +26,16 @@ class TableCC4(Table):
 
     def _label_sections(self):
         """Labels only CC4"""
-        cc4 = self._find_cc4()
-        self.labels[cc4] = 'CC4'
-        log.info("Table Cell CC4 = {}".format(cc4))
+        self._cc4 = self._find_cc4()
+        log.info("Table Cell CC4 = {}".format(self._cc4))
+
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc4] = 'CC4'
+        return temp
 
 
 class TestCC4(unittest.TestCase):
@@ -88,11 +96,19 @@ class TableCC1CC2(Table):
 
     def _label_sections(self):
         """Label CC1 and CC2 and stop."""
-        cc4 = self._find_cc4()
-        cc1, cc2 = self._find_cc1_cc2(cc4, self.pre_cleaned_table)
-        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(cc1, cc2))
-        self.labels[cc1] = 'CC1'
-        self.labels[cc2] = 'CC2'
+        self._cc4 = self._find_cc4()
+        self._cc1, self._cc2 = self._find_cc1_cc2(self._cc4, self._pre_cleaned_table)
+        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
+
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc4] = 'CC4'
+        temp[self._cc1] = 'CC1'
+        temp[self._cc2] = 'CC2'
+        return temp
 
 
 class TableCC3(Table):
@@ -102,12 +118,21 @@ class TableCC3(Table):
 
     def _label_sections(self):
         """Label CC3."""
-        cc4 = self._find_cc4()
-        cc1, cc2 = self._find_cc1_cc2(cc4, self.pre_cleaned_table)
-        cc3 = self._find_cc3(cc2)
-        log.info("Table Cell CC3 = {}".format(cc3))
-        self.labels[cc3] = 'CC3'
-        return cc3
+        self._cc4 = self._find_cc4()
+        self._cc1, self._cc2 = self._find_cc1_cc2(self._cc4, self._pre_cleaned_table)
+        self._cc3 = self._find_cc3(self._cc2)
+        log.info("Table Cell CC3 = {}".format(self._cc3))
+
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc4] = 'CC4'
+        temp[self._cc1] = 'CC1'
+        temp[self._cc2] = 'CC2'
+        temp[self._cc3] = 'CC3'
+        return temp
 
 
 class TestCC1CC2(unittest.TestCase):
@@ -116,7 +141,7 @@ class TestCC1CC2(unittest.TestCase):
         log.debug("Test CC1 & CC2, Table: {}".format(input_path))
         table = TableCC1CC2(input_path, use_spanning_cells=False, use_header_extension=False)
         table.print()
-        result = table._find_cc1_cc2(table._find_cc4(), table.pre_cleaned_table)
+        result = table._find_cc1_cc2(table._find_cc4(), table._pre_cleaned_table)
         log.debug("Result = {}".format(result))
         self.assertTupleEqual(expected, result)
 
@@ -163,7 +188,7 @@ class TestCC3(unittest.TestCase):
     def do_table(self, input_path, expected):
         log.debug("Test CC3, Table: {}".format(input_path))
         table = TableCC3(input_path, use_spanning_cells=False, use_header_extension=False)
-        result = table._label_sections()
+        result = table._cc3
         log.debug("Result = {}".format(result))
         table.print()
         self.assertTupleEqual(expected, result)
@@ -212,8 +237,8 @@ class TestDuplicateLabelPrefixing(unittest.TestCase):
         log.debug("Test duplicate label prefixing: {}".format(input_path))
         table = Table(input_path, use_footnotes=False, use_spanning_cells=False, use_header_extension=False)
         print_table(table.raw_table)
-        print_table(table.pre_cleaned_table)
-        result = table.pre_cleaned_table.tolist()
+        print_table(table._pre_cleaned_table)
+        result = table._pre_cleaned_table.tolist()
         expected = from_csv.read(expected_path).tolist()
         self.assertListEqual(expected, result)
 
