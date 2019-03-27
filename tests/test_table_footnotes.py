@@ -25,20 +25,18 @@ class TableF(Table):
         """
         Labelling of all classification table elements.
         """
-
-        title_row = self._find_title_row()
-        self.title_row = title_row
-
         cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
         self._cc4 = cc4
 
         for footnote in self._find_footnotes():
-            self.footnotes.append(footnote)
-            # update the pre-cleaned table
+            self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
-                self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+                if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
+                    self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+                    self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+                    self.history._footnotes_copied = True
+                    log.info("METHOD. Footnotes copied into cells.")
 
     @property
     def labels(self):
@@ -46,12 +44,14 @@ class TableF(Table):
         temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
         temp[:, :] = '/'
         temp[self._cc4] = 'CC4'
+
         for footnote in self.footnotes:
             temp[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
             if footnote.text_cell is not None:
                 temp[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if temp[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
             for ref_cell in footnote.reference_cells:
                 temp[ref_cell[0], ref_cell[1]] = 'FNref' if temp[ref_cell[0], ref_cell[1]] == '/' else temp[ref_cell[0], ref_cell[1]] + ' & FNref'
+
         return temp
 
 

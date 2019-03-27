@@ -68,28 +68,33 @@ class Table:
 
         self._set_configs(**kwargs)
 
-        # initializing empty elements
-        self._cc1 = None
-        self._cc2 = None
-        self._cc3 = None
-        self._cc4 = None
-        self._pre_cleaned_table = None
-        self._pre_cleaned_table_empty = None
-        self._raw_table_empty = None
+        self._footnotes = []
 
-
-        #: Title row of the table as Python list.
-        self.title_row = None
-
-        #: Indicates if the table has been transposed, `True`/`False`.
-        self.transposed = False
-        #: List of footnotes in the table. Each footnote is an instance of :class:`~tabledataextractor.table.footnotes.Footnote`.
-        self.footnotes = []
-        #: Indicates which algorithms have been applied to the table by TableDataExtractor. Instance of :class:`~tabledataextractor.table.history.History`.
-        self.history = History()
+        self._history = History()
 
         # run the table analysis
         self._analyze_table()
+
+    @property
+    def footnotes(self):
+        """
+        List of footnotes in the table. Each footnote is an instance of :class:`~tabledataextractor.table.footnotes.Footnote`.
+        """
+        return self._footnotes
+
+    @property
+    def title_row(self):
+        """Title row of the table as Python list."""
+        if self._configs['use_title_row']:
+            return self._find_title_row()
+
+    @property
+    def history(self):
+        """
+        Indicates which algorithms have been applied to the table by TableDataExtractor.
+        Instance of :class:`~tabledataextractor.table.history.History`.
+        """
+        return self._history
 
     @property
     def labels(self):
@@ -116,17 +121,6 @@ class Table:
         for note_cell in self._find_note_cells(temp):
             temp[note_cell] = 'Note'
         return temp
-
-    def _set_configs(self, **kwargs):
-        """Sets the configuration parameters based on the user input."""
-        for key, value in kwargs.items():
-            if key in self._configs:
-                self._configs[key] = value
-            else:
-                msg = 'Keyword "{}" does not exist.'.format(key)
-                log.critical(msg)
-                raise InputError(msg)
-        log.info('Configuration parameters are: {}'.format(self._configs))
 
     @property
     def configs(self):
@@ -206,9 +200,16 @@ class Table:
             msg = "No data region. Critical cells have not been found."
             raise MIPSError(msg)
 
-
-
-
+    def _set_configs(self, **kwargs):
+        """Sets the configuration parameters based on the user input."""
+        for key, value in kwargs.items():
+            if key in self._configs:
+                self._configs[key] = value
+            else:
+                msg = 'Keyword "{}" does not exist.'.format(key)
+                log.critical(msg)
+                raise InputError(msg)
+        log.info('Configuration parameters are: {}'.format(self._configs))
 
 
     def _analyze_table(self):
@@ -254,17 +255,9 @@ class Table:
         transpose it.
         """
         # self.raw_table = self.raw_table.T
-        self.history = History()
+        self._history = History()
         self.history._table_transposed = True
-        self.transposed = True
-        self._cc1 = None
-        self._cc2 = None
-        self._cc3 = None
-        self._cc4 = None
-        self._pre_cleaned_table = None
-        self._pre_cleaned_table_empty = None
-        self._raw_table_empty = None
-        self.footnotes = []
+        self._footnotes = []
         self._analyze_table()
 
     def _duplicate_spanning_cells(self, table):
@@ -942,13 +935,13 @@ class Table:
                 yield footnote
 
     @staticmethod
-    def empty_cells(table):
+    def empty_cells(table, regex=r'^([\s\-\–\"]+)?$'):
         """
         Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
-        The regular expression within this function, which defines an empty cell, can be tweaked.
+        The regular expression which defines an empty cell can be tweaked.
         """
         empty = np.full_like(table, fill_value=False, dtype=bool)
-        empty_parser = CellParser(r'^([\s\-\–\"]+)?$')
+        empty_parser = CellParser(regex)
         for empty_cell in empty_parser.parse(table, method='fullmatch'):
             empty[empty_cell[0], empty_cell[1]] = True
         return empty
@@ -1015,9 +1008,6 @@ class Table:
         Labelling of all classification table elements.
         """
 
-        if self._configs['use_title_row']:
-            title_row = self._find_title_row()
-            self.title_row = title_row
 
         cc4 = self._find_cc4()
         log.info("Table Cell CC4 = {}".format(cc4))
@@ -1025,7 +1015,7 @@ class Table:
         self._cc4 = cc4
 
         for footnote in self._find_footnotes():
-            self.footnotes.append(footnote)
+            self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
                 if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
                     self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
@@ -1212,7 +1202,7 @@ class Table:
 
     def __repr__(self):
         """As the developer wants to see it"""
-        intro = "Table({}, table_number={}, transposed={})".format(self._file_path, self._table_number, self.transposed)
+        intro = "Table({}, table_number={}, transposed={})".format(self._file_path, self._table_number, self.history.table_transposed)
         log.info("Repr. table: {}".format(self._file_path))
         array_width = np.shape(self._pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
