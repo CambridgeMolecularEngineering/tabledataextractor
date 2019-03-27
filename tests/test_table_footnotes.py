@@ -32,11 +32,7 @@ class TableF(Table):
         for footnote in self._find_footnotes():
             self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
-                if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
-                    self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                    self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
-                    self.history._footnotes_copied = True
-                    log.info("METHOD. Footnotes copied into cells.")
+                self._copy_footnotes(footnote)
 
     @property
     def labels(self):

@@ -67,12 +67,7 @@ class Table:
                          'use_max_data_area': False}
 
         self._set_configs(**kwargs)
-
-        self._footnotes = []
-
         self._history = History()
-
-        # run the table analysis
         self._analyze_table()
 
     @property
@@ -218,6 +213,8 @@ class Table:
         and is run automatically on initialization of the table object, but can be re-run manually if needed.
         """
 
+        self._footnotes = []
+
         # mask, 'cell = True' if cell is empty
         self._raw_table_empty = self.empty_cells(self.raw_table)
 
@@ -257,7 +254,6 @@ class Table:
         # self.raw_table = self.raw_table.T
         self._history = History()
         self.history._table_transposed = True
-        self._footnotes = []
         self._analyze_table()
 
     def _duplicate_spanning_cells(self, table):
@@ -1003,6 +999,18 @@ class Table:
         log.info(
             "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self._pre_cleaned_table)))
 
+
+    def _copy_footnotes(self, footnote):
+        """
+        Updates the pre-cleaned table with updated reference cells for a given footnote
+        """
+        if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
+            self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
+            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+            self.history._footnotes_copied = True
+            log.info("METHOD. Footnotes copied into cells.")
+
+
     def _label_sections(self):
         """
         Labelling of all classification table elements.
@@ -1017,11 +1025,7 @@ class Table:
         for footnote in self._find_footnotes():
             self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
-                if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
-                    self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                    self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
-                    self.history._footnotes_copied = True
-                    log.info("METHOD. Footnotes copied into cells.")
+                self._copy_footnotes(footnote)
 
         try:
             cc1, cc2 = self._find_cc1_cc2(cc4, self._pre_cleaned_table)
