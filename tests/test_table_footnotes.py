@@ -10,6 +10,7 @@ import logging
 
 from tabledataextractor import Table
 from tabledataextractor.table.algorithms import find_cc4
+from tabledataextractor.table.footnotes import find_footnotes
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class TableF(Table):
         log.info("Table Cell CC4 = {}".format(cc4))
         self._cc4 = cc4
 
-        for footnote in self._find_footnotes():
+        for footnote in find_footnotes(self):
             self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
                 self._copy_footnotes(footnote)

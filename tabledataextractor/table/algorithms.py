@@ -12,6 +12,7 @@ import numpy as np
 from tabledataextractor.exceptions import MIPSError
 from tabledataextractor.table.parse import StringParser
 
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 

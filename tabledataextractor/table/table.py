@@ -22,6 +22,8 @@ from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
 from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells
+from tabledataextractor.table.footnotes import find_footnotes
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
 
@@ -259,22 +261,21 @@ class Table:
         self.history._table_transposed = True
         self._analyze_table()
 
-
-    def _find_footnotes(self):
-        """
-        Finds a footnote and yields a Footnote() object will all the appropriate properties.
-        A footnote is defined with::
-
-            FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
-
-        A search is performed only below the data region.
-        """
-        #: finds a footnote cell that possibly contains some text as well
-        fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
-        for fn in fn_parser.parse(self._pre_cleaned_table):
-            if fn[0] > self._cc4[0]:
-                footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
-                yield footnote
+    # def _find_footnotes(self):
+    #     """
+    #     Finds a footnote and yields a Footnote() object will all the appropriate properties.
+    #     A footnote is defined with::
+    #
+    #         FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
+    #
+    #     A search is performed only below the data region.
+    #     """
+    #     #: finds a footnote cell that possibly contains some text as well
+    #     fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
+    #     for fn in fn_parser.parse(self._pre_cleaned_table):
+    #         if fn[0] > self._cc4[0]:
+    #             footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
+    #             yield footnote
 
     @staticmethod
     def empty_cells(table, regex=r'^([\s\-\–\"]+)?$'):
@@ -368,7 +369,7 @@ class Table:
         # self.labels[cc4] = 'CC4'
         self._cc4 = cc4
 
-        for footnote in self._find_footnotes():
+        for footnote in find_footnotes(self):
             self._footnotes.append(footnote)
             if self._configs['use_footnotes']:
                 self._copy_footnotes(footnote)
