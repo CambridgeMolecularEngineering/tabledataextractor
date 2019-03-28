@@ -150,7 +150,7 @@ class Footnote:
 
 def find_footnotes(table_object):
     """
-    Finds a footnote and yields a `~tabledataextractor.table.footnotes.Footnote`_ object will all the appropriate properties.
+    Finds a footnote and yields a :class:`~tabledataextractor.table.footnotes.Footnote` object with all the appropriate properties.
     A footnote is defined with::
 
         FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
