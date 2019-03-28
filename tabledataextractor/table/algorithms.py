@@ -8,6 +8,8 @@ Algorithms for TableDataExtractor.
 
 import logging
 import numpy as np
+from sympy import Symbol
+from sympy import factor_list, factor
 
 from tabledataextractor.exceptions import MIPSError
 from tabledataextractor.table.parse import StringParser, CellParser
@@ -782,4 +784,51 @@ def header_extension(table_object, cc1):
 
     return cc1_new
 
+
+def categorize_header(header):
+    """
+    Performs header categorization (calls the `SymPy` `fact` function) for a given table.
+
+    :param header: header region, Numpy array
+    :return: factor_list
+    """
+
+    # empty expression and part of the expression that will be factorized
+    # these are SymPy expressions
+    expression = 0
+    part = 0
+    for row_index, row in enumerate(header):
+        for column_index, cell in enumerate(row):
+            if column_index == 0:
+                part = Symbol(cell)
+            else:
+                part = part * Symbol(cell)
+        expression = expression + part
+    # factorization
+    # f = factor(expression, deep=True)
+    f = factor_list(expression)
+    log.debug("Factorization, initial header: {}".format(expression))
+    log.debug("Factorization, factorized header: {}".format(f))
+    return f
+
+
+def build_category_table(table, cc1, cc2, cc3, cc4):
+    """
+    Build category table for given input table.
+    Original header factorization, according to Embley et al.
+    This version is not used.
+
+    :param table: Table on which to perform the categorization
+    :type table: Numpy array
+    :param cc1: key MIPS cell
+    :param cc2: key MIPS cell
+    :param cc3: key MIPS cell
+    :param cc4: key MIPS cell
+    :return: category table as numpy array
+    """
+
+    column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
+    row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
+    column_factors = categorize_header(column_header.T)
+    row_factors = categorize_header(row_header)
 

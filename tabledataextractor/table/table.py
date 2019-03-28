@@ -157,7 +157,7 @@ class Table:
     def category_table(self):
         """Standardized table, where each row corresponds to a single data point of the original table. Python list."""
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
-            return self._build_category_table(self._pre_cleaned_table, self._cc1, self._cc2, self._cc3, self._cc4)
+            return build_category_table(to_pandas(self))
         else:
             msg = "Category table not built. Critical cells have not been found."
             raise MIPSError(msg)
@@ -231,25 +231,16 @@ class Table:
             log.critical(msg)
             raise InputError(msg)
 
-        # pre-cleaning table
-        #self._pre_cleaned_table = np.copy(self.raw_table)
-        #self._pre_clean()
-        # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
         self._pre_cleaned_table = pre_clean(self.raw_table)
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self.pre_cleaned_table)))
 
         if self._configs['use_spanning_cells']:
             self._pre_cleaned_table = duplicate_spanning_cells(self, self._pre_cleaned_table)
-            # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         # prefixing of duplicate labels in the header region
         if self._configs['use_prefixing']:
             self._pre_cleaned_table = prefix_duplicate_labels(self, self._pre_cleaned_table)
-            # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
-        # labelling
-        # self.labels = np.empty_like(self._pre_cleaned_table, dtype="<U60")
-        # self.labels[:, :] = '/'
         self._label_sections()
 
     def transpose(self):
@@ -258,56 +249,9 @@ class Table:
         In this way, if working interactively from a Jupyter notebook, it is possible to input a table and then
         transpose it.
         """
-        # self.raw_table = self.raw_table.T
         self._history = History()
         self.history._table_transposed = True
         self._analyze_table()
-
-    # def _pre_clean(self):
-    #     """
-    #     Removes empty and duplicate rows and columns that extend over the whole table.
-    #     """
-    #
-    #     # find empty rows and delete them
-    #     empty_rows = []
-    #     for row_index, row in enumerate(self._raw_table_empty):
-    #         if False not in row:
-    #             empty_rows.append(row_index)
-    #     log.info("Empty rows {} deleted.".format(empty_rows))
-    #     self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_rows, axis=0)
-    #
-    #     # find empty columns and delete them
-    #     empty_columns = []
-    #     for column_index, column in enumerate(self._raw_table_empty.T):
-    #         if False not in column:
-    #             empty_columns.append(column_index)
-    #     log.info("Empty columns {} deleted.".format(empty_columns))
-    #     self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_columns, axis=1)
-    #
-    #     # delete duplicate rows that extend over the whole table
-    #     _, indices = np.unique(self._pre_cleaned_table, axis=0, return_index=True)
-    #     # for logging only, which rows have been removed
-    #     removed_rows = []
-    #     for row_index in range(0, len(self._pre_cleaned_table)):
-    #         if row_index not in indices:
-    #             removed_rows.append(row_index)
-    #     log.info("Duplicate rows {} removed.".format(removed_rows))
-    #     # deletion:
-    #     self._pre_cleaned_table = self._pre_cleaned_table[np.sort(indices)]
-    #
-    #     # delete duplicate columns that extend over the whole table
-    #     _, indices = np.unique(self._pre_cleaned_table, axis=1, return_index=True)
-    #     # for logging only, which rows have been removed
-    #     removed_columns = []
-    #     for column_index in range(0, len(self._pre_cleaned_table.T)):
-    #         if column_index not in indices:
-    #             removed_columns.append(column_index)
-    #     log.info("Duplicate columns {} removed.".format(removed_columns))
-    #     # deletion:
-    #     self._pre_cleaned_table = self._pre_cleaned_table[:, np.sort(indices)]
-    #     log.info(
-    #         "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self._pre_cleaned_table)))
-
 
     def _copy_footnotes(self, footnote):
         """
@@ -315,16 +259,13 @@ class Table:
         """
         if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
             self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-            #self.pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
             self.history._footnotes_copied = True
             log.info("METHOD. Footnotes copied into cells.")
-
 
     def _label_sections(self):
         """
         Labelling of all classification table elements.
         """
-
 
         cc4 = find_cc4(self)
         log.info("Table Cell CC4 = {}".format(cc4))
@@ -357,34 +298,6 @@ class Table:
         # self.labels[cc3] = 'CC3'
         self._cc3 = cc3
 
-
-
-    @staticmethod
-    def _categorize_header(header):
-        """
-        Performs header categorization (calls the `SymPy` `fact` function) for a given table.
-
-        :param header: header region, Numpy array
-        :return: factor_list
-        """
-
-        # empty expression and part of the expression that will be factorized
-        # these are SymPy expressions
-        expression = 0
-        part = 0
-        for row_index, row in enumerate(header):
-            for column_index, cell in enumerate(row):
-                if column_index == 0:
-                    part = Symbol(cell)
-                else:
-                    part = part * Symbol(cell)
-            expression = expression + part
-        # factorization
-        # f = factor(expression, deep=True)
-        f = factor_list(expression)
-        log.debug("Factorization, initial header: {}".format(expression))
-        log.debug("Factorization, factorized header: {}".format(f))
-        return f
 
     def _split_table(self):
         """
@@ -448,29 +361,6 @@ class Table:
                     tables.append(subtable)
         return tables
 
-    def _build_category_table(self, table, cc1, cc2, cc3, cc4):
-        """
-        Build category table for given input table.
-        Uses a Pandas data frame is to create the category table.
-
-        :param table: Table on which to perform the categorization
-        :param cc1: key MIPS cell
-        :param cc2: key MIPS cell
-        :param cc3: key MIPS cell
-        :param cc4: key MIPS cell
-        :return: category table as numpy array
-        """
-
-        # Obsolete code, original header factorization, according to Embley et al.
-        # column_header = table[cc1[0]:cc2[0] + 1, cc3[1]:cc4[1] + 1]
-        # row_header = table[cc3[0]:cc4[0] + 1, cc1[1]:cc2[1] + 1]
-        # column_factors = self._categorize_header(column_header.T)
-        # row_factors = self._categorize_header(row_header)
-
-        # Make the Pandas DataFrame
-        dataframe = to_pandas(self)
-        category_table = build_category_table(dataframe)
-        return category_table
 
     def contains(self, pattern):
         """
