@@ -13,7 +13,7 @@ import logging
 from tabledataextractor import Table
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
-from tabledataextractor.table.algorithms import find_cc4
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ class TableCC1CC2(Table):
     def _label_sections(self):
         """Label CC1 and CC2 and stop."""
         self._cc4 = find_cc4(self)
-        self._cc1, self._cc2 = self._find_cc1_cc2(self._cc4, self._pre_cleaned_table)
+        self._cc1, self._cc2 = find_cc1_cc2(self, self._cc4, self.pre_cleaned_table)
         log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
 
     @property
@@ -120,7 +120,7 @@ class TableCC3(Table):
     def _label_sections(self):
         """Label CC3."""
         self._cc4 = find_cc4(self)
-        self._cc1, self._cc2 = self._find_cc1_cc2(self._cc4, self._pre_cleaned_table)
+        self._cc1, self._cc2 = find_cc1_cc2(self, self._cc4, self.pre_cleaned_table)
         self._cc3 = self._find_cc3(self._cc2)
         log.info("Table Cell CC3 = {}".format(self._cc3))
 
@@ -142,7 +142,7 @@ class TestCC1CC2(unittest.TestCase):
         log.debug("Test CC1 & CC2, Table: {}".format(input_path))
         table = TableCC1CC2(input_path, use_spanning_cells=False, use_header_extension=False)
         table.print()
-        result = table._find_cc1_cc2(find_cc4(table), table._pre_cleaned_table)
+        result = find_cc1_cc2(table, find_cc4(table), table.pre_cleaned_table)
         log.debug("Result = {}".format(result))
         self.assertTupleEqual(expected, result)
 
