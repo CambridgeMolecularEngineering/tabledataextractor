@@ -21,7 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells, empty_cells, pre_clean
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells, empty_cells, pre_clean, split_table
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -298,56 +298,11 @@ class Table:
         # self.labels[cc3] = 'CC3'
         self._cc3 = cc3
 
-
-    def _split_table(self):
-        """
-        Splits table into subtables. Yields :class:`~tabledataextractor.table.table.Table` objects.
-
-        Algorithm:
-            If the stub header is repeated in the column header section the table is split up before
-            the repeated element.
-
-        """
-
-        # first, the column header
-        i = 0
-        # the last row of the column/stub header is not used, as it will be determined as
-        # data region by the main MIPS algorithm
-        for col_index, column in enumerate(self.col_header[:-1].T):
-            # the first match is backwards and forwards looking
-            if i == 0 and column.size > 0 and \
-                    self.stub_header[:-1].T[0].size > 0 and \
-                    np.array_equal(column, self.stub_header[:-1].T[0]):
-                yield Table(self._pre_cleaned_table[:, 0:col_index + 1].tolist())
-                i += 1
-            # every other match is only forwards looking
-            if i > 0 and column.size > 0 and \
-                    self.stub_header[:-1].T[0].size > 0 and \
-                    np.array_equal(column, self.stub_header[:-1].T[0]):
-                yield Table(self._pre_cleaned_table[:, col_index + 1:col_index + i * col_index + 2].tolist())
-                i += 1
-
-        # now the same thing for the row header
-        i = 0
-        for row_index, row in enumerate(self.row_header[:, :-1]):
-            # the first match is backwards and forwards looking
-            if i == 0 and row.size > 0 and \
-                    self.stub_header[0, :-1].size > 0 and \
-                    np.array_equal(row, self.stub_header[0, :-1]):
-                yield Table(self._pre_cleaned_table[0:row_index + 1, :].tolist())
-                i += 1
-            # every other match is only forwards looking
-            if i > 0 and row.size > 0 and \
-                    self.stub_header[0, :-1].size > 0 \
-                    and np.array_equal(row, self.stub_header[0, :-1]):
-                yield Table(self._pre_cleaned_table[row_index + 1:row_index + i * row_index + 2, :].tolist())
-                i += 1
-
     @property
     def subtables(self):
         """List of all subtables. Each subtable is an instance of :class:`~tabledataextractor.table.table.Table`."""
         tables = []
-        g = self._split_table()
+        g = split_table(self)
         while True:
             try:
                 subtable = next(g, None)
@@ -358,9 +313,8 @@ class Table:
                 if subtable is None:
                     break
                 else:
-                    tables.append(subtable)
+                    tables.append(Table(subtable))
         return tables
-
 
     def contains(self, pattern):
         """

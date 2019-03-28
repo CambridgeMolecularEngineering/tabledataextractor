@@ -832,3 +832,50 @@ def build_category_table(table, cc1, cc2, cc3, cc4):
     column_factors = categorize_header(column_header.T)
     row_factors = categorize_header(row_header)
 
+
+def split_table(table_object):
+    """
+    Splits table into subtables. Yields :class:`~tabledataextractor.table.table.Table` objects.
+
+    Algorithm:
+        If the stub header is repeated in the column header section the table is split up before
+        the repeated element.
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    """
+
+    # first, the column header
+    i = 0
+    # the last row of the column/stub header is not used, as it will be determined as
+    # data region by the main MIPS algorithm
+    for col_index, column in enumerate(table_object.col_header[:-1].T):
+        # the first match is backwards and forwards looking
+        if i == 0 and column.size > 0 and \
+                table_object.stub_header[:-1].T[0].size > 0 and \
+                np.array_equal(column, table_object.stub_header[:-1].T[0]):
+            yield table_object._pre_cleaned_table[:, 0:col_index + 1].tolist()
+            i += 1
+        # every other match is only forwards looking
+        if i > 0 and column.size > 0 and \
+                table_object.stub_header[:-1].T[0].size > 0 and \
+                np.array_equal(column, table_object.stub_header[:-1].T[0]):
+            yield table_object._pre_cleaned_table[:, col_index + 1:col_index + i * col_index + 2].tolist()
+            i += 1
+
+    # now the same thing for the row header
+    i = 0
+    for row_index, row in enumerate(table_object.row_header[:, :-1]):
+        # the first match is backwards and forwards looking
+        if i == 0 and row.size > 0 and \
+                table_object.stub_header[0, :-1].size > 0 and \
+                np.array_equal(row, table_object.stub_header[0, :-1]):
+            yield table_object._pre_cleaned_table[0:row_index + 1, :].tolist()
+            i += 1
+        # every other match is only forwards looking
+        if i > 0 and row.size > 0 and \
+                table_object.stub_header[0, :-1].size > 0 \
+                and np.array_equal(row, table_object.stub_header[0, :-1]):
+            yield table_object._pre_cleaned_table[row_index + 1:row_index + i * row_index + 2, :].tolist()
+            i += 1
+
