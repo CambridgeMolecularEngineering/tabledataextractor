@@ -13,7 +13,7 @@ import logging
 from tabledataextractor import Table
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, find_cc3
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -24,11 +24,6 @@ class TableCC4(Table):
     """Derivative of Table used to isolate testing for CC4"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def _label_sections(self):
-        """Labels only CC4"""
-        self._cc4 = find_cc4(self)
-        log.info("Table Cell CC4 = {}".format(self._cc4))
 
     @property
     def labels(self):
@@ -95,12 +90,6 @@ class TableCC1CC2(Table):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _label_sections(self):
-        """Label CC1 and CC2 and stop."""
-        self._cc4 = find_cc4(self)
-        self._cc1, self._cc2 = find_cc1_cc2(self, self._cc4, self.pre_cleaned_table)
-        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
-
     @property
     def labels(self):
         """Cell labels. Python List"""
@@ -116,13 +105,6 @@ class TableCC3(Table):
     """Derivative of Table used to isolate testing for CC3"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def _label_sections(self):
-        """Label CC3."""
-        self._cc4 = find_cc4(self)
-        self._cc1, self._cc2 = find_cc1_cc2(self, self._cc4, self.pre_cleaned_table)
-        self._cc3 = find_cc3(self, self._cc2)
-        log.info("Table Cell CC3 = {}".format(self._cc3))
 
     @property
     def labels(self):

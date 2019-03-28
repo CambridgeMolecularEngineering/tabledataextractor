@@ -16,7 +16,7 @@ def print_table(table):
     Prints a table to screen.
 
     :param table: input numpy array for printing
-    :type table: ndarray
+    :type table: numpy.array
     """
     n_columns = table.shape[1]
     cell_width = np.zeros(n_columns, dtype=int)
@@ -40,7 +40,7 @@ def as_string(table):
     Returns table as string for printing.
 
     :param table: input numpy array
-    :type table: ndarray
+    :type table: numpy.array
     :return: string
     """
     n_columns = table.shape[1]

@@ -9,8 +9,6 @@ import unittest
 import logging
 
 from tabledataextractor import Table
-from tabledataextractor.table.algorithms import find_cc4
-from tabledataextractor.table.footnotes import find_footnotes
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -22,19 +20,6 @@ class TableF(Table):
 
     def __init__(self, file_path, table_number=1, **kwargs):
         super().__init__(file_path, table_number, **kwargs)
-
-    def _label_sections(self):
-        """
-        Labelling of all classification table elements.
-        """
-        cc4 = find_cc4(self)
-        log.info("Table Cell CC4 = {}".format(cc4))
-        self._cc4 = cc4
-
-        for footnote in find_footnotes(self):
-            self._footnotes.append(footnote)
-            if self._configs['use_footnotes']:
-                self._copy_footnotes(footnote)
 
     @property
     def labels(self):

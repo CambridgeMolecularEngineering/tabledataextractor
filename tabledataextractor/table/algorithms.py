@@ -816,7 +816,7 @@ def build_category_table(table, cc1, cc2, cc3, cc4):
     """
     Build category table for given input table.
     Original header factorization, according to Embley et al.
-    This version is not used.
+    This version is not used, instead :class:`~tabledataextractor.output.to_pandas.build_category_table` is being used.
 
     :param table: Table on which to perform the categorization
     :type table: Numpy array

@@ -211,7 +211,7 @@ class Table:
         """
         try:
             temp = from_any.create_table(self._file_path, self._table_number)
-        except TypeError as e:
+        except TypeError:
             raise
         else:
             assert isinstance(temp, np.ndarray) and temp.dtype == '<U60'
@@ -410,16 +410,6 @@ class Table:
         array_width = np.shape(self._pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
         results_string = as_string(
-            np.concatenate(
-                (self._pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)
-            )
-        )
+            np.concatenate((self._pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)))
         t = list_as_PrettyTable(self.category_table)
         return intro + "\n\n" + input_string + results_string + str(t)
-
-
-
-
-
-
-
