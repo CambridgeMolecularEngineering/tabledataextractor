@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(name='TableDataExtractor',
       version='1.5.1',
       url='https://www.tabledataextractor.com',
-      license='proprietary',
+      license='Creative Commons Attribution 4.0 International Public License',
       author='Juraj Mavračić',
       author_email='jm2111@cam.ac.uk',
       description='Extracts data from tables',
