@@ -28,7 +28,7 @@ def empty_string(string):
     return empty_parser.parse(string, method='fullmatch')
 
 
-def find_cc4(table):
+def find_cc4(table_object):
     """
     Searches for critical cell `CC4`.
 
@@ -36,18 +36,18 @@ def find_cc4(table):
     Rows with at most a few empty cells are assumed to be part of the data region rather than notes or footnotes rows
     (which usually only have one or two non-empty cells).
 
-    :param table: Input Table object
-    :type table: ~tabledataextractor.table.table.Table
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
     :return: cc4
     """
     # searching from the bottom of original table:
-    n_rows = len(table.pre_cleaned_table)
+    n_rows = len(table_object.pre_cleaned_table)
     for row_index in range(n_rows - 1, -1, -1):
         # counting the number of full cells
         # if n_empty < n_full terminate, this is our goal row
         n_full = 0
-        n_columns = len(table.pre_cleaned_table_empty[row_index])
-        for empty in table.pre_cleaned_table_empty[row_index]:
+        n_columns = len(table_object.pre_cleaned_table_empty[row_index])
+        for empty in table_object.pre_cleaned_table_empty[row_index]:
             if not empty:
                 n_full += 1
             if n_full > int(n_columns / 2):
@@ -484,7 +484,7 @@ def prefix_duplicate_labels(table_object, array):
         return array
 
 
-def duplicate_spanning_cells(table, array):
+def duplicate_spanning_cells(table_object, array):
     """
     Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for `.csv` files where
     information has been lost, or, if the source table is not properly formatted.
@@ -494,8 +494,8 @@ def duplicate_spanning_cells(table, array):
 
     Algorithm according to Nagy and Seth, 2016, in Procs. ICPR 2016, Cancun, Mexico.
 
-    :param table: Input Table object
-    :type table: ~tabledataextractor.table.table.Table
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
     :param array: Table to use as input
     :type array: Numpy array
     :return: Array with spanning cells copied, if necessary. Alternatively, returns the original table.
@@ -511,7 +511,7 @@ def duplicate_spanning_cells(table, array):
     # running MIPS to find the data region
     log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
     try:
-        cc1, cc2 = find_cc1_cc2(table, find_cc4(table), table.pre_cleaned_table)
+        cc1, cc2 = find_cc1_cc2(table_object, find_cc4(table_object), table_object.pre_cleaned_table)
     except (MIPSError, TypeError):
         log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
         return array
@@ -549,23 +549,23 @@ def duplicate_spanning_cells(table, array):
     temp2 = np.copy(temp)
     diff_row_length = 0
     diff_col_length = 0
-    if table.configs['use_prefixing']:
-        temp2 = prefix_duplicate_labels(temp)
+    if table_object.configs['use_prefixing']:
+        temp2 = prefix_duplicate_labels(table_object, temp)
         # reset the prefixing flag
-        table.history._prefixing_performed = False
+        table_object.history._prefixing_performed = False
         diff_row_length = len(temp2) - len(temp)
         diff_col_length = len(temp2.T) - len(temp.T)
     log.info("Spanning cells. Attempt to run main MIPS algorithm.")
     # disable title row temporarily
-    old_title_row_setting = table.configs['use_title_row']
-    table.configs['use_title_row'] = False
+    old_title_row_setting = table_object.configs['use_title_row']
+    table_object.configs['use_title_row'] = False
     try:
-        cc1, cc2 = find_cc1_cc2(table, find_cc4(table), temp2)
+        cc1, cc2 = find_cc1_cc2(table_object, find_cc4(table_object), temp2)
     except (MIPSError, TypeError):
         log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
-        return table
+        return array
     finally:
-        table.configs['use_title_row'] = old_title_row_setting
+        table_object.configs['use_title_row'] = old_title_row_setting
 
     updated = array.copy()
     # update the original table with values from the updated table if the cells are in the header regions
@@ -579,9 +579,11 @@ def duplicate_spanning_cells(table, array):
 
     # log
     if not np.array_equal(updated, array):
-        table.history._spanning_cells_extended = True
+        table_object.history._spanning_cells_extended = True
         log.info("METHOD. Spanning cells extended.")
 
     return updated
+
+
 
 
