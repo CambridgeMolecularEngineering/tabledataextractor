@@ -10,9 +10,22 @@ import logging
 import numpy as np
 
 from tabledataextractor.exceptions import MIPSError
+from tabledataextractor.table.parse import StringParser
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
+
+def empty_string(string):
+    """
+    Returns `True` if a particular string is empty, which is defined with a regular expression.
+
+    :param string: Input string for testing
+    :type string: str
+    :return: True/False
+    """
+    empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
+    return empty_parser.parse(string, method='fullmatch')
 
 
 def find_cc4(table):
@@ -311,7 +324,167 @@ def find_cc1_cc2(table_object, cc4, array):
 
     return cc1, cc2
 
-def duplicate_spanning_cells(table):
+
+def prefix_duplicate_labels(table_object, array):
+    """
+    Prefixes duplicate labels in first row or column where this is possible,
+    by adding a new row/column containing the preceding (to the left or above) unique labels, if available.
+
+    Nested prefixing is not supported.
+
+    The algorithm is not completely selective and there might be cases where it's application is undesirable.
+    However, on standard datasets it significantly improves table-region classification.
+
+    Algorithm for column headers:
+
+    1. Run MIPS, to find the old header region, without prefixing.
+    2. For row in table, can *meaningful* prefixing in this row been done?
+        * yes --> do prefixing and go to 3, prefixing of only one row is possible; accept prefixing only if prefixed rows/cells are above the end of the header (not in the data region), the prefixed cells can still be above the header
+        * no  --> go to 2, next row
+    3. run MIPS to get the new header region
+    4. accept prefixing only if the prefixing has not made the header region start lower than before
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    :param array: Table to use as input and to do the prefixing on
+    :type array: Numpy array
+    :return: Table with added rows/columns with prefixes, or, input table, if no prefixing was done
+
+    """
+
+    def unique(data, row_or_column):
+        """
+        Returns True if data is unique in the given row/column or False if not unique or not present.
+
+        :param data:
+        :param row_or_column:
+        :return:
+        """
+        count = 0
+        for cell in row_or_column:
+            if cell == data:
+                count += 1
+        if count == 1:
+            return True
+        else:
+            return False
+
+    def prefixed_row_or_column(table):
+        """
+        Main algorithm for creating prefixed column/row headers.
+        If cell is not unique, it is prefixed with the first unique above (for row header) or to the left
+        (for column header).
+
+        Returns the row/column containing the prefixes and the position of the row/column where the new row/column
+        has to be inserted into the original table.
+
+        This function is getting ugly and could be rewritten with the use of a nice list of tuples,
+        for every row/column in the table, we would have a list of distinct elements with their positions in the row/column
+
+        :param table: input table (will not be changed)
+        :return: row_index: where the row/column has to be inserted, new_row: the list of prefixes
+        """
+
+        unique_prefix = False
+        prefixed = False
+        row_index = 0
+        new_row = []
+        for row_index, row in enumerate(table):
+            duplicated_row = []
+            new_row = []
+            for cell_index, cell in enumerate(row):
+                # append if unique or empty cell
+                if unique(cell, row) or empty_string(cell):
+                    duplicated_row.append(cell)
+                    new_row.append("")
+                else:
+                    # find the first unique cell to the left
+                    # don't use the first column and first row
+                    # as these will presumably be in the stub header region
+                    for prefix in reversed(duplicated_row[1:]):
+                        # use the prefix if it is unique and not empty
+                        if unique(prefix, row) and not empty_string(prefix):
+                            unique_prefix = prefix
+                            break
+                    # prefix the cell and append it to new row
+                    if unique_prefix:
+                        duplicated_row.append(unique_prefix + "/" + cell)
+                        new_row.append(unique_prefix)
+                        prefixed = True
+                    # else, if no unique prefix was found, just append the original cell,
+                    else:
+                        duplicated_row.append(cell)
+                        new_row.append("")
+            # and continue to the next row (if no prefixing has been performed)
+            if prefixed:
+                break
+        if prefixed:
+            return row_index, new_row
+        else:
+            return None
+
+    # MAIN ALGORITHM
+    # 1. first, check the MIPS, to see what header we would have gotten without the prefixing
+    # note, cc4 couldn't have changed
+    log.info("Prefixing. Attempt to run main MIPS algorithm.")
+    try:
+        cc1, cc2 = find_cc1_cc2(table_object, find_cc4(table_object), array)
+    except (MIPSError, TypeError):
+        log.error("Prefixing was not performed due to failure of MIPS algorithm.")
+        return array
+
+    # this flag is used for the return value, if it doesn't change the original table is returned
+    prefixed = False
+
+    # 2. DO THE PREFIXING
+    # prefixing of column headers
+    if prefixed_row_or_column(array):
+        row_index, new_row = prefixed_row_or_column(array)
+        # only perform prefixing if not below of header region (above is allowed!)
+        # to allow prefixing even below the old header region cannot be right
+        if row_index <= cc2[0]:
+            log.info("Column header prefixing, row_index= {}".format(row_index))
+            log.debug("Prefixed row= {}".format(new_row))
+            # Prefixing by adding new row:
+            prefixed = True
+            prefixed_table = np.insert(array, row_index, new_row, axis=0)
+
+    # prefixing of row headers
+    if prefixed_row_or_column(array.T):
+        column_index, new_column = prefixed_row_or_column(array.T)
+        # only perform prefixing if not to the right of header region (to the left is allowed!)
+        # to allow prefixing even below the old header region cannot be right
+        if column_index <= cc2[1]:
+            log.info("Row header prefixing, column_index= {}".format(column_index))
+            log.debug("Prefixed column= {}".format(new_column))
+            # Prefixing by adding a new column:
+            prefixed = True
+            prefixed_table = np.insert(array, column_index, new_column, axis=1)
+
+    # 3. check the headers again, after prefixing
+    # note, cc4 couldn't have changed
+    if prefixed:
+        # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
+        try:
+            cc1_new, cc2_new = find_cc1_cc2(table_object, find_cc4(table_object), prefixed_table)
+        except (MIPSError, TypeError):
+            log.info("Prefixing was not performed because it destroyed the table")
+            return array
+        # return prefixed_table only if the prefixing has not made the header to start lower,
+        # it can end lower (and this is desired and what we want - not to include the data region into the header),
+        # but it cannot start lower, because that would mean that we have removed some of the hierarchy and added
+        # hierarchy from the left/above into a column/row
+        if cc1_new[0] <= cc1[0] and cc1_new[1] <= cc1[1]:
+            table_object.history._prefixing_performed = True
+            log.info("METHOD. Prefixing was performed.")
+            return prefixed_table
+        else:
+            return array
+    else:
+        return array
+
+
+def duplicate_spanning_cells(table, array):
     """
     Duplicates cell contents into appropriate spanning cells. This is sometimes necessary for `.csv` files where
     information has been lost, or, if the source table is not properly formatted.
@@ -321,14 +494,16 @@ def duplicate_spanning_cells(table):
 
     Algorithm according to Nagy and Seth, 2016, in Procs. ICPR 2016, Cancun, Mexico.
 
-    :param table: Table to use as input
-    :type table: Numpy array
-    :return: Table with spanning cells copied, if necessary. Alternatively, returns the original table.
+    :param table: Input Table object
+    :type table: ~tabledataextractor.table.table.Table
+    :param array: Table to use as input
+    :type array: Numpy array
+    :return: Array with spanning cells copied, if necessary. Alternatively, returns the original table.
     """
 
-    def empty_row(array):
+    def empty_row(arrayy):
         """Returns 'True' if the whole row is truly empty"""
-        for element in array:
+        for element in arrayy:
             if element:
                 return False
         return True
@@ -336,13 +511,13 @@ def duplicate_spanning_cells(table):
     # running MIPS to find the data region
     log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
     try:
-        cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), self._pre_cleaned_table)
+        cc1, cc2 = find_cc1_cc2(table, find_cc4(table), table.pre_cleaned_table)
     except (MIPSError, TypeError):
         log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
-        return table
+        return array
 
     log.info("Spanning cells. Attempt to run main spanning cell algorithm.")
-    temp = table.copy()
+    temp = array.copy()
     top_fill = None
     left_fill = None
     for c in range(0, len(temp.T)):
@@ -374,25 +549,25 @@ def duplicate_spanning_cells(table):
     temp2 = np.copy(temp)
     diff_row_length = 0
     diff_col_length = 0
-    if self._configs['use_prefixing']:
-        temp2 = self._prefix_duplicate_labels(temp)
+    if table.configs['use_prefixing']:
+        temp2 = prefix_duplicate_labels(temp)
         # reset the prefixing flag
-        self.history._prefixing_performed = False
+        table.history._prefixing_performed = False
         diff_row_length = len(temp2) - len(temp)
         diff_col_length = len(temp2.T) - len(temp.T)
     log.info("Spanning cells. Attempt to run main MIPS algorithm.")
     # disable title row temporarily
-    old_title_row_setting = self._configs['use_title_row']
-    self._configs['use_title_row'] = False
+    old_title_row_setting = table.configs['use_title_row']
+    table.configs['use_title_row'] = False
     try:
-        cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), temp2)
+        cc1, cc2 = find_cc1_cc2(table, find_cc4(table), temp2)
     except (MIPSError, TypeError):
         log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
         return table
     finally:
-        self._configs['use_title_row'] = old_title_row_setting
+        table.configs['use_title_row'] = old_title_row_setting
 
-    updated = table.copy()
+    updated = array.copy()
     # update the original table with values from the updated table if the cells are in the header regions
     # update column header
     for col_header_index in range(cc1[0], cc2[0] + 1 - diff_row_length):
@@ -403,8 +578,8 @@ def duplicate_spanning_cells(table):
         updated[:, row_header_index] = temp[:, row_header_index]
 
     # log
-    if not np.array_equal(updated, table):
-        self.history._spanning_cells_extended = True
+    if not np.array_equal(updated, array):
+        table.history._spanning_cells_extended = True
         log.info("METHOD. Spanning cells extended.")
 
     return updated
