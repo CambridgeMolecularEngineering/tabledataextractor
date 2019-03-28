@@ -21,8 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension
-
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
 
@@ -450,7 +449,7 @@ class Table:
             self._cc1 = header_extension(self, self._cc1)
             log.info("Header extension, new cc1 = {}".format(self._cc1))
 
-        cc3 = self._find_cc3(cc2)
+        cc3 = find_cc3(self, cc2)
         log.info("Table Cell CC3 = {}".format(cc3))
         # self.labels[cc3] = 'CC3'
         self._cc3 = cc3

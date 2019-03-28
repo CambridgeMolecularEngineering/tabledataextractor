@@ -13,7 +13,7 @@ import logging
 from tabledataextractor import Table
 from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, find_cc3
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -121,7 +121,7 @@ class TableCC3(Table):
         """Label CC3."""
         self._cc4 = find_cc4(self)
         self._cc1, self._cc2 = find_cc1_cc2(self, self._cc4, self.pre_cleaned_table)
-        self._cc3 = self._find_cc3(self._cc2)
+        self._cc3 = find_cc3(self, self._cc2)
         log.info("Table Cell CC3 = {}".format(self._cc3))
 
     @property

@@ -325,6 +325,48 @@ def find_cc1_cc2(table_object, cc4, array):
     return cc1, cc2
 
 
+def find_cc3(table_object, cc2):
+    """
+    Searches for critical cell `CC3`, as the leftmost cell of the first filled row of the data region.
+
+    .. rubric:: Comment on implementation
+
+    There are two options on how to implement the search for `CC3`:
+
+        1. With the possibility of `Notes` rows directly below the header (default):
+            * the first half filled row below the header is considered as the start of the data region, just like for the `CC4` cell
+            * implemented by Embley et. al.
+        2. Without the possibility of `Notes` rows directly below the header:
+            * the first row below the header is considered as the start of the data region
+            * for scientific tables it might be more common that the first data row only has a single entry
+            * this can be chosen my commenting/uncommenting the code within this function
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    :param cc2: Tuple, position of `CC2` cell found with find_cc1_cc2()
+    :type cc2: (int,int)
+    :return: cc3
+    """
+
+    # OPTION 1
+    # searching from the top of table for first half-full row, starting with first row below the header:
+    n_rows = len(table_object.pre_cleaned_table[cc2[0] + 1:])
+    log.debug("n_rows= {}".format(n_rows))
+    for row_index in range(cc2[0] + 1, cc2[0] + 1 + n_rows, 1):
+        n_full = 0
+        n_columns = len(table_object.pre_cleaned_table[row_index, cc2[1] + 1:])
+        log.debug("n_columns= {}".format(n_columns))
+        for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
+            empty = table_object.pre_cleaned_table_empty[row_index, column_index]
+            if not empty:
+                n_full += 1
+            if n_full >= int(n_columns / 2):
+                return row_index, cc2[1] + 1
+    raise MIPSError("No CC3 critical cell found! No data region defined.")
+    # OPTION 2
+    # return (cc2[0]+1,cc2[1]+1)
+
+
 def prefix_duplicate_labels(table_object, array):
     """
     Prefixes duplicate labels in first row or column where this is possible,
