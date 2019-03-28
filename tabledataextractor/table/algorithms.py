@@ -585,5 +585,61 @@ def duplicate_spanning_cells(table_object, array):
     return updated
 
 
+def header_extension(table_object, cc1):
+    """
+    Extends the header after main MIPS run.
+    According to Nagy and Seth, 2016, *"Table Headers: An entrance to the data mine"*.
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    :param cc1: `CC1` critical cell
+    :return: cc1_new
+    """
+
+    cc1_new_row = None
+    cc1_new_col = None
+
+    # add row above the identified column header if it does not consist of cells with identical values and if it
+    # adds at least one non-blank cell that has a value different from the cell immediately below it
+    current_row = table_object.pre_cleaned_table[cc1[0], :]
+    for row_index in range(cc1[0]-1, -1, -1):
+        # start after the first column to allow for a title
+        if len(np.unique(table_object.pre_cleaned_table[row_index, 1:])) == 1:
+            cc1_new_row = row_index+1
+        else:
+            for col_index, cell in enumerate(table_object.pre_cleaned_table[row_index, :]):
+                # remove the first row from this check to preserve a title,
+                # if the title is the only non-empty element of the row
+                if col_index != 0 and \
+                        cell != current_row[col_index] and \
+                        not table_object.pre_cleaned_table_empty[row_index, col_index]:
+                    current_row = table_object.pre_cleaned_table[row_index, :]
+                    cc1_new_row = row_index
+                    break
+    if cc1_new_row is None:
+        cc1_new_row = cc1[0]
+
+    # now do the same for the row headers
+    current_col = table_object.pre_cleaned_table[:, cc1[1]]
+    for col_index in range(cc1[1]-1, -1, -1):
+        if len(np.unique(table_object.pre_cleaned_table[:, col_index])) == 1:
+            cc1_new_col = col_index+1
+        else:
+            for row_index, cell in enumerate(table_object.pre_cleaned_table[:, col_index]):
+                if cell != current_col[row_index] and not table_object.pre_cleaned_table_empty[row_index, col_index]:
+                    current_col = table_object.pre_cleaned_table[:, col_index]
+                    cc1_new_col = col_index
+                    break
+    if cc1_new_col is None:
+        cc1_new_col = cc1[1]
+
+    cc1_new = (cc1_new_row, cc1_new_col)
+
+    # log
+    if not cc1_new == cc1:
+        table_object.history._header_extended = True
+        log.info("METHOD. Header extended.")
+
+    return cc1_new
 
 
