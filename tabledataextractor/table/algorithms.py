@@ -367,6 +367,17 @@ def find_cc3(table_object, cc2):
     # return (cc2[0]+1,cc2[1]+1)
 
 
+def find_title_row(table_object):
+    """
+    Searches for the topmost non-empty row.
+
+    :return: int
+    """
+    for row_index, empty_row in enumerate(table_object.pre_cleaned_table_empty):
+        if not empty_row.all():
+            return row_index
+
+
 def prefix_duplicate_labels(table_object, array):
     """
     Prefixes duplicate labels in first row or column where this is possible,

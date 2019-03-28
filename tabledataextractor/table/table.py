@@ -21,7 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
 
@@ -82,7 +82,7 @@ class Table:
     def title_row(self):
         """Title row of the table as Python list."""
         if self._configs['use_title_row']:
-            return self._find_title_row()
+            return find_title_row(self)
 
     @property
     def history(self):
@@ -258,56 +258,7 @@ class Table:
         self._history = History()
         self.history._table_transposed = True
         self._analyze_table()
-
-
-    # def _find_cc3(self, cc2):
-    #     """
-    #     Searches for critical cell `CC3`, as the leftmost cell of the first filled row of the data region.
-    #
-    #     .. rubric:: Comment on implementation
-    #
-    #     There are two options on how to implement the search for `CC3`:
-    #
-    #         1. With the possibility of `Notes` rows directly below the header (default):
-    #             * the first half filled row below the header is considered as the start of the data region, just like for the `CC4` cell
-    #             * implemented by Embley et. al.
-    #         2. Without the possibility of `Notes` rows directly below the header:
-    #             * the first row below the header is considered as the start of the data region
-    #             * for scientific tables it might be more common that the first data row only has a single entry
-    #             * this can be chosen my commenting/uncommenting the code within this function
-    #
-    #     :param cc2: Tuple, position of `CC2` cell found with find_cc4()
-    #     :type cc2: (int,int)
-    #     :return: cc3
-    #     """
-    #
-    #     # OPTION 1
-    #     # searching from the top of table for first half-full row, starting with first row below the header:
-    #     n_rows = len(self._pre_cleaned_table[cc2[0] + 1:])
-    #     log.debug("n_rows= {}".format(n_rows))
-    #     for row_index in range(cc2[0] + 1, cc2[0] + 1 + n_rows, 1):
-    #         n_full = 0
-    #         n_columns = len(self._pre_cleaned_table[row_index, cc2[1] + 1:])
-    #         log.debug("n_columns= {}".format(n_columns))
-    #         for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
-    #             empty = self.pre_cleaned_table_empty[row_index, column_index]
-    #             if not empty:
-    #                 n_full += 1
-    #             if n_full >= int(n_columns / 2):
-    #                 return row_index, cc2[1] + 1
-    #     raise MIPSError("No CC3 critical cell found! No data region defined.")
-    #     # OPTION 2
-    #     # return (cc2[0]+1,cc2[1]+1)
-
-    def _find_title_row(self):
-        """
-        Searches for the topmost non-empty row.
-
-        :return: int
-        """
-        for row_index, empty_row in enumerate(self.pre_cleaned_table_empty):
-            if not empty_row.all():
-                return row_index
+        
 
     def _find_note_cells(self, labels_table):
         """
