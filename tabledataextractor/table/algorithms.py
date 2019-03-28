@@ -10,7 +10,7 @@ import logging
 import numpy as np
 
 from tabledataextractor.exceptions import MIPSError
-from tabledataextractor.table.parse import StringParser
+from tabledataextractor.table.parse import StringParser, CellParser
 
 
 log = logging.getLogger(__name__)
@@ -27,6 +27,22 @@ def empty_string(string):
     """
     empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
     return empty_parser.parse(string, method='fullmatch')
+
+
+def empty_cells(array, regex=r'^([\s\-\–\"]+)?$'):
+    """
+    Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
+
+    :param regex: The regular expression which defines an empty cell (can be tweaked).
+    :type regex: str
+    :param array: Input array to return the mask for
+    :type array: numpy array
+    """
+    empty = np.full_like(array, fill_value=False, dtype=bool)
+    empty_parser = CellParser(regex)
+    for empty_cell in empty_parser.parse(array, method='fullmatch'):
+        empty[empty_cell[0], empty_cell[1]] = True
+    return empty
 
 
 def find_cc4(table_object):

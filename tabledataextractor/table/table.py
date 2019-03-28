@@ -21,7 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells, empty_cells
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -201,7 +201,7 @@ class Table:
     @property
     def pre_cleaned_table_empty(self):
         """Mask array with `True` for all empty cells of the ``pre_cleaned_table``."""
-        return self.empty_cells(self._pre_cleaned_table)
+        return empty_cells(self._pre_cleaned_table)
 
     def _set_configs(self, **kwargs):
         """Sets the configuration parameters based on the user input."""
@@ -223,7 +223,7 @@ class Table:
         self._footnotes = []
 
         # mask, 'cell = True' if cell is empty
-        self._raw_table_empty = self.empty_cells(self.raw_table)
+        self._raw_table_empty = empty_cells(self.raw_table)
 
         # check if array is empty
         if self._raw_table_empty.all():
@@ -261,33 +261,17 @@ class Table:
         self.history._table_transposed = True
         self._analyze_table()
 
-    # def _find_footnotes(self):
+    # @staticmethod
+    # def empty_cells(table, regex=r'^([\s\-\–\"]+)?$'):
     #     """
-    #     Finds a footnote and yields a Footnote() object will all the appropriate properties.
-    #     A footnote is defined with::
-    #
-    #         FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
-    #
-    #     A search is performed only below the data region.
+    #     Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
+    #     The regular expression which defines an empty cell can be tweaked.
     #     """
-    #     #: finds a footnote cell that possibly contains some text as well
-    #     fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
-    #     for fn in fn_parser.parse(self._pre_cleaned_table):
-    #         if fn[0] > self._cc4[0]:
-    #             footnote = Footnote(self, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
-    #             yield footnote
-
-    @staticmethod
-    def empty_cells(table, regex=r'^([\s\-\–\"]+)?$'):
-        """
-        Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
-        The regular expression which defines an empty cell can be tweaked.
-        """
-        empty = np.full_like(table, fill_value=False, dtype=bool)
-        empty_parser = CellParser(regex)
-        for empty_cell in empty_parser.parse(table, method='fullmatch'):
-            empty[empty_cell[0], empty_cell[1]] = True
-        return empty
+    #     empty = np.full_like(table, fill_value=False, dtype=bool)
+    #     empty_parser = CellParser(regex)
+    #     for empty_cell in empty_parser.parse(table, method='fullmatch'):
+    #         empty[empty_cell[0], empty_cell[1]] = True
+    #     return empty
 
     # @staticmethod
     # def _empty_string(string):
