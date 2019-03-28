@@ -45,6 +45,58 @@ def empty_cells(array, regex=r'^([\s\-\–\"]+)?$'):
     return empty
 
 
+def pre_clean(array):
+    """
+    Removes empty and duplicate rows and columns that extend over the whole table.
+
+    :param array: Input Table object
+    :type array: Numpy array
+    """
+
+    pre_cleaned_table = np.copy(array)
+    array_empty = empty_cells(array)
+
+    # find empty rows and delete them
+    empty_rows = []
+    for row_index, row in enumerate(array_empty):
+        if False not in row:
+            empty_rows.append(row_index)
+    log.info("Empty rows {} deleted.".format(empty_rows))
+    pre_cleaned_table = np.delete(pre_cleaned_table, empty_rows, axis=0)
+
+    # find empty columns and delete them
+    empty_columns = []
+    for column_index, column in enumerate(array_empty.T):
+        if False not in column:
+            empty_columns.append(column_index)
+    log.info("Empty columns {} deleted.".format(empty_columns))
+    pre_cleaned_table = np.delete(pre_cleaned_table, empty_columns, axis=1)
+
+    # delete duplicate rows that extend over the whole table
+    _, indices = np.unique(pre_cleaned_table, axis=0, return_index=True)
+    # for logging only, which rows have been removed
+    removed_rows = []
+    for row_index in range(0, len(pre_cleaned_table)):
+        if row_index not in indices:
+            removed_rows.append(row_index)
+    log.info("Duplicate rows {} removed.".format(removed_rows))
+    # deletion:
+    pre_cleaned_table = pre_cleaned_table[np.sort(indices)]
+
+    # delete duplicate columns that extend over the whole table
+    _, indices = np.unique(pre_cleaned_table, axis=1, return_index=True)
+    # for logging only, which rows have been removed
+    removed_columns = []
+    for column_index in range(0, len(pre_cleaned_table.T)):
+        if column_index not in indices:
+            removed_columns.append(column_index)
+    log.info("Duplicate columns {} removed.".format(removed_columns))
+    # deletion:
+    pre_cleaned_table = pre_cleaned_table[:, np.sort(indices)]
+
+    return pre_cleaned_table
+
+
 def find_cc4(table_object):
     """
     Searches for critical cell `CC4`.

@@ -21,7 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells, empty_cells
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells, empty_cells, pre_clean
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -232,9 +232,11 @@ class Table:
             raise InputError(msg)
 
         # pre-cleaning table
-        self._pre_cleaned_table = np.copy(self.raw_table)
-        self._pre_clean()
+        #self._pre_cleaned_table = np.copy(self.raw_table)
+        #self._pre_clean()
         # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+        self._pre_cleaned_table = pre_clean(self.raw_table)
+        log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self.pre_cleaned_table)))
 
         if self._configs['use_spanning_cells']:
             self._pre_cleaned_table = duplicate_spanning_cells(self, self._pre_cleaned_table)
@@ -261,74 +263,50 @@ class Table:
         self.history._table_transposed = True
         self._analyze_table()
 
-    # @staticmethod
-    # def empty_cells(table, regex=r'^([\s\-\–\"]+)?$'):
+    # def _pre_clean(self):
     #     """
-    #     Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
-    #     The regular expression which defines an empty cell can be tweaked.
+    #     Removes empty and duplicate rows and columns that extend over the whole table.
     #     """
-    #     empty = np.full_like(table, fill_value=False, dtype=bool)
-    #     empty_parser = CellParser(regex)
-    #     for empty_cell in empty_parser.parse(table, method='fullmatch'):
-    #         empty[empty_cell[0], empty_cell[1]] = True
-    #     return empty
-
-    # @staticmethod
-    # def _empty_string(string):
-    #     """
-    #     Returns `True` if a particular string is empty, which is defined with a regular expression.
     #
-    #     :param string: Input string for testing
-    #     :type string: str
-    #     :return: True/False
-    #     """
-    #     empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
-    #     return empty_parser.parse(string, method='fullmatch')
-
-    def _pre_clean(self):
-        """
-        Removes empty and duplicate rows and columns that extend over the whole table.
-        """
-
-        # find empty rows and delete them
-        empty_rows = []
-        for row_index, row in enumerate(self._raw_table_empty):
-            if False not in row:
-                empty_rows.append(row_index)
-        log.info("Empty rows {} deleted.".format(empty_rows))
-        self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_rows, axis=0)
-
-        # find empty columns and delete them
-        empty_columns = []
-        for column_index, column in enumerate(self._raw_table_empty.T):
-            if False not in column:
-                empty_columns.append(column_index)
-        log.info("Empty columns {} deleted.".format(empty_columns))
-        self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_columns, axis=1)
-
-        # delete duplicate rows that extend over the whole table
-        _, indices = np.unique(self._pre_cleaned_table, axis=0, return_index=True)
-        # for logging only, which rows have been removed
-        removed_rows = []
-        for row_index in range(0, len(self._pre_cleaned_table)):
-            if row_index not in indices:
-                removed_rows.append(row_index)
-        log.info("Duplicate rows {} removed.".format(removed_rows))
-        # deletion:
-        self._pre_cleaned_table = self._pre_cleaned_table[np.sort(indices)]
-
-        # delete duplicate columns that extend over the whole table
-        _, indices = np.unique(self._pre_cleaned_table, axis=1, return_index=True)
-        # for logging only, which rows have been removed
-        removed_columns = []
-        for column_index in range(0, len(self._pre_cleaned_table.T)):
-            if column_index not in indices:
-                removed_columns.append(column_index)
-        log.info("Duplicate columns {} removed.".format(removed_columns))
-        # deletion:
-        self._pre_cleaned_table = self._pre_cleaned_table[:, np.sort(indices)]
-        log.info(
-            "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self._pre_cleaned_table)))
+    #     # find empty rows and delete them
+    #     empty_rows = []
+    #     for row_index, row in enumerate(self._raw_table_empty):
+    #         if False not in row:
+    #             empty_rows.append(row_index)
+    #     log.info("Empty rows {} deleted.".format(empty_rows))
+    #     self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_rows, axis=0)
+    #
+    #     # find empty columns and delete them
+    #     empty_columns = []
+    #     for column_index, column in enumerate(self._raw_table_empty.T):
+    #         if False not in column:
+    #             empty_columns.append(column_index)
+    #     log.info("Empty columns {} deleted.".format(empty_columns))
+    #     self._pre_cleaned_table = np.delete(self._pre_cleaned_table, empty_columns, axis=1)
+    #
+    #     # delete duplicate rows that extend over the whole table
+    #     _, indices = np.unique(self._pre_cleaned_table, axis=0, return_index=True)
+    #     # for logging only, which rows have been removed
+    #     removed_rows = []
+    #     for row_index in range(0, len(self._pre_cleaned_table)):
+    #         if row_index not in indices:
+    #             removed_rows.append(row_index)
+    #     log.info("Duplicate rows {} removed.".format(removed_rows))
+    #     # deletion:
+    #     self._pre_cleaned_table = self._pre_cleaned_table[np.sort(indices)]
+    #
+    #     # delete duplicate columns that extend over the whole table
+    #     _, indices = np.unique(self._pre_cleaned_table, axis=1, return_index=True)
+    #     # for logging only, which rows have been removed
+    #     removed_columns = []
+    #     for column_index in range(0, len(self._pre_cleaned_table.T)):
+    #         if column_index not in indices:
+    #             removed_columns.append(column_index)
+    #     log.info("Duplicate columns {} removed.".format(removed_columns))
+    #     # deletion:
+    #     self._pre_cleaned_table = self._pre_cleaned_table[:, np.sort(indices)]
+    #     log.info(
+    #         "Table shape changed from {} to {}.".format(np.shape(self.raw_table), np.shape(self._pre_cleaned_table)))
 
 
     def _copy_footnotes(self, footnote):
