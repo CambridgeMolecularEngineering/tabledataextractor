@@ -21,6 +21,8 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
+from tabledataextractor.table.algorithms import find_cc4
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
 
@@ -59,13 +61,13 @@ class Table:
         self._file_path = file_path
         self._table_number = table_number
 
+        # default configs
         self._configs = {'use_title_row': True,
                          'use_prefixing': True,
                          'use_footnotes': True,
                          'use_spanning_cells': True,
                          'use_header_extension': True,
                          'use_max_data_area': False}
-
         self._set_configs(**kwargs)
         self._history = History()
         self._analyze_table()
@@ -137,7 +139,7 @@ class Table:
                 msg = 'Input table has only one row or column.'
                 log.critical(msg)
                 raise InputError(msg)
-            if not self.history._table_transposed:
+            if not self.history.table_transposed:
                 return temp
             else:
                 return temp.T
@@ -195,6 +197,11 @@ class Table:
             msg = "No data region. Critical cells have not been found."
             raise MIPSError(msg)
 
+    @property
+    def pre_cleaned_table_empty(self):
+        """Mask array with `True` for all empty cells of the ``pre_cleaned_table``."""
+        return self.empty_cells(self._pre_cleaned_table)
+
     def _set_configs(self, **kwargs):
         """Sets the configuration parameters based on the user input."""
         for key, value in kwargs.items():
@@ -205,7 +212,6 @@ class Table:
                 log.critical(msg)
                 raise InputError(msg)
         log.info('Configuration parameters are: {}'.format(self._configs))
-
 
     def _analyze_table(self):
         """
@@ -227,23 +233,21 @@ class Table:
         # pre-cleaning table
         self._pre_cleaned_table = np.copy(self.raw_table)
         self._pre_clean()
-        self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+        # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         if self._configs['use_spanning_cells']:
             self._pre_cleaned_table = self._duplicate_spanning_cells(self._pre_cleaned_table)
-            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+            # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         # prefixing of duplicate labels in the header region
         if self._configs['use_prefixing']:
             self._pre_cleaned_table = self._prefix_duplicate_labels(self._pre_cleaned_table)
-            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+            # self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
 
         # labelling
         # self.labels = np.empty_like(self._pre_cleaned_table, dtype="<U60")
         # self.labels[:, :] = '/'
         self._label_sections()
-
-
 
     def transpose(self):
         """
@@ -281,7 +285,7 @@ class Table:
         # running MIPS to find the data region
         log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
         try:
-            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), self._pre_cleaned_table)
+            cc1, cc2 = self._find_cc1_cc2(find_cc4(self), self._pre_cleaned_table)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -330,7 +334,7 @@ class Table:
         old_title_row_setting = self._configs['use_title_row']
         self._configs['use_title_row'] = False
         try:
-            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), temp2)
+            cc1, cc2 = self._find_cc1_cc2(find_cc4(self), temp2)
         except (MIPSError, TypeError):
             log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
             return table
@@ -454,7 +458,7 @@ class Table:
         # note, cc4 couldn't have changed
         log.info("Prefixing. Attempt to run main MIPS algorithm.")
         try:
-            cc1, cc2 = self._find_cc1_cc2(self._find_cc4(), table)
+            cc1, cc2 = self._find_cc1_cc2(find_cc4(self), table)
         except (MIPSError, TypeError):
             log.error("Prefixing was not performed due to failure of MIPS algorithm.")
             return table
@@ -492,7 +496,7 @@ class Table:
         if prefixed:
             # if new headers fail, the prefixing has destroyed the table, which is not a HIT table anymore
             try:
-                cc1_new, cc2_new = self._find_cc1_cc2(self._find_cc4(), prefixed_table)
+                cc1_new, cc2_new = self._find_cc1_cc2(find_cc4(self), prefixed_table)
             except (MIPSError, TypeError):
                 log.info("Prefixing was not performed because it destroyed the table")
                 return table
@@ -509,28 +513,28 @@ class Table:
         else:
             return table
 
-    def _find_cc4(self):
-        """
-        Searches for critical cell `CC4`.
-
-        Searching from the bottom of the pre-cleaned table for the last row with a minority of empty cells.
-        Rows with at most a few empty cells are assumed to be part of the data region rather than notes or footnotes rows
-        (which usually only have one or two non-empty cells).
-
-        :return: cc4
-        """
-        # searching from the bottom of original table:
-        n_rows = len(self._pre_cleaned_table)
-        for row_index in range(n_rows - 1, -1, -1):
-            # counting the number of full cells
-            # if n_empty < n_full terminate, this is our goal row
-            n_full = 0
-            n_columns = len(self._pre_cleaned_table_empty[row_index])
-            for empty in self._pre_cleaned_table_empty[row_index]:
-                if not empty:
-                    n_full += 1
-                if n_full > int(n_columns / 2):
-                    return row_index, n_columns - 1
+    # def _find_cc4(self):
+    #     """
+    #     Searches for critical cell `CC4`.
+    #
+    #     Searching from the bottom of the pre-cleaned table for the last row with a minority of empty cells.
+    #     Rows with at most a few empty cells are assumed to be part of the data region rather than notes or footnotes rows
+    #     (which usually only have one or two non-empty cells).
+    #
+    #     :return: cc4
+    #     """
+    #     # searching from the bottom of original table:
+    #     n_rows = len(self._pre_cleaned_table)
+    #     for row_index in range(n_rows - 1, -1, -1):
+    #         # counting the number of full cells
+    #         # if n_empty < n_full terminate, this is our goal row
+    #         n_full = 0
+    #         n_columns = len(self.pre_cleaned_table_empty[row_index])
+    #         for empty in self.pre_cleaned_table_empty[row_index]:
+    #             if not empty:
+    #                 n_full += 1
+    #             if n_full > int(n_columns / 2):
+    #                 return row_index, n_columns - 1
 
     def _find_cc1_cc2(self, cc4, table):
         """
@@ -539,7 +543,7 @@ class Table:
         MIPS locates the critical cells that define the minimum row and column headers needed to index
         every data cell.
 
-        :param cc4: Position of `CC4` cell found with _find_cc4()
+        :param cc4: Position of `CC4` cell found with find_cc4()
         :param table: table to search for `CC1` and `CC2`
         :type table: numpy array
         :type cc4: (int, int)
@@ -824,7 +828,7 @@ class Table:
                     # if the title is the only non-empty element of the row
                     if col_index != 0 and \
                             cell != current_row[col_index] and \
-                            not self._pre_cleaned_table_empty[row_index, col_index]:
+                            not self.pre_cleaned_table_empty[row_index, col_index]:
                         current_row = self._pre_cleaned_table[row_index, :]
                         cc1_new_row = row_index
                         break
@@ -838,7 +842,7 @@ class Table:
                 cc1_new_col = col_index+1
             else:
                 for row_index, cell in enumerate(self._pre_cleaned_table[:, col_index]):
-                    if cell != current_col[row_index] and not self._pre_cleaned_table_empty[row_index, col_index]:
+                    if cell != current_col[row_index] and not self.pre_cleaned_table_empty[row_index, col_index]:
                         current_col = self._pre_cleaned_table[:, col_index]
                         cc1_new_col = col_index
                         break
@@ -870,7 +874,7 @@ class Table:
                 * for scientific tables it might be more common that the first data row only has a single entry
                 * this can be chosen my commenting/uncommenting the code within this function
 
-        :param cc2: Tuple, position of `CC2` cell found with _find_cc4()
+        :param cc2: Tuple, position of `CC2` cell found with find_cc4()
         :type cc2: (int,int)
         :return: cc3
         """
@@ -884,7 +888,7 @@ class Table:
             n_columns = len(self._pre_cleaned_table[row_index, cc2[1] + 1:])
             log.debug("n_columns= {}".format(n_columns))
             for column_index in range(cc2[1] + 1, cc2[1] + 1 + n_columns, 1):
-                empty = self._pre_cleaned_table_empty[row_index, column_index]
+                empty = self.pre_cleaned_table_empty[row_index, column_index]
                 if not empty:
                     n_full += 1
                 if n_full >= int(n_columns / 2):
@@ -899,7 +903,7 @@ class Table:
 
         :return: int
         """
-        for row_index, empty_row in enumerate(self._pre_cleaned_table_empty):
+        for row_index, empty_row in enumerate(self.pre_cleaned_table_empty):
             if not empty_row.all():
                 return row_index
 
@@ -911,7 +915,7 @@ class Table:
         """
         for row_index, row in enumerate(labels_table):
             for column_index, cell in enumerate(row):
-                if cell == '/' and not self._pre_cleaned_table_empty[row_index, column_index]:
+                if cell == '/' and not self.pre_cleaned_table_empty[row_index, column_index]:
                     yield row_index, column_index
 
     def _find_footnotes(self):
@@ -1006,7 +1010,7 @@ class Table:
         """
         if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
             self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-            self._pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
+            #self.pre_cleaned_table_empty = self.empty_cells(self._pre_cleaned_table)
             self.history._footnotes_copied = True
             log.info("METHOD. Footnotes copied into cells.")
 
@@ -1017,7 +1021,7 @@ class Table:
         """
 
 
-        cc4 = self._find_cc4()
+        cc4 = find_cc4(self)
         log.info("Table Cell CC4 = {}".format(cc4))
         # self.labels[cc4] = 'CC4'
         self._cc4 = cc4

@@ -9,6 +9,7 @@ import unittest
 import logging
 
 from tabledataextractor import Table
+from tabledataextractor.table.algorithms import find_cc4
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class TableF(Table):
         """
         Labelling of all classification table elements.
         """
-        cc4 = self._find_cc4()
+        cc4 = find_cc4(self)
         log.info("Table Cell CC4 = {}".format(cc4))
         self._cc4 = cc4
 
