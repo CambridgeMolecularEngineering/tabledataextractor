@@ -371,11 +371,29 @@ def find_title_row(table_object):
     """
     Searches for the topmost non-empty row.
 
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
     :return: int
     """
     for row_index, empty_row in enumerate(table_object.pre_cleaned_table_empty):
         if not empty_row.all():
             return row_index
+
+
+def find_note_cells(table_object, labels_table):
+    """
+    Searches for all non-empty cells that have not been labelled differently.
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    :param labels_table: table that holds all the labels
+    :type labels_table: Numpy array
+    :return: Tuple
+    """
+    for row_index, row in enumerate(labels_table):
+        for column_index, cell in enumerate(row):
+            if cell == '/' and not table_object.pre_cleaned_table_empty[row_index, column_index]:
+                yield row_index, column_index
 
 
 def prefix_duplicate_labels(table_object, array):

@@ -21,7 +21,7 @@ from tabledataextractor.exceptions import TDEError, InputError, MIPSError
 from tabledataextractor.table.footnotes import Footnote
 from tabledataextractor.table.history import History
 
-from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row
+from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2, prefix_duplicate_labels, duplicate_spanning_cells, header_extension, find_cc3, find_title_row, find_note_cells
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
 
@@ -114,7 +114,7 @@ class Table:
                 temp[ref_cell[0], ref_cell[1]] = 'FNref' if temp[ref_cell[0], ref_cell[1]] == '/' else temp[ref_cell[0], ref_cell[1]] + ' & FNref'
 
         # all non-empty unlabelled cells at this point are labelled 'Note'
-        for note_cell in self._find_note_cells(temp):
+        for note_cell in find_note_cells(self, temp):
             temp[note_cell] = 'Note'
         return temp
 
@@ -258,18 +258,7 @@ class Table:
         self._history = History()
         self.history._table_transposed = True
         self._analyze_table()
-        
 
-    def _find_note_cells(self, labels_table):
-        """
-        Searches for all non-empty cells that have not been labelled differently.
-
-        :return: Tuple
-        """
-        for row_index, row in enumerate(labels_table):
-            for column_index, cell in enumerate(row):
-                if cell == '/' and not self.pre_cleaned_table_empty[row_index, column_index]:
-                    yield row_index, column_index
 
     def _find_footnotes(self):
         """
