@@ -8,7 +8,7 @@ setup(name='TableDataExtractor',
       author_email='jm2111@cam.ac.uk',
       description='Extracts data from tables',
       packages=find_packages(exclude=['tests']),
-      long_description=open('README.md').read(),
+      long_description=open('README.md', 'r', encoding='utf-8').read(),
       zip_safe=False,
       test_suite='unittest',
       tests_require=[
