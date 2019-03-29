@@ -127,7 +127,7 @@ def find_cc4(table_object):
 
 def find_cc1_cc2(table_object, cc4, array):
     """
-    Main MIPS (*Minimum Indexing Point Search*) algorithm, according to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
+    Main MIPS (*Minimum Indexing Point Search*) algorithm. According to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
     Searches for critical cells `CC2` and `CC3`.
     MIPS locates the critical cells that define the minimum row and column headers needed to index
     every data cell.
@@ -486,6 +486,8 @@ def prefix_duplicate_labels(table_object, array):
     3. run MIPS to get the new header region
     4. accept prefixing only if the prefixing has not made the header region start lower than before
 
+    The algorithm has been modified from Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
+
     :param table_object: Input Table object
     :type table_object: ~tabledataextractor.table.table.Table
     :param array: Table to use as input and to do the prefixing on
@@ -730,7 +732,9 @@ def duplicate_spanning_cells(table_object, array):
 def header_extension(table_object, cc1):
     """
     Extends the header after main MIPS run.
-    According to Nagy and Seth, 2016, *"Table Headers: An entrance to the data mine"*.
+
+    Algorithm according to Nagy and Seth, 2016, *"Table Headers: An entrance to the data mine"*,
+    in Procs. ICPR 2016, Cancun, Mexico.
 
     :param table_object: Input Table object
     :type table_object: ~tabledataextractor.table.table.Table
@@ -815,7 +819,7 @@ def categorize_header(header):
 def build_category_table(table, cc1, cc2, cc3, cc4):
     """
     Build category table for given input table.
-    Original header factorization, according to Embley et al.
+    Original header factorization, according to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
     This version is not used, instead :class:`~tabledataextractor.output.to_pandas.build_category_table` is being used.
 
     :param table: Table on which to perform the categorization
