@@ -65,7 +65,7 @@ def create_table(name_key, table_number=1):
     :type name_key: str | list
     :param table_number: Number of the table that we want to input if there are several at the given address/path
     :type table_number: int
-    :return: table as numpy.ndarray
+    :return: table as numpy.array
     """
 
     if isinstance(name_key, list):

@@ -21,25 +21,21 @@ class TableF(Table):
     def __init__(self, file_path, table_number=1, **kwargs):
         super().__init__(file_path, table_number, **kwargs)
 
-    def label_sections(self):
-        """
-        Labelling of all classification table elements.
-        """
+    @property
+    def labels(self):
+        """Cell labels. Python List"""
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc4] = 'CC4'
 
-        title_row = self.find_title_row()
-        self.title_row = title_row
+        for footnote in self.footnotes:
+            temp[footnote.prefix_cell[0], footnote.prefix_cell[1]] = 'FNprefix'
+            if footnote.text_cell is not None:
+                temp[footnote.text_cell[0], footnote.text_cell[1]] = 'FNtext' if temp[footnote.text_cell[0], footnote.text_cell[1]] == '/' else 'FNprefix & FNtext'
+            for ref_cell in footnote.reference_cells:
+                temp[ref_cell[0], ref_cell[1]] = 'FNref' if temp[ref_cell[0], ref_cell[1]] == '/' else temp[ref_cell[0], ref_cell[1]] + ' & FNref'
 
-        cc4 = self.find_cc4()
-        log.info("Table Cell CC4 = {}".format(cc4))
-        self.labels[cc4] = 'CC4'
-        self._cc4 = cc4
-
-        for footnote in self.find_footnotes():
-            self.footnotes.append(footnote)
-            # update the pre-cleaned table
-            if self.configs['use_footnotes']:
-                self.pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
-                self._pre_cleaned_table_empty = self.empty_cells(self.pre_cleaned_table)
+        return temp
 
 
 class TestFootnote(unittest.TestCase):

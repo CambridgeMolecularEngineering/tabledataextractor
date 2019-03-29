@@ -31,7 +31,7 @@ class CellParser:
         :param method:  `search`, `match` or `fullmatch`; Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
         :param table: Input table to be parsed
-        :type table: numpy.ndarray
+        :type table: numpy.array
         :yield: (int, int, str) with index of cells and the strings of the groups that were matched
 
         """
@@ -61,7 +61,7 @@ class CellParser:
         :param method:  `search`, `match` or `fullmatch`; see Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
         :param table: Input table to be parsed, of type 'numpy.ndarray'
-        :type table: numpy.ndarray
+        :type table: numpy.array
         :yield: (int, int, str) with index of cells and the strings of the groups that were matched
 
         """
@@ -80,7 +80,7 @@ class CellParser:
         :param method: `search`, `match` or `fullmatch`; see Python `Regular expressions <https://docs.python.org/3.6/library/re.html>`_
         :type method: str
         :param table: Input table to be parsed
-        :type table: numpy.ndarray
+        :type table: numpy.array
         :param repl: Replacement string that will be included instead of the patters
         :type repl: str
         :yield: (int, int, str) with index of cells and the strings of the groups that were matched

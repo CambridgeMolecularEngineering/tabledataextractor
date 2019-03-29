@@ -56,7 +56,7 @@ class Footnote:
     def _find_text_cell(self):
         """Finds the cell index containing the text associated with the prefix."""
         for column_index in range(self.prefix_cell[1] + 1, np.shape(self.pre_cleaned_table)[1]):
-            if not self._table._pre_cleaned_table_empty[self.prefix_cell[0], column_index]:
+            if not self._table.pre_cleaned_table_empty[self.prefix_cell[0], column_index]:
                 return self.prefix_cell[0], column_index
             return None
 
@@ -148,5 +148,22 @@ class Footnote:
                                        str(self.references))
 
 
+def find_footnotes(table_object):
+    """
+    Finds a footnote and yields a :class:`~tabledataextractor.table.footnotes.Footnote` object with all the appropriate properties.
+    A footnote is defined with::
 
+        FNprefix  = \*, #, ., o, †; possibly followed by "." or ")"
+
+    A search is performed only below the data region.
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    """
+    #: finds a footnote cell that possibly contains some text as well
+    fn_parser = CellParser(r'^([*#\.o†\da-z][\.\)]?)(?!\d)\s?(([\w\[\]\s\:]+)?\.?)\s?$')
+    for fn in fn_parser.parse(table_object.pre_cleaned_table):
+        if fn[0] > table_object._cc4[0]:
+            footnote = Footnote(table_object, prefix=fn[2][0], prefix_cell=(fn[0], fn[1]), text=fn[2][1])
+            yield footnote
 

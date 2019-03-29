@@ -27,7 +27,7 @@ class TestSpanningCells(unittest.TestCase):
                              ['1991', '4861', '2181', '389411', '197711', '3601', '592921', '67421', '']]
         category_table = [['4869', ['1990'], ['School', 'School', 'School']], ['2189', ['1990'], ['Pupils', 'Pre-primary', 'Pre-primary']], ['389410', ['1990'], ['Pupils', 'Grades', '6 Jan']], ['197719', ['1990'], ['Pupils', 'Grades', '9 Jul']], ['', ['1990'], ['Pupils', 'Additional', 'Additional']], ['592920', ['1990'], ['Pupils', 'Total', 'Total']], ['67427', ['1990'], ['Grade 1', 'Grade 1', 'Grade 1']], ['61054', ['1990'], ['Leaving certificates', 'Leaving certificates', 'Leaving certificates']], ['4861', ['1991'], ['School', 'School', 'School']], ['2181', ['1991'], ['Pupils', 'Pre-primary', 'Pre-primary']], ['389411', ['1991'], ['Pupils', 'Grades', '6 Jan']], ['197711', ['1991'], ['Pupils', 'Grades', '9 Jul']], ['3601', ['1991'], ['Pupils', 'Additional', 'Additional']], ['592921', ['1991'], ['Pupils', 'Total', 'Total']], ['67421', ['1991'], ['Grade 1', 'Grade 1', 'Grade 1']], ['', ['1991'], ['Leaving certificates', 'Leaving certificates', 'Leaving certificates']]]
         labels = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'], ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'], ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
-        self.assertListEqual(pre_cleaned_table, table.pre_cleaned_table.tolist())
+        self.assertListEqual(pre_cleaned_table, table._pre_cleaned_table.tolist())
         self.assertListEqual(category_table, table.category_table)
         self.assertListEqual(labels, table.labels.tolist())
 
@@ -47,7 +47,7 @@ class TestSpanningCells(unittest.TestCase):
                   ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                   ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data'],
                   ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
-        self.assertListEqual(pre_cleaned_table, table.pre_cleaned_table.tolist())
+        self.assertListEqual(pre_cleaned_table, table._pre_cleaned_table.tolist())
         self.assertListEqual(category_table, table.category_table)
         self.assertListEqual(labels, table.labels.tolist())
 

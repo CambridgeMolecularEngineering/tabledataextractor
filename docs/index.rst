@@ -94,6 +94,8 @@ Importing Table 2 from 'https://link.springer.com/article/10.1007%2Fs10853-012-6
    basic_functionality.nblink
    features.nblink
    source_code/source_code
+   license
+   acknowledgement
 
 
 Indices and tables

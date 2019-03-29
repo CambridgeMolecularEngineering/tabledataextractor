@@ -25,7 +25,7 @@ copyright = u'2018, Juraj Mavračić'
 author = u'Juraj Mavračić'
 
 # The short X.Y version
-version = u'1.5'
+version = u'1.5.1'
 # The full version, including alpha/beta/rc tags
 release = u'2019'
 

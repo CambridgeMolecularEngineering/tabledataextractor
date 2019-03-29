@@ -1,15 +1,10 @@
+.. _exceptions:
+
 Exceptions
 ================
 
-.. autoclass:: tabledataextractor.exceptions.TDEError
+.. automodule:: tabledataextractor.exceptions
     :members:
-    :private-members:
 
-.. autoclass:: tabledataextractor.exceptions.InputError
-    :members:
-    :private-members:
 
-.. autoclass:: tabledataextractor.exceptions.MIPSError
-    :members:
-    :private-members:
 
