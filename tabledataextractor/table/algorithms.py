@@ -426,6 +426,14 @@ def find_cc1_cc2(table_object, cc4, array):
     else:
         table_object.history._title_row_removed = False
 
+    # TODO provision for using only the first column of the table as row header
+    if table_object.configs['row_header'] is not None:
+        row_header = table_object.configs['row_header']
+        assert row_header is type(int)
+        left = min(cc1[1], row_header)
+        cc1 = (cc1[0], left)
+        cc2 = (cc2[0], row_header)
+
     return cc1, cc2
 
 
