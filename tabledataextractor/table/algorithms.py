@@ -19,15 +19,17 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-def empty_string(string):
+def empty_string(string, regex=r'^([\s\-\–\"]+)?$'):
     """
     Returns `True` if a particular string is empty, which is defined with a regular expression.
 
     :param string: Input string for testing
     :type string: str
+    :param regex: The regular expression which defines an empty cell (can be tweaked).
+    :type regex: str
     :return: True/False
     """
-    empty_parser = StringParser(r'^([\s\-\–\"]+)?$')
+    empty_parser = StringParser(regex)
     return empty_parser.parse(string, method='fullmatch')
 
 
@@ -45,6 +47,22 @@ def empty_cells(array, regex=r'^([\s\-\–\"]+)?$'):
     for empty_cell in empty_parser.parse(array, method='fullmatch'):
         empty[empty_cell[0], empty_cell[1]] = True
     return empty
+
+
+def standardize_empty(array):
+    """
+    Returns an array with the empty cells of the input array standardized to 'NoValue'.
+
+    :param array: Input array
+    :type array: numpy.array
+    :return: Array with standardized empty cells
+    """
+    standardized = np.copy(array)
+    for row_index, row in enumerate(standardized):
+        for col_index, col in enumerate(row):
+            if empty_string(col):
+                standardized[row_index, col_index] = 'NoValue'
+    return standardized
 
 
 def pre_clean(array):

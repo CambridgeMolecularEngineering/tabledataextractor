@@ -18,7 +18,7 @@ from tabledataextractor.exceptions import InputError, MIPSError
 from tabledataextractor.table.history import History
 from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4, prefix_duplicate_labels, \
     duplicate_spanning_cells, header_extension, find_title_row, find_note_cells, empty_cells, \
-    pre_clean, split_table
+    pre_clean, split_table, standardize_empty
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -46,6 +46,8 @@ class Table:
         * ``use_max_data_area = False``
             If `True` the max data area will be used to determine the cell `CC2` in the main MIPS algorithm.
             It is probably never necessary to set this to True.
+        * ``standardize_empty_data = True``
+            Will standardize empty cells in the `data` region to 'NoValue'
 
     :param file_path: Path to .html or .cvs file, URL or list object that is used as input
     :type file_path: str | list
@@ -65,7 +67,8 @@ class Table:
                          'use_footnotes': True,
                          'use_spanning_cells': True,
                          'use_header_extension': True,
-                         'use_max_data_area': False}
+                         'use_max_data_area': False,
+                         'standardize_empty_data': True}
         self._set_configs(**kwargs)
         self._history = History()
         self._analyze_table()
@@ -304,7 +307,10 @@ class Table:
         :type: list
         """
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
-            return self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+            data_region = self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+            if self.configs['standardize_empty_data']:
+                data_region = standardize_empty(data_region)
+            return data_region
         else:
             msg = "No data region. Critical cells have not been found."
             raise MIPSError(msg)

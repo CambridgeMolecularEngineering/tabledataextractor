@@ -27,7 +27,7 @@ def find_multiindex_level(row_number, column_number, df):
     """
     result_index = []
     if hasattr(df.index, 'labels'):
-        for i,labels in enumerate(df.index.labels):
+        for i, labels in enumerate(df.index.labels):
             result_index.append(df.index.levels[i][labels[row_number]])
     else:
         result_index.append(df.index[row_number])

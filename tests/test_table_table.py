@@ -353,7 +353,7 @@ class TestCategorizationTable(unittest.TestCase):
 
     def do_table(self, input_path, expected):
         log.debug("Test Categorization Table: {}".format(input_path))
-        table = Table(input_path, use_footnotes=False, use_spanning_cells=False, use_header_extension=False)
+        table = Table(input_path, use_footnotes=False, use_spanning_cells=False, use_header_extension=False, standardize_empty_data=False)
         print(repr(table))
         result = table.category_table
         self.assertListEqual(expected, result)
