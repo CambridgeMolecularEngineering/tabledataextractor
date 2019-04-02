@@ -30,7 +30,7 @@ def print_table(table):
     # print each row
     for row in table:
         for i, cell in enumerate(row):
-            print("{:{cell_width}} ".format(cell,cell_width=cell_width[i]+1), end='', flush=True)
+            print("{:{cell_width}} ".format(cell, cell_width=cell_width[i]+1), end='', flush=True)
         print("\n", end='', flush=True)
     print("\n", flush=True)
 
