@@ -8,6 +8,8 @@ Welcome to TableDataExtractor!
 
 .. TODO Add pypi status/version badge once the code is included in Pip
 
+.. TODO Add DOI badge once we have a publication
+
 .. image:: https://travis-ci.com/CambridgeMolecularEngineering/tabledataextractor.svg?token=QWAzgYdPbGciePvYMQM3&branch=master
    :target: https://travis-ci.com/CambridgeMolecularEngineering/tabledataextractor.svg?token=QWAzgYdPbGciePvYMQM3&branch=master
    :alt: build status
