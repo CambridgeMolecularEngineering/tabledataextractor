@@ -114,7 +114,22 @@ def pre_clean(array):
     # deletion:
     pre_cleaned_table = pre_cleaned_table[:, np.sort(indices)]
 
+    # clean-up unicode characters
+    pre_cleaned_table = clean_unicode(pre_cleaned_table)
+
     return pre_cleaned_table
+
+
+def clean_unicode(array):
+    """
+    Replaces problematic unicode characters in a given numpy array
+    :param array: input array
+    :type array: numpy.array
+    :return: cleaned array
+    """
+    temp = np.copy(array)
+    temp = np.core.defchararray.replace(temp, '\xa0', ' ')
+    return temp
 
 
 def find_cc4(table_object):
