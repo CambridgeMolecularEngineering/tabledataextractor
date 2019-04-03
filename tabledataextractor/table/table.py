@@ -48,6 +48,9 @@ class Table:
             It is probably never necessary to set this to True.
         * ``standardize_empty_data = True``
             Will standardize empty cells in the `data` region to 'NoValue'
+        * ``row_header = None``
+            If an integer is given, it indicates the index of `row_header` columns. This overwrites the MIPS algorithm.
+            For example, ``row_header = 0`` will make only the first column a row header.
 
     :param file_path: Path to .html or .cvs file, URL or list object that is used as input
     :type file_path: str | list
@@ -68,7 +71,8 @@ class Table:
                          'use_spanning_cells': True,
                          'use_header_extension': True,
                          'use_max_data_area': False,
-                         'standardize_empty_data': True}
+                         'standardize_empty_data': True,
+                         'row_header': None}
         self._set_configs(**kwargs)
         self._history = History()
         self._analyze_table()
@@ -328,14 +332,13 @@ class Table:
         while True:
             try:
                 subtable = next(g, None)
-            except MIPSError as e:
-                log.exception("Subtable MIPS failure {}".format(e.args))
-                break
-            else:
                 if subtable is None:
                     break
                 else:
                     tables.append(Table(subtable))
+            except MIPSError as e:
+                log.exception("Subtable MIPS failure {}".format(e.args))
+                break
         return tables
 
     def contains(self, pattern):
