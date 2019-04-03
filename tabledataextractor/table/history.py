@@ -21,6 +21,7 @@ class History:
     def __init__(self):
         self._title_row_removed = False
         self._prefixing_performed = False
+        self._prefixed_rows = False
         self._footnotes_copied = False
         self._spanning_cells_extended = False
         self._header_extended = False
@@ -36,6 +37,11 @@ class History:
     def prefixing_performed(self):
         """Indicates whether prefixing has been performed on the table."""
         return self._prefixing_performed
+
+    @property
+    def prefixed_rows(self):
+        """Indicates whether prefixing has been performed on the rows (left side)."""
+        return self._prefixed_rows
 
     @property
     def footnotes_copied(self):
@@ -65,6 +71,7 @@ class History:
         out = str()
         out += "title_row_removed       = {}".format(self.title_row_removed)
         out += "\n" + "prefixing_performed     = {}".format(self.prefixing_performed)
+        out += "\n" + "prefixed_rows           = {}".format(self.prefixed_rows)
         out += "\n" + "footnotes_copied        = {}".format(self.footnotes_copied)
         out += "\n" + "spanning_cells_extended = {}".format(self.spanning_cells_extended)
         out += "\n" + "header_extended         = {}".format(self.header_extended)

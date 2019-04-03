@@ -426,10 +426,12 @@ def find_cc1_cc2(table_object, cc4, array):
     else:
         table_object.history._title_row_removed = False
 
-    # TODO provision for using only the first column of the table as row header
+    # provision for using only the first column of the table as row header
     if table_object.configs['row_header'] is not None:
         row_header = table_object.configs['row_header']
-        assert row_header is type(int)
+        assert isinstance(row_header, int)
+        if table_object.history.prefixed_rows:
+            row_header += 1
         left = min(cc1[1], row_header)
         cc1 = (cc1[0], left)
         cc2 = (cc2[0], row_header)
@@ -662,6 +664,8 @@ def prefix_duplicate_labels(table_object, array):
         if cc1_new[0] <= cc1[0] and cc1_new[1] <= cc1[1]:
             table_object.history._prefixing_performed = True
             log.info("METHOD. Prefixing was performed.")
+            if len(prefixed_table.T) > len(array.T):
+                table_object.history._prefixed_rows = True
             return prefixed_table
         else:
             return array
@@ -738,6 +742,7 @@ def duplicate_spanning_cells(table_object, array):
         temp2 = prefix_duplicate_labels(table_object, temp)
         # reset the prefixing flag
         table_object.history._prefixing_performed = False
+        table_object.history._prefixed_rows = False
         diff_row_length = len(temp2) - len(temp)
         diff_col_length = len(temp2.T) - len(temp.T)
     log.info("Spanning cells. Attempt to run main MIPS algorithm.")
