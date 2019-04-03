@@ -103,10 +103,10 @@ class Table:
         log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),
                                                              np.shape(self.pre_cleaned_table)))
 
-        if self._configs['use_spanning_cells']:
+        if self.configs['use_spanning_cells']:
             self._pre_cleaned_table = duplicate_spanning_cells(self, self._pre_cleaned_table)
 
-        if self._configs['use_prefixing']:
+        if self.configs['use_prefixing']:
             self._pre_cleaned_table = prefix_duplicate_labels(self, self._pre_cleaned_table)
 
         #: Critical cell `CC4`
@@ -117,7 +117,7 @@ class Table:
         self._footnotes = []
         for footnote in find_footnotes(self):
             self._footnotes.append(footnote)
-            if self._configs['use_footnotes']:
+            if self.configs['use_footnotes']:
                 self._copy_footnotes(footnote)
 
         # Main MIPS algorithm, finding the data and header regions
@@ -131,7 +131,7 @@ class Table:
         else:
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
 
-        if self._configs['use_header_extension']:
+        if self.configs['use_header_extension']:
             self._cc1 = header_extension(self, self._cc1)
             log.info("Header extension, new cc1 = {}".format(self._cc1))
 
