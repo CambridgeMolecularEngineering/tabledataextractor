@@ -17,8 +17,8 @@ from tabledataextractor.table.parse import StringParser
 from tabledataextractor.exceptions import InputError, MIPSError
 from tabledataextractor.table.history import History
 from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4, prefix_duplicate_labels, \
-    duplicate_spanning_cells, header_extension, find_title_row, find_note_cells, empty_cells, \
-    pre_clean, split_table, standardize_empty
+    duplicate_spanning_cells, header_extension_up, find_title_row, find_note_cells, empty_cells, \
+    pre_clean, split_table, standardize_empty, header_extension_down
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -77,17 +77,6 @@ class Table:
         self._history = History()
         self._analyze_table()
 
-    def _set_configs(self, **kwargs):
-        """Sets the configuration parameters based on the user input."""
-        for key, value in kwargs.items():
-            if key in self._configs:
-                self._configs[key] = value
-            else:
-                msg = 'Keyword "{}" does not exist.'.format(key)
-                log.critical(msg)
-                raise InputError(msg)
-        log.info('Configuration parameters are: {}'.format(self._configs))
-
     def _analyze_table(self):
         """
         Performs the analysis of the input table and is run automatically on initialization of the table object.
@@ -109,10 +98,6 @@ class Table:
         if self.configs['use_prefixing']:
             self._pre_cleaned_table = prefix_duplicate_labels(self, self._pre_cleaned_table)
 
-        #: Critical cell `CC4`
-        self._cc4 = find_cc4(self)
-        log.info("Table Cell CC4 = {}".format(self._cc4))
-
         # footnotes handling
         self._footnotes = []
         for footnote in find_footnotes(self):
@@ -132,12 +117,9 @@ class Table:
             log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
 
         if self.configs['use_header_extension']:
-            self._cc1 = header_extension(self, self._cc1)
-            log.info("Header extension, new cc1 = {}".format(self._cc1))
-
-        #: Critical cell `CC3`
-        self._cc3 = find_cc3(self, self._cc2)
-        log.info("Table Cell CC3 = {}".format(self._cc3))
+            self._cc1 = header_extension_up(self, self._cc1)
+            self._cc2 = header_extension_down(self, self._cc1, self._cc2, self._cc4)
+            log.info("Header extension, new cc1 = {}, new cc2 = {}".format(self._cc1, self._cc2))
 
     @property
     def footnotes(self):
@@ -330,15 +312,15 @@ class Table:
         tables = []
         g = split_table(self)
         while True:
-            try:
                 subtable = next(g, None)
                 if subtable is None:
                     break
                 else:
-                    tables.append(Table(subtable))
-            except MIPSError as e:
-                log.exception("Subtable MIPS failure {}".format(e.args))
-                break
+                    try:
+                        tables.append(Table(subtable))
+                    except MIPSError as e:
+                        log.exception("Subtable MIPS failure {}".format(e.args))
+                        break
         return tables
 
     def contains(self, pattern):
@@ -366,6 +348,27 @@ class Table:
         self._history = History()
         self.history._table_transposed = True
         self._analyze_table()
+
+    @property
+    def _cc4(self):
+        """Critical cell `CC4`."""
+        return find_cc4(self)
+
+    @property
+    def _cc3(self):
+        """Critical cell `CC3`."""
+        return find_cc3(self, self._cc2)
+
+    def _set_configs(self, **kwargs):
+        """Sets the configuration parameters based on the user input."""
+        for key, value in kwargs.items():
+            if key in self._configs:
+                self._configs[key] = value
+            else:
+                msg = 'Keyword "{}" does not exist.'.format(key)
+                log.critical(msg)
+                raise InputError(msg)
+        log.info('Configuration parameters are: {}'.format(self._configs))
 
     def _copy_footnotes(self, footnote):
         """

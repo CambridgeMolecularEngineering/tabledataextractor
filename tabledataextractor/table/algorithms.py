@@ -45,7 +45,10 @@ def empty_cells(array, regex=r'^([\s\-\–\"]+)?$'):
     empty = np.full_like(array, fill_value=False, dtype=bool)
     empty_parser = CellParser(regex)
     for empty_cell in empty_parser.parse(array, method='fullmatch'):
-        empty[empty_cell[0], empty_cell[1]] = True
+        if array.ndim == 2:
+            empty[empty_cell[0], empty_cell[1]] = True
+        elif array.ndim == 1:
+            empty[empty_cell[0]] = True
     return empty
 
 
@@ -122,7 +125,7 @@ def pre_clean(array):
 
 def clean_unicode(array):
     """
-    Replaces problematic unicode characters in a given numpy array
+    Replaces problematic unicode characters in a given numpy array.
     :param array: input array
     :type array: numpy.array
     :return: cleaned array
@@ -158,6 +161,38 @@ def find_cc4(table_object):
                 return row_index, n_columns - 1
 
 
+def duplicate_rows(table):
+    """
+    Returns True if there are duplicate rows in the table and False if there are no duplicate rows
+    :param table:
+    :return: True or False
+    """
+    if table.ndim > 0 and table.size:
+        _, indices = np.unique(table, axis=0, return_index=True)
+        if len(table) > len(indices):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def duplicate_columns(table):
+    """
+    Returns True if there are duplicate columns in the table and False if there are no duplicate columns
+    :param table:
+    :return: True or False
+    """
+    if table.T.ndim > 0 and table.T.size:
+        _, indices = np.unique(table.T, axis=0, return_index=True)
+        if len(table.T) > len(indices):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
 def find_cc1_cc2(table_object, cc4, array):
     """
     Main MIPS (*Minimum Indexing Point Search*) algorithm. According to Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
@@ -183,36 +218,6 @@ def find_cc1_cc2(table_object, cc4, array):
     r2 = r_max - 1
     c2 = 0
     max_area = 0
-
-    def duplicate_rows(table):
-        """
-        Returns True if there are duplicate rows in the table and False if there are no duplicate rows
-        :param table:
-        :return: True or False
-        """
-        if table.ndim > 0 and table.size:
-            _, indices = np.unique(table, axis=0, return_index=True)
-            if len(table) > len(indices):
-                return True
-            else:
-                return False
-        else:
-            return False
-
-    def duplicate_columns(table):
-        """
-        Returns True if there are duplicate columns in the table and False if there are no duplicate columns
-        :param table:
-        :return: True or False
-        """
-        if table.T.ndim > 0 and table.T.size:
-            _, indices = np.unique(table.T, axis=0, return_index=True)
-            if len(table.T) > len(indices):
-                return True
-            else:
-                return False
-        else:
-            return False
 
     def table_slice_cc2(table, r2, r_max, c1, c2):
         """
@@ -775,7 +780,7 @@ def duplicate_spanning_cells(table_object, array):
     return updated
 
 
-def header_extension(table_object, cc1):
+def header_extension_up(table_object, cc1):
     """
     Extends the header after main MIPS run.
 
@@ -829,10 +834,75 @@ def header_extension(table_object, cc1):
 
     # log
     if not cc1_new == cc1:
-        table_object.history._header_extended = True
-        log.info("METHOD. Header extended.")
+        table_object.history._header_extended_up = True
+        log.info("METHOD. Header extended upwards.")
 
     return cc1_new
+
+
+def header_extension_down(table_object, cc1, cc2, cc4):
+    """
+    Extends the header downwards, if no prefixing was done and if the appropriate stub header is empty.
+    For row-header expansion downwards, only the first cell of the stub header has to be empty.
+    For column-header expansion to the right, the whole stub header column above has to be empty.
+
+    :param table_object: Input Table object
+    :type table_object: ~tabledataextractor.table.table.Table
+    :param cc2: Critical cell `CC2`
+    :type cc2: (int, int)
+    :type cc2: Critical cell `CC1`
+    :type cc1: (int, int)
+    :return: New `cc2`
+    """
+    cc2_new = cc2
+    extended = False
+
+    # only do downwards header extension if no prefixing was done
+    if not table_object.history.prefixing_performed:
+
+        # extend column header downwards, changes cc2 row
+        # only the first cell of the stub header has to be empty to accept the move downwards
+        row_index = cc2[0]
+        while row_index <= cc4[0] and empty_string(table_object.pre_cleaned_table[row_index, cc1[1]]):
+            row_index += 1
+            cc2_new = (row_index - 1, cc2_new[1])
+            if cc2_new != cc2:
+                extended = True
+
+        # Check if row header can be shortened now, check duplicate rows accordingly, changes cc2 col
+        if extended:
+            cc2_new_col = cc2_new[1]
+            i = len(table_object.row_header.T)
+            while not duplicate_rows(table_object.row_header[:, :i]) and i > 1:
+                i -= 1
+                if not duplicate_rows(table_object.row_header[:, :i]):
+                    cc2_new_col -= 1
+            cc2_new = (cc2_new[0], cc2_new_col)
+            extended = False
+
+        # extend row header to the right, changes cc2 col
+        # this check is more rigorous than above, and all the cells in the stub header have to be empty
+        col_index = cc2_new[1]
+        while col_index <= cc4[1] and empty_cells(table_object.pre_cleaned_table[cc1[0]:cc2[0]+1, col_index]).all():
+            col_index += 1
+            if col_index - 1 != cc2_new[1]:
+                extended = True
+            cc2_new = (cc2_new[0], col_index - 1)
+
+        if extended:
+            # Check if column header can be shortened now, changes cc2 row
+            cc2_new_row = cc2_new[0]
+            i = len(table_object.col_header)
+            while not duplicate_columns(table_object.col_header[:i, :]) and i > 1:
+                i -= 1
+                if not duplicate_columns(table_object.col_header[:i, :]):
+                    cc2_new_row -= 1
+            cc2_new = (cc2_new_row, cc2_new[1])
+
+        if extended:
+            table_object.history._header_extended_down = True
+
+    return cc2_new
 
 
 def categorize_header(header):

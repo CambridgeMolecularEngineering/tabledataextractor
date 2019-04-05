@@ -24,7 +24,8 @@ class History:
         self._prefixed_rows = False
         self._footnotes_copied = False
         self._spanning_cells_extended = False
-        self._header_extended = False
+        self._header_extended_up = False
+        self._header_extended_down = False
         self._table_transposed = False
         log.info("History() object created.")
 
@@ -57,10 +58,16 @@ class History:
         return self._spanning_cells_extended
 
     @property
-    def header_extended(self):
-        """Indicates whether the header has been extended beyond the result obtained by the MIPS
+    def header_extended_up(self):
+        """Indicates whether the header has been extended upwards, beyond the result obtained by the MIPS
          (*Minimum Indexing Point Search*) algorithm."""
-        return self._header_extended
+        return self._header_extended_up
+
+    @property
+    def header_extended_down(self):
+        """Indicates whether the header has been extended downwards, beyond the result obtained by the MIPS
+        (*Minimum Indexing Point Search*) algorithm."""
+        return self._header_extended_down
 
     @property
     def table_transposed(self):
@@ -74,7 +81,8 @@ class History:
         out += "\n" + "prefixed_rows           = {}".format(self.prefixed_rows)
         out += "\n" + "footnotes_copied        = {}".format(self.footnotes_copied)
         out += "\n" + "spanning_cells_extended = {}".format(self.spanning_cells_extended)
-        out += "\n" + "header_extended         = {}".format(self.header_extended)
+        out += "\n" + "header_extended_up      = {}".format(self.header_extended_up)
+        out += "\n" + "header_extended_down    = {}".format(self.header_extended_down)
         out += "\n" + "table_transposed        = {}".format(self._table_transposed)
         return out
 

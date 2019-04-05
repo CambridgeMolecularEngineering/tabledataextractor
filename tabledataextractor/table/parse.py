@@ -42,16 +42,28 @@ class CellParser:
         result = None
         prog = re.compile(self.pattern)
 
-        for row_index, row in enumerate(table):
-            for column_index, cell in enumerate(row):
+        # check the dimensionality of the array
+        if table.ndim == 2:
+            for row_index, row in enumerate(table):
+                for column_index, cell in enumerate(row):
+                    if method == 'match':
+                        result = prog.match(cell)
+                    elif method == 'fullmatch':
+                        result = prog.fullmatch(cell)
+                    elif method == 'search':
+                        result = prog.search(cell)
+                    if result:
+                        yield row_index, column_index, result.groups()
+        elif table.ndim == 1:
+            for row_index, row in enumerate(table):
                 if method == 'match':
-                    result = prog.match(cell)
+                    result = prog.match(row)
                 elif method == 'fullmatch':
-                    result = prog.fullmatch(cell)
+                    result = prog.fullmatch(row)
                 elif method == 'search':
-                    result = prog.search(cell)
+                    result = prog.search(row)
                 if result:
-                    yield row_index, column_index, result.groups()
+                    yield row_index, result.groups()
 
     def cut(self, table, method='match'):
         """
