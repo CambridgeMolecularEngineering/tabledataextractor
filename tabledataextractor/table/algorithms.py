@@ -850,8 +850,10 @@ def header_extension_down(table_object, cc1, cc2, cc4):
     :type table_object: ~tabledataextractor.table.table.Table
     :param cc2: Critical cell `CC2`
     :type cc2: (int, int)
-    :type cc2: Critical cell `CC1`
+    :param cc1: Critical cell `CC1`
     :type cc1: (int, int)
+    :param cc4: Critical cell `CC4`
+    :type cc4: (int, int)
     :return: New `cc2`
     """
     cc2_new = cc2
