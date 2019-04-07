@@ -16,10 +16,10 @@ from tabledataextractor.table.parse import StringParser, CellParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
-def empty_string(string, regex=r'^([\s\-\–\"]+)?$'):
+def empty_string(string, regex=r'^([\s\-\–\—\"]+)?$'):
     """
     Returns `True` if a particular string is empty, which is defined with a regular expression.
 
@@ -33,7 +33,7 @@ def empty_string(string, regex=r'^([\s\-\–\"]+)?$'):
     return empty_parser.parse(string, method='fullmatch')
 
 
-def empty_cells(array, regex=r'^([\s\-\–\"]+)?$'):
+def empty_cells(array, regex=r'^([\s\-\–\—\"]+)?$'):
     """
     Returns a mask with `True` for all empty cells in the original array and `False` for non-empty cells.
 
@@ -532,7 +532,7 @@ def prefix_duplicate_labels(table_object, array):
         * yes --> do prefixing and go to 3, prefixing of only one row is possible; accept prefixing only if prefixed rows/cells are above the end of the header (not in the data region), the prefixed cells can still be above the header
         * no  --> go to 2, next row
     3. run MIPS to get the new header region
-    4. accept prefixing only if the prefixing has not made the header region start lower than before
+    4. accept prefixing only if the prefixing has not made the header region start lower than before and if it hasn't made the header region wider than before
 
     The algorithm has been modified from Embley et al., *DOI: 10.1007/s10032-016-0259-1*.
 
@@ -667,11 +667,16 @@ def prefix_duplicate_labels(table_object, array):
         # but it cannot start lower, because that would mean that we have removed some of the hierarchy and added
         # hierarchy from the left/above into a column/row
         if cc1_new[0] <= cc1[0] and cc1_new[1] <= cc1[1]:
-            table_object.history._prefixing_performed = True
-            log.info("METHOD. Prefixing was performed.")
-            if len(prefixed_table.T) > len(array.T):
-                table_object.history._prefixed_rows = True
-            return prefixed_table
+            # Another condition, the header has to end lower than before, not to include at east one
+            # lower row/column that was included before
+            if cc2_new[0] <= cc2[0] and cc2_new[1] <= cc2[1]:
+                table_object.history._prefixing_performed = True
+                log.info("METHOD. Prefixing was performed.")
+                if len(prefixed_table.T) > len(array.T):
+                    table_object.history._prefixed_rows = True
+                return prefixed_table
+            else:
+                return array
         else:
             return array
     else:
