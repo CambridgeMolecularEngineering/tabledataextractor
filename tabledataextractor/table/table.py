@@ -18,7 +18,7 @@ from tabledataextractor.exceptions import InputError, MIPSError
 from tabledataextractor.table.history import History
 from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4, prefix_duplicate_labels, \
     duplicate_spanning_cells, header_extension_up, find_title_row, find_note_cells, empty_cells, \
-    pre_clean, split_table, standardize_empty, header_extension_down, find_row_header_table
+    pre_clean, split_table, standardize_empty, header_extension_down, find_row_header_table, clean_row_header
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -66,20 +66,21 @@ class Table:
         log.info('Initialization of table: "{}"'.format(file_path))
         self._file_path = file_path
         self._table_number = table_number
-
-        # default configs
-        self._configs = {'use_title_row': True,
-                         'use_prefixing': True,
-                         'use_footnotes': True,
-                         'use_spanning_cells': True,
-                         'use_header_extension': True,
-                         'use_max_data_area': False,
-                         'standardize_empty_data': True,
-                         'row_header': None,
-                         'col_header': None}
-        self._set_configs(**kwargs)
+        self._configs = self._set_configs(**kwargs)
         self._history = History()
         self._analyze_table()
+
+    @property
+    def _default_configs(self):
+        return {'use_title_row': True,
+                'use_prefixing': True,
+                'use_footnotes': True,
+                'use_spanning_cells': True,
+                'use_header_extension': True,
+                'use_max_data_area': False,
+                'standardize_empty_data': True,
+                'row_header': None,
+                'col_header': None}
 
     def _analyze_table(self):
         """
@@ -335,17 +336,11 @@ class Table:
         stub header). The `row_categories` table can be used if the row categories want to be analyzed as `data`
         themselves, which can occur if the header regions of the original table intentionally have duplicate elements.
 
-        :type: ~tabledataextractor.table.table.Table
+        :type: ~tabledataextractor.table.table.TrivialTable
         """
-        # TODO Think of a better check to do here maybe?
         if len(self.stub_header.T) == len(self.category_table[0][1]):
             raw_table = find_row_header_table(self.category_table, self.stub_header)
-            try:
-                table = Table(raw_table, row_header=0, col_header=len(self.stub_header)-1)
-            except MIPSError as e:
-                log.exception("'Table.row_categories' MIPS failure {}".format(e.args))
-            else:
-                return table
+            return TrivialTable(raw_table, clean_row_header=True, row_header=0, col_header=len(self.stub_header)-1)
         else:
             return None
 
@@ -387,14 +382,16 @@ class Table:
 
     def _set_configs(self, **kwargs):
         """Sets the configuration parameters based on the user input."""
+        configs = self._default_configs
         for key, value in kwargs.items():
-            if key in self._configs:
-                self._configs[key] = value
+            if key in self._default_configs:
+                configs[key] = value
             else:
                 msg = 'Keyword "{}" does not exist.'.format(key)
                 log.critical(msg)
                 raise InputError(msg)
-        log.info('Configuration parameters are: {}'.format(self._configs))
+        log.info('Configuration parameters are: {}'.format(configs))
+        return configs
 
     def _copy_footnotes(self, footnote):
         """
@@ -451,3 +448,114 @@ class Table:
             np.concatenate((self._pre_cleaned_table, np.full((1, array_width), "", dtype='<U60'), self.labels)))
         t = list_as_PrettyTable(self.category_table)
         return intro + "\n\n" + input_string + results_string + str(t)
+
+
+class TrivialTable(Table):
+    """
+    Trivial Table object. No high level analysis will be performed. MIPS algorithm is never run.
+    """
+    def __init__(self, file_path, table_number=1, **kwargs):
+        super().__init__(file_path=file_path, table_number=table_number, **kwargs)
+
+    @property
+    def _default_configs(self):
+        return {'standardize_empty_data': False, 'clean_row_header': False, 'row_header': 0, 'col_header': 0}
+
+    def _analyze_table(self):
+        """
+        Performs the analysis of the input table and is run automatically on initialization of the table object.
+        """
+        # check if input array is empty
+        if empty_cells(self.raw_table).all():
+            msg = 'Input table is empty.'
+            log.critical(msg)
+            raise InputError(msg)
+
+        # define critical cells cc1 and cc2 (no MIPS algorithm is used in TrivialTable)
+        self._cc1, self._cc2 = (0, 0), (self.configs['col_header'], self.configs['row_header'])
+        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
+
+        self._pre_cleaned_table = self.raw_table
+        if self.configs['clean_row_header']:
+            self._pre_cleaned_table = clean_row_header(self.pre_cleaned_table, self._cc2)
+
+    @property
+    def _cc4(self):
+        """Critical cell `CC4`."""
+        return len(self.pre_cleaned_table)-1, len(self.pre_cleaned_table.T)-1
+
+    @property
+    def _cc3(self):
+        """Critical cell `CC3`."""
+        if len(self.pre_cleaned_table.T) == 1:
+            return self._cc2[0]+1, self._cc2[1]
+        elif len(self.pre_cleaned_table) == 1:
+            return self._cc2[0], self._cc2[1]+1
+        else:
+            return self._cc2[0]+1, self._cc2[1]+1
+
+    @property
+    def labels(self):
+        """
+        Cell labels.
+
+        :type: numpy.array
+        """
+        temp = np.empty_like(self._pre_cleaned_table, dtype="<U60")
+        temp[:, :] = '/'
+        temp[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'StubHeader'
+        temp[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1] = 'RowHeader'
+        temp[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'ColHeader'
+        temp[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1] = 'Data'
+        return temp
+
+    @property
+    def col_header(self):
+        """
+        Column header of the table.
+
+        :type: numpy.ndarray
+        """
+        if self._critical_cells and self._cc3[0] > self._cc2[0]:
+            return self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1]
+        elif self._critical_cells:
+            return np.full_like(self.pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1],
+                                fill_value='', dtype='<U60')
+        else:
+            return None
+
+    @property
+    def row_header(self):
+        """
+        Row header of the table. Enables a one-column table.
+
+        :type: numpy.ndarray
+        """
+        if self._critical_cells and self._cc3[1] > self._cc2[1]:
+            return self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1]
+        elif self._critical_cells:
+            return np.full_like(self.pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1],
+                                fill_value='', dtype='<U60')
+        else:
+            return None
+
+    @property
+    def _critical_cells(self):
+        """Indicates if all the critical cells have been found."""
+        if self._cc1 and self._cc2 and self._cc3 and self._cc4:
+            return True
+        else:
+            return False
+
+    @property
+    def footnotes(self):
+        """None"""
+        return None
+
+    @property
+    def title_row(self):
+        """None"""
+        return None
+
+
+
