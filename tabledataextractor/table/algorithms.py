@@ -441,6 +441,16 @@ def find_cc1_cc2(table_object, cc4, array):
         cc1 = (cc1[0], left)
         cc2 = (cc2[0], row_header)
 
+    # provision for using only the first row of the table as column header
+    if table_object.configs['col_header'] is not None:
+        col_header = table_object.configs['col_header']
+        assert  isinstance(col_header, int)
+        if table_object.history.prefixing_performed and not table_object.history.prefixed_rows:
+            col_header += 1
+        top = min(cc1[0], col_header)
+        cc1 = (top, cc1[1])
+        cc2 = (col_header, cc2[1])
+
     return cc1, cc2
 
 

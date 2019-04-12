@@ -51,6 +51,9 @@ class Table:
         * ``row_header = None``
             If an integer is given, it indicates the index of `row_header` columns. This overwrites the MIPS algorithm.
             For example, ``row_header = 0`` will make only the first column a row header.
+        * ``col_header = None``
+            If an integer is given, it indicates the index of `col_header` rows. This overwrites the MIPS algorithm.
+            For example, ``col_header = 0`` will make only the first row a column header.
 
     :param file_path: Path to .html or .cvs file, URL or list object that is used as input
     :type file_path: str | list
@@ -72,7 +75,8 @@ class Table:
                          'use_header_extension': True,
                          'use_max_data_area': False,
                          'standardize_empty_data': True,
-                         'row_header': None}
+                         'row_header': None,
+                         'col_header': None}
         self._set_configs(**kwargs)
         self._history = History()
         self._analyze_table()
@@ -251,7 +255,7 @@ class Table:
         """
         Column header of the table.
 
-        :type: list
+        :type: numpy.ndarray
         """
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
             return self._pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc3[1]:self._cc4[1] + 1]
@@ -264,7 +268,7 @@ class Table:
         """
         Row header of the table.
 
-        :type: list
+        :type: numpy.ndarray
         """
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
             return self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc1[1]:self._cc2[1] + 1]
@@ -277,7 +281,7 @@ class Table:
         """
         Stub header of the table.
 
-        :type: list
+        :type: numpy.ndarray
         """
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
             return self._pre_cleaned_table[self._cc1[0]:self._cc2[0] + 1, self._cc1[1]:self._cc2[1] + 1]
@@ -290,7 +294,7 @@ class Table:
         """
         Data region of the table.
 
-        :type: list
+        :type: numpy.ndarray
         """
         if self._cc1 and self._cc2 and self._cc3 and self._cc4:
             data_region = self._pre_cleaned_table[self._cc3[0]:self._cc4[0] + 1, self._cc3[1]:self._cc4[1] + 1]
