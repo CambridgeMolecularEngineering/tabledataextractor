@@ -1016,3 +1016,30 @@ def split_table(table_object):
             yield table_object._pre_cleaned_table[row_index + 1:row_index + i * row_index + 2, :].tolist()
             i += 1
 
+
+def find_row_header_table(category_table, stub_header):
+    """
+    Constructs a Table from the row categories of the original table.
+
+    :param category_table: ~tabledataextractor.table.table.Table.category_table
+    :type category_table: list
+    :param stub_header: ~tabledataextractor.table.table.Table.stub_header
+    :type stub_header: numpy.ndarray
+    :return: ~tabledataextractor.table.table.Table
+    """
+    stub_header = stub_header.tolist()
+    raw_table = list()
+    for line in stub_header:
+        new_line = list()
+        for item in line:
+            new_line.append(item)
+        raw_table.append(new_line)
+    for line in category_table:
+        new_line = list()
+        for item in line[1]:
+            new_line.append(item)
+        raw_table.append(new_line)
+    return raw_table
+
+
+

@@ -18,7 +18,7 @@ from tabledataextractor.exceptions import InputError, MIPSError
 from tabledataextractor.table.history import History
 from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4, prefix_duplicate_labels, \
     duplicate_spanning_cells, header_extension_up, find_title_row, find_note_cells, empty_cells, \
-    pre_clean, split_table, standardize_empty, header_extension_down
+    pre_clean, split_table, standardize_empty, header_extension_down, find_row_header_table
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
@@ -326,6 +326,28 @@ class Table:
                         log.exception("Subtable MIPS failure {}".format(e.args))
                         break
         return tables
+
+    @property
+    def row_categories(self):
+        """
+        Table where the stub header is the first row(s) and all subsequent rows are the row categories of the
+        original table. The assumption is made that the stub header labels row categories (that is, cells below the
+        stub header). The `row_categories` table can be used if the row categories want to be analyzed as `data`
+        themselves, which can occur if the header regions of the original table intentionally have duplicate elements.
+
+        :type: ~tabledataextractor.table.table.Table
+        """
+        # TODO Think of a better check to do here maybe?
+        if len(self.stub_header.T) == len(self.category_table[0][1]):
+            raw_table = find_row_header_table(self.category_table, self.stub_header)
+            try:
+                table = Table(raw_table, row_header=0, col_header=len(self.stub_header)-1)
+            except MIPSError as e:
+                log.exception("'Table.row_categories' MIPS failure {}".format(e.args))
+            else:
+                return table
+        else:
+            return None
 
     def contains(self, pattern):
         """
