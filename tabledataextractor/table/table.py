@@ -331,14 +331,14 @@ class Table:
     @property
     def row_categories(self):
         """
-        Table where the stub header is the first row(s) and all subsequent rows are the row categories of the
+        Table where the original stub header is the first row(s) and all subsequent rows are the row categories of the
         original table. The assumption is made that the stub header labels row categories (that is, cells below the
         stub header). The `row_categories` table can be used if the row categories want to be analyzed as `data`
         themselves, which can occur if the header regions of the original table intentionally have duplicate elements.
 
         :type: ~tabledataextractor.table.table.TrivialTable
         """
-        if len(self.stub_header.T) == len(self.category_table[0][1]):
+        if len(self.stub_header.T) != 0 and len(self.stub_header.T) == len(self.category_table[0][1]):
             raw_table = find_row_header_table(self.category_table, self.stub_header)
             return TrivialTable(raw_table, clean_row_header=True, row_header=0, col_header=len(self.stub_header)-1)
         else:
