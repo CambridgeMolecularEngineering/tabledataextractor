@@ -559,5 +559,10 @@ class TrivialTable(Table):
         """None"""
         return None
 
+    @property
+    def subtables(self):
+        """None"""
+        return None
+
 
 
