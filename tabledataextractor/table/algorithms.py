@@ -441,6 +441,16 @@ def find_cc1_cc2(table_object, cc4, array):
         cc1 = (cc1[0], left)
         cc2 = (cc2[0], row_header)
 
+    # provision for using only the first row of the table as column header
+    if table_object.configs['col_header'] is not None:
+        col_header = table_object.configs['col_header']
+        assert isinstance(col_header, int)
+        if table_object.history.prefixing_performed and not table_object.history.prefixed_rows:
+            col_header += 1
+        top = min(cc1[0], col_header)
+        cc1 = (top, cc1[1])
+        cc2 = (col_header, cc2[1])
+
     return cc1, cc2
 
 
@@ -1006,3 +1016,47 @@ def split_table(table_object):
             yield table_object._pre_cleaned_table[row_index + 1:row_index + i * row_index + 2, :].tolist()
             i += 1
 
+
+def find_row_header_table(category_table, stub_header):
+    """
+    Constructs a Table from the row categories of the original table.
+
+    :param category_table: ~tabledataextractor.table.table.Table.category_table
+    :type category_table: list
+    :param stub_header: ~tabledataextractor.table.table.Table.stub_header
+    :type stub_header: numpy.ndarray
+    :return: ~tabledataextractor.table.table.Table
+    """
+    stub_header = stub_header.tolist()
+    raw_table = list()
+    for line in stub_header:
+        new_line = list()
+        for item in line:
+            new_line.append(item)
+        raw_table.append(new_line)
+    for line in category_table:
+        new_line = list()
+        for item in line[1]:
+            new_line.append(item)
+        raw_table.append(new_line)
+    return raw_table
+
+
+def clean_row_header(pre_cleaned_table, cc2):
+    """
+    Cleans the row header by removing duplicate rows that span the whole table.
+    """
+    unmodified_part = pre_cleaned_table[:cc2[0]+1, :]
+    modified_part = pre_cleaned_table[cc2[0]+1:, :]
+
+    # delete duplicate rows that extend over the whole table
+    _, indices = np.unique(modified_part, axis=0, return_index=True)
+    # for logging only, which rows have been removed
+    removed_rows = []
+    for row_index in range(0, len(modified_part)):
+        if row_index not in indices:
+            removed_rows.append(row_index)
+    # deletion
+    modified_part = modified_part[np.sort(indices)]
+
+    return np.vstack((unmodified_part, modified_part))
