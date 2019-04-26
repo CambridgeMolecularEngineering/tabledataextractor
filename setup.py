@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='TableDataExtractor',
-      version='1.5.4',
+      version='1.5.5',
       url='https://www.tabledataextractor.com',
       license='Creative Commons Attribution 4.0 International Public License',
       author='Juraj Mavračić',
@@ -26,6 +26,7 @@ setup(name='TableDataExtractor',
             'sympy',
             'beautifulsoup4==4.6.3',
             'requests==2.21.0',
+            'urllib3==1.24',
             'selenium==3.141.0',
             'prettytable==0.7.2',
             'pandas==0.23.4'])
