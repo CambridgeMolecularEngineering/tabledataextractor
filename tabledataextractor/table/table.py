@@ -455,6 +455,20 @@ class Table:
 class TrivialTable(Table):
     """
     Trivial Table object. No high level analysis will be performed. MIPS algorithm is never run.
+    This table doesn't have footnotes, a title row or subtables.
+
+    Optional configuration keywords (defaults):
+
+        * ``standardize_empty_data = False``
+            Will standardize empty cells in the `data` region to 'NoValue'.
+        * ``clean_row_header = False``
+            Removes duplicate rows that span the whole table (all columns).
+        * ``row_header = 0``
+            The column up to which the row header is defined.
+        * ``col_header = 0``
+            The row up to which the column header is defined.
+
+
     """
     def __init__(self, file_path, table_number=1, **kwargs):
         super().__init__(file_path=file_path, table_number=table_number, **kwargs)
