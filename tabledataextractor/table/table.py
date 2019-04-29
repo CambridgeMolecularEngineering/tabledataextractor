@@ -126,6 +126,12 @@ class Table:
             self._cc2 = header_extension_down(self, self._cc1, self._cc2, self._cc4)
             log.info("Header extension, new cc1 = {}, new cc2 = {}".format(self._cc1, self._cc2))
 
+        # check if critical cell `CC3` can be found
+        try:
+            _ = self._cc3
+        except MIPSError:
+            raise
+
     @property
     def footnotes(self):
         """
