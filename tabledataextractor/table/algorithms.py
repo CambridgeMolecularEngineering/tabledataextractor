@@ -1025,7 +1025,7 @@ def find_row_header_table(category_table, stub_header):
     :type category_table: list
     :param stub_header: ~tabledataextractor.table.table.Table.stub_header
     :type stub_header: numpy.ndarray
-    :return: ~tabledataextractor.table.table.Table
+    :return: list
     """
     stub_header = stub_header.tolist()
     raw_table = list()
