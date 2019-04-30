@@ -14,7 +14,7 @@ from tabledataextractor.output.print import as_string, print_table, list_as_Pret
 from tabledataextractor.output.to_csv import write_to_csv
 from tabledataextractor.output.to_pandas import to_pandas, build_category_table
 from tabledataextractor.table.parse import StringParser
-from tabledataextractor.exceptions import InputError, MIPSError
+from tabledataextractor.exceptions import InputError, MIPSError, TDEError
 from tabledataextractor.table.history import History
 from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4, prefix_duplicate_labels, \
     duplicate_spanning_cells, header_extension_up, find_title_row, find_note_cells, empty_cells, \
@@ -125,6 +125,12 @@ class Table:
             self._cc1 = header_extension_up(self, self._cc1)
             self._cc2 = header_extension_down(self, self._cc1, self._cc2, self._cc4)
             log.info("Header extension, new cc1 = {}, new cc2 = {}".format(self._cc1, self._cc2))
+
+        # check if critical cell `CC3` can be found
+        try:
+            _ = self._cc3
+        except MIPSError:
+            raise
 
     @property
     def footnotes(self):
@@ -340,7 +346,11 @@ class Table:
         """
         if len(self.stub_header.T) != 0 and len(self.stub_header.T) == len(self.category_table[0][1]):
             raw_table = find_row_header_table(self.category_table, self.stub_header)
-            table = TrivialTable(raw_table, clean_row_header=True, row_header=0, col_header=len(self.stub_header)-1)
+            try:
+                table = TrivialTable(raw_table, clean_row_header=True, row_header=0,
+                                     col_header=len(self.stub_header) - 1)
+            except TDEError as e:
+                return None
             if not empty_cells(table.data).any():
                 return table
         else:
