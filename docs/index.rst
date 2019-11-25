@@ -18,9 +18,9 @@ Welcome to TableDataExtractor!
    :target: https://readthedocs.com/projects/cambridgemolecularengineering-tabledataextractor/badge/?version=latest
    :alt: docs status
 
-.. image:: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
-   :target: https://creativecommons.org/licenses/by/4.0/
-   :alt: CC BY 4.0 (Creative Commons Attribution 4.0 International)
+.. image:: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+   :target: https://creativecommons.org/licenses/by-nc-sa/4.0/
+   :alt: CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)
 
 
 Input a table as unstructured **.csv** file, **python list**, **.html** file, or **url** and output a standardized table where each row corresponds to a single data entry in the original table.

@@ -7,5 +7,5 @@ https://cambridgemolecularengineering-tabledataextractor.readthedocs-hosted.com/
 ## License
 Copyright 2019 Juraj Mavračić and contributors
 
-TableDataExtractor is licensed under the *Creative Commons Attribution 4.0 International Public License*, https://creativecommons.org/licenses/by/4.0/
+TableDataExtractor is licensed under the *Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License*, https://creativecommons.org/licenses/by-nc-sa/4.0/
 
