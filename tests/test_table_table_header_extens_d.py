@@ -19,7 +19,7 @@ class TestHeaderExtDown(unittest.TestCase):
     def test_rows_extension(self):
         table = Table('./tests/data/te_03.csv')
         table.print()
-        category_table = [['"4.64"', ['"This study"'], ['"Test2"', '"A"']], ['"2.99"', ['"This study"'], ['"Test3"', '"B"']], ['"0.305"', ['"This study"'], ['"Test4"', '"C"']], ['"3.83"', ['"This study"'], ['"Test5"', '"D"']], ['"9.62"', ['"This study"'], ['"Test6"', '"E"']], ['"0.208"', ['"This study"'], ['"Test7"', '"F"']]]
+        category_table = [['4.64', ['This study'], ['Test2', 'A']], ['2.99', ['This study'], ['Test3', 'B']], ['0.305', ['This study'], ['Test4', 'C']], ['3.83', ['This study'], ['Test5', 'D']], ['9.62', ['This study'], ['Test6', 'E']], ['0.208', ['This study'], ['Test7', 'F']]]
         labels = [['TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle', 'TableTitle'], ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
         self.assertListEqual(category_table, table.category_table)
         self.assertListEqual(labels, table.labels.tolist())
@@ -37,7 +37,7 @@ class TestHeaderExtDown(unittest.TestCase):
         table = Table('./tests/data/te_03.csv')
         table.transpose()
         table.print()
-        category_table = [['"4.64"', ['"Test"', '"Test2"', '"A"'], ['"This study"']], ['"2.99"', ['"Test"', '"Test3"', '"B"'], ['"This study"']], ['"0.305"', ['"Test"', '"Test4"', '"C"'], ['"This study"']], ['"3.83"', ['"Test"', '"Test5"', '"D"'], ['"This study"']], ['"9.62"', ['"Test"', '"Test6"', '"E"'], ['"This study"']], ['"0.208"', ['"Test"', '"Test7"', '"F"'], ['"This study"']]]
+        category_table = [['4.64', ['Test', 'Test2', 'A'], ['This study']], ['2.99', ['Test', 'Test3', 'B'], ['This study']], ['0.305', ['Test', 'Test4', 'C'], ['This study']], ['3.83', ['Test', 'Test5', 'D'], ['This study']], ['9.62', ['Test', 'Test6', 'E'], ['This study']], ['0.208', ['Test', 'Test7', 'F'], ['This study']]]
         labels = [['StubHeader', 'StubHeader', 'StubHeader', 'ColHeader'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data'], ['RowHeader', 'RowHeader', 'RowHeader', 'Data']]
         self.assertListEqual(category_table, table.category_table)
         self.assertListEqual(labels, table.labels.tolist())

@@ -15,6 +15,7 @@ from tabledataextractor.input import from_csv
 from tabledataextractor.output.print import print_table
 from tabledataextractor.table.algorithms import find_cc4, find_cc1_cc2
 import numpy as np
+import os
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -359,8 +360,8 @@ class TestCategorizationTable(unittest.TestCase):
         self.assertListEqual(expected, result)
 
     def test_table_1(self):
-        input_path = './tests/data/table_example1.csv'
-        expected = [['4.64', ['This study'], ['Rutile', 'a = b (A)']], ['2.99', ['This study'], ['Rutile', 'c (A)']], ['0.305', ['This study'], ['Rutile', 'u']], ['3.83', ['This study'], ['Anatase', 'a = b (A)']], ['9.62', ['This study'], ['Anatase', 'c (A)']], ['0.208', ['This study'], ['Anatase', 'u']], ['4.67', ['GGA [25]'], ['Rutile', 'a = b (A)']], ['2.97', ['GGA [25]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [25]'], ['Rutile', 'u']], ['3.80', ['GGA [25]'], ['Anatase', 'a = b (A)']], ['9.67', ['GGA [25]'], ['Anatase', 'c (A)']], ['0.207', ['GGA [25]'], ['Anatase', 'u']], ['4.63', ['GGA [26]'], ['Rutile', 'a = b (A)']], ['2.98', ['GGA [26]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [26]'], ['Rutile', 'u']], ['""', ['GGA [26]'], ['Anatase', 'a = b (A)']], ['""', ['GGA [26]'], ['Anatase', 'c (A)']], ['""', ['GGA [26]'], ['Anatase', 'u']], ['""', ['HF [27]'], ['Rutile', 'a = b (A)']], ['""', ['HF [27]'], ['Rutile', 'c (A)']], ['""', ['HF [27]'], ['Rutile', 'u']], ['3.76', ['HF [27]'], ['Anatase', 'a = b (A)']], ['9.85', ['HF [27]'], ['Anatase', 'c (A)']], ['0.202', ['HF [27]'], ['Anatase', 'u']], ['4.594', ['Expt. [23]'], ['Rutile', 'a = b (A)']], ['2.958', ['Expt. [23]'], ['Rutile', 'c (A)']], ['0.305', ['Expt. [23]'], ['Rutile', 'u']], ['3.785', ['Expt. [23]'], ['Anatase', 'a = b (A)']], ['9.514', ['Expt. [23]'], ['Anatase', 'c (A)']], ['0.207', ['Expt. [23]'], ['Anatase', 'u']]]
+        input_path = os.path.join(os.path.dirname(__file__), 'data', 'table_example1.csv')
+        expected = [['4.64', ['This study'], ['Rutile', 'a = b (A)']], ['2.99', ['This study'], ['Rutile', 'c (A)']], ['0.305', ['This study'], ['Rutile', 'u']], ['3.83', ['This study'], ['Anatase', 'a = b (A)']], ['9.62', ['This study'], ['Anatase', 'c (A)']], ['0.208', ['This study'], ['Anatase', 'u']], ['4.67', ['GGA [25]'], ['Rutile', 'a = b (A)']], ['2.97', ['GGA [25]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [25]'], ['Rutile', 'u']], ['3.80', ['GGA [25]'], ['Anatase', 'a = b (A)']], ['9.67', ['GGA [25]'], ['Anatase', 'c (A)']], ['0.207', ['GGA [25]'], ['Anatase', 'u']], ['4.63', ['GGA [26]'], ['Rutile', 'a = b (A)']], ['2.98', ['GGA [26]'], ['Rutile', 'c (A)']], ['0.305', ['GGA [26]'], ['Rutile', 'u']], ['', ['GGA [26]'], ['Anatase', 'a = b (A)']], ['', ['GGA [26]'], ['Anatase', 'c (A)']], ['', ['GGA [26]'], ['Anatase', 'u']], ['', ['HF [27]'], ['Rutile', 'a = b (A)']], ['', ['HF [27]'], ['Rutile', 'c (A)']], ['', ['HF [27]'], ['Rutile', 'u']], ['3.76', ['HF [27]'], ['Anatase', 'a = b (A)']], ['9.85', ['HF [27]'], ['Anatase', 'c (A)']], ['0.202', ['HF [27]'], ['Anatase', 'u']], ['4.594', ['Expt. [23]'], ['Rutile', 'a = b (A)']], ['2.958', ['Expt. [23]'], ['Rutile', 'c (A)']], ['0.305', ['Expt. [23]'], ['Rutile', 'u']], ['3.785', ['Expt. [23]'], ['Anatase', 'a = b (A)']], ['9.514', ['Expt. [23]'], ['Anatase', 'c (A)']], ['0.207', ['Expt. [23]'], ['Anatase', 'u']]]
         self.do_table(input_path, expected)
 
     def test_table_2(self):
@@ -458,8 +459,8 @@ class TestSingleRowColumnTable(unittest.TestCase):
                       ['RowHeader', 'Data'],
                       ['RowHeader', 'Data'],
                       ['RowHeader', 'Data']]
-        expected_cat = [['"4.64"', ['"This study"'], ['"A"']], ['"2.99"', ['"This study"'], ['"B"']], ['"0.305"', ['"This study"'], ['"C"']], ['"3.83"', ['"This study"'], ['"D"']], ['"9.62"', ['"This study"'], ['"E"']], ['"0.208"', ['"This study"'], ['"F"']]]
-        expected_cat_t = [['"4.64"', ['"A"'], ['"This study"']], ['"2.99"', ['"B"'], ['"This study"']], ['"0.305"', ['"C"'], ['"This study"']], ['"3.83"', ['"D"'], ['"This study"']], ['"9.62"', ['"E"'], ['"This study"']], ['"0.208"', ['"F"'], ['"This study"']]]
+        expected_cat = [['4.64', ['This study'], ['A']], ['2.99', ['This study'], ['B']], ['0.305', ['This study'], ['C']], ['3.83', ['This study'], ['D']], ['9.62', ['This study'], ['E']], ['0.208', ['This study'], ['F']]]
+        expected_cat_t = [['4.64', ['A'], ['This study']], ['2.99', ['B'], ['This study']], ['0.305', ['C'], ['This study']], ['3.83', ['D'], ['This study']], ['9.62', ['E'], ['This study']], ['0.208', ['F'], ['This study']]]
         self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
 
     def test_table_2(self):
@@ -473,8 +474,8 @@ class TestSingleRowColumnTable(unittest.TestCase):
                     ['RowHeader', 'Data']]
         expected_t = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'],
                       ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
-        expected_cat = [['"4.64"', ['"A"'], ['"This study"']], ['"2.99"', ['"B"'], ['"This study"']], ['"0.305"', ['"C"'], ['"This study"']], ['"3.83"', ['"D"'], ['"This study"']], ['"9.62"', ['"E"'], ['"This study"']], ['"0.208"', ['"F"'], ['"This study"']]]
-        expected_cat_t = [['"4.64"', ['"This study"'], ['"A"']], ['"2.99"', ['"This study"'], ['"B"']], ['"0.305"', ['"This study"'], ['"C"']], ['"3.83"', ['"This study"'], ['"D"']], ['"9.62"', ['"This study"'], ['"E"']], ['"0.208"', ['"This study"'], ['"F"']]]
+        expected_cat = [['4.64', ['A'], ['This study']], ['2.99', ['B'], ['This study']], ['0.305', ['C'], ['This study']], ['3.83', ['D'], ['This study']], ['9.62', ['E'], ['This study']], ['0.208', ['F'], ['This study']]]
+        expected_cat_t = [['4.64', ['This study'], ['A']], ['2.99', ['This study'], ['B']], ['0.305', ['This study'], ['C']], ['3.83', ['This study'], ['D']], ['9.62', ['This study'], ['E']], ['0.208', ['This study'], ['F']]]
         self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
 
     def test_table_3(self):
@@ -490,8 +491,8 @@ class TestSingleRowColumnTable(unittest.TestCase):
                       ['Note', 'RowHeader', 'Data', 'Data'],
                       ['Note', 'RowHeader', 'Data', 'Data'],
                       ['Note', 'RowHeader', 'Data', 'Data']]
-        expected_cat = [['"B"', ['"A"'], ['"Test3"']], ['"C"', ['"A"'], ['"Test4"']], ['"D"', ['"A"'], ['"Test5"']], ['"E"', ['"A"'], ['"Test6"']], ['"F"', ['"A"'], ['"Test7"']], ['"2.99"', ['"4.64"'], ['"Test3"']], ['"0.305"', ['"4.64"'], ['"Test4"']], ['"3.83"', ['"4.64"'], ['"Test5"']], ['"9.62"', ['"4.64"'], ['"Test6"']], ['"0.208"', ['"4.64"'], ['"Test7"']]]
-        expected_cat_t = [['"A"', ['"Test2"'], ['""']], ['"4.64"', ['"Test2"'], ['"This study"']], ['"B"', ['"Test3"'], ['""']], ['"2.99"', ['"Test3"'], ['"This study"']], ['"C"', ['"Test4"'], ['""']], ['"0.305"', ['"Test4"'], ['"This study"']], ['"D"', ['"Test5"'], ['""']], ['"3.83"', ['"Test5"'], ['"This study"']], ['"E"', ['"Test6"'], ['""']], ['"9.62"', ['"Test6"'], ['"This study"']], ['"F"', ['"Test7"'], ['""']], ['"0.208"', ['"Test7"'], ['"This study"']]]
+        expected_cat = [['B', ['A'], ['Test3']], ['C', ['A'], ['Test4']], ['D', ['A'], ['Test5']], ['E', ['A'], ['Test6']], ['F', ['A'], ['Test7']], ['2.99', ['4.64'], ['Test3']], ['0.305', ['4.64'], ['Test4']], ['3.83', ['4.64'], ['Test5']], ['9.62', ['4.64'], ['Test6']], ['0.208', ['4.64'], ['Test7']]]
+        expected_cat_t = [['A', ['Test2'], ['']], ['4.64', ['Test2'], ['This study']], ['B', ['Test3'], ['']], ['2.99', ['Test3'], ['This study']], ['C', ['Test4'], ['']], ['0.305', ['Test4'], ['This study']], ['D', ['Test5'], ['']], ['3.83', ['Test5'], ['This study']], ['E', ['Test6'], ['']], ['9.62', ['Test6'], ['This study']], ['F', ['Test7'], ['']], ['0.208', ['Test7'], ['This study']]]
         self.do_table(input_path, expected, expected_t, expected_cat, expected_cat_t)
 
 

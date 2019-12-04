@@ -186,13 +186,13 @@ class TestTDE(unittest.TestCase):
     def test_11(self):
         input_path = './tests/data/te_01.csv'
         expected_labels = [['StubHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader', 'ColHeader'], ['RowHeader', 'Data', 'Data', 'Data', 'Data', 'Data', 'Data']]
-        expected_category_table = [['"4.64"', ['"This study"'], ['"A"']], ['"2.99"', ['"This study"'], ['"B"']], ['"0.305"', ['"This study"'], ['"C"']], ['"3.83"', ['"This study"'], ['"D"']], ['"9.62"', ['"This study"'], ['"E"']], ['"0.208"', ['"This study"'], ['"F"']]]
+        expected_category_table = [['4.64', ['This study'], ['A']], ['2.99', ['This study'], ['B']], ['0.305', ['This study'], ['C']], ['3.83', ['This study'], ['D']], ['9.62', ['This study'], ['E']], ['0.208', ['This study'], ['F']]]
         self.do_table(input_path, expected_labels, expected_category_table)
 
     def test_12(self):
         input_path = './tests/data/te_02.csv'
         expected_labels = [['StubHeader', 'ColHeader'], ['RowHeader', 'Data'], ['RowHeader', 'Data'], ['RowHeader', 'Data'], ['RowHeader', 'Data'], ['RowHeader', 'Data'], ['RowHeader', 'Data']]
-        expected_category_table = [['"4.64"', ['"A"'], ['"This study"']], ['"2.99"', ['"B"'], ['"This study"']], ['"0.305"', ['"C"'], ['"This study"']], ['"3.83"', ['"D"'], ['"This study"']], ['"9.62"', ['"E"'], ['"This study"']], ['"0.208"', ['"F"'], ['"This study"']]]
+        expected_category_table = [['4.64', ['A'], ['This study']], ['2.99', ['B'], ['This study']], ['0.305', ['C'], ['This study']], ['3.83', ['D'], ['This study']], ['9.62', ['E'], ['This study']], ['0.208', ['F'], ['This study']]]
         self.do_table(input_path, expected_labels, expected_category_table)
 
     def test_13(self):
