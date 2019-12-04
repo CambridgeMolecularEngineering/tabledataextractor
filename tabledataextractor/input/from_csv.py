@@ -18,7 +18,7 @@ def read(file_path):
     :return: numpy.ndarray
     """
 
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         array = list(csv.reader(f))
         array = np.asarray(array, dtype='<U60')
     return array

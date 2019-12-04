@@ -21,5 +21,5 @@ def write_to_csv(table, file_path):
     """
     if os.path.exists(file_path):
         log.info("File: {} overwritten.".format(file_path))
-    with open(file_path, 'w') as f:
-        csv.writer(f).writerows(table)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        csv.writer(f).writerows(table.raw_table)
