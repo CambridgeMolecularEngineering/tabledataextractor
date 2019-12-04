@@ -4,7 +4,7 @@ Outputs the table to cvs.
 """
 
 import logging
-import numpy as np
+import csv
 import os
 
 log = logging.getLogger(__name__)
@@ -21,4 +21,5 @@ def write_to_csv(table, file_path):
     """
     if os.path.exists(file_path):
         log.info("File: {} overwritten.".format(file_path))
-    np.savetxt(file_path,table,delimiter=',',fmt='%-s', newline='\n', header='', footer='', comments='# ')
+    with open(file_path, 'w') as f:
+        csv.writer(f).writerows(table)

@@ -5,6 +5,7 @@ Reads a `csv` formatted table from file. The file has to be 'utf-8' encoded.
 
 import numpy as np
 import logging
+import csv
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
@@ -16,6 +17,9 @@ def read(file_path):
     :type file_path: str
     :return: numpy.ndarray
     """
-    array = np.genfromtxt(file_path, delimiter=',', dtype='<U60', invalid_raise=False, encoding='utf-8')
+
+    with open(file_path, 'r') as f:
+        array = list(csv.reader(f))
+        array = np.asarray(array, dtype='<U60')
     return array
 
