@@ -60,3 +60,18 @@ class TestInputCsv(unittest.TestCase):
 
         row_3_cell_2 = table.raw_table[3][2]
         self.assertEqual(row_3_cell_2, "13'.8")
+
+    def test_input_with_blank_lines(self):
+        path = os.path.join(os.path.dirname(__file__), 'data', 'table_empty_lines.csv')
+        table = Table(path)
+
+        # Normal table
+        table.print()
+        row_0_cell_6 = table.raw_table[0][6]
+        self.assertEqual(row_0_cell_6, 'PCE (η, %)')
+
+        row_1_cell_0 = table.raw_table[1][0]
+        self.assertEqual(row_1_cell_0, '2H–MoS2 (hydrothermal, 200 °C)')
+
+        row_2_cell_0 = table.raw_table[2][0]
+        self.assertEqual(row_2_cell_0, '1T–MoS2 (hydrothermal, 180 °C)')

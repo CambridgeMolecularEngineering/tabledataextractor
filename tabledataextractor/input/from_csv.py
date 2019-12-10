@@ -19,7 +19,7 @@ def read(file_path):
     """
 
     with open(file_path, 'r', encoding='utf-8') as f:
-        array = list(csv.reader(f))
+        array = [elem for elem in list(csv.reader(f)) if elem]
         array = np.asarray(array, dtype='<U60')
     return array
 
