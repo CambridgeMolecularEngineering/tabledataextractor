@@ -344,16 +344,20 @@ class Table:
 
         :type: ~tabledataextractor.table.table.TrivialTable
         """
-        if len(self.stub_header.T) != 0 and len(self.stub_header.T) == len(self.category_table[0][1]):
-            raw_table = find_row_header_table(self.category_table, self.stub_header)
-            try:
-                table = TrivialTable(raw_table, clean_row_header=True, row_header=0,
-                                     col_header=len(self.stub_header) - 1)
-            except TDEError as e:
+        # this outer try statement is necessary to catch some weird errors with empty category tables
+        try:
+            if len(self.stub_header.T) != 0 and len(self.stub_header.T) == len(self.category_table[0][1]):
+                raw_table = find_row_header_table(self.category_table, self.stub_header)
+                try:
+                    table = TrivialTable(raw_table, clean_row_header=True, row_header=0,
+                                         col_header=len(self.stub_header) - 1)
+                except TDEError as e:
+                    return None
+                if not empty_cells(table.data).any():
+                    return table
+            else:
                 return None
-            if not empty_cells(table.data).any():
-                return table
-        else:
+        except IndexError:
             return None
 
     def contains(self, pattern):
