@@ -66,7 +66,6 @@ class TestInputCsv(unittest.TestCase):
         table = Table(path)
 
         # Normal table
-        table.print()
         row_0_cell_6 = table.raw_table[0][6]
         self.assertEqual(row_0_cell_6, 'PCE (η, %)')
 
@@ -75,3 +74,10 @@ class TestInputCsv(unittest.TestCase):
 
         row_2_cell_0 = table.raw_table[2][0]
         self.assertEqual(row_2_cell_0, '1T–MoS2 (hydrothermal, 180 °C)')
+
+    def test_table_with_broken_rows(self):
+        path = os.path.join(os.path.dirname(__file__), 'data', 'table_broken_row.csv')
+        table = Table(path)
+
+        self.assertEqual(len(table.category_table), 10)
+

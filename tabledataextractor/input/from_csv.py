@@ -20,6 +20,8 @@ def read(file_path):
 
     with open(file_path, 'r', encoding='utf-8') as f:
         array = [elem for elem in list(csv.reader(f)) if elem]
+        n = len(array[0])
+        array = [x for x in array if len(x) == n]  # Only include rows with data for every column
         array = np.asarray(array, dtype='<U60')
     return array
 

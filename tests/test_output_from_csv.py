@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-class TestInputCsv(unittest.TestCase):
+class TestOutputCsv(unittest.TestCase):
 
     def do_conversion(self, filename):
         """ Helper function to convert from input to output"""
@@ -34,7 +34,7 @@ class TestInputCsv(unittest.TestCase):
         table = Table(in_path)
 
         # Output csv and import as string
-        write_to_csv(table, out_path)
+        write_to_csv(table.raw_table, out_path)
         with open(in_path, 'r', encoding='utf-8') as f:
             out_string = f.read()
         os.remove(out_path)
@@ -44,7 +44,7 @@ class TestInputCsv(unittest.TestCase):
     def test_table_example1(self):
         self.do_conversion('table_example1.csv')
 
-    def test_table_example15(self):
+    def test_table_double_quotes(self):
         self.do_conversion('table_double_quotes.csv')
 
     def test_all_example_tables(self):
