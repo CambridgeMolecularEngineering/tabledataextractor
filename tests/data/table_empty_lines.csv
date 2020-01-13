@@ -1,0 +1,6 @@
+Counter electrodes,Redox couple,Dye,Jsc (mA cm−2),Voc (V),FF (%),"PCE (η, %)",Rs (Ω cm2),RCT (Ω cm2),Ref.
+"2H–MoS2 (hydrothermal, 200 °C)",I−/I3−,N719,6.78,0.73,35,1.72,16,49,130
+"1T–MoS2 (hydrothermal, 180 °C)",I−/I3−,N719,8.76,0.73,52,7.08,16,19,130
+Pt reference,I−/I3−,N719,17.75,0.702,58,7.25,—,—,130
+
+
