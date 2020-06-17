@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = u'TableDataExtractor'
-copyright = u'2018, Juraj Mavračić'
+copyright = u'2019, Juraj Mavračić'
 author = u'Juraj Mavračić'
 
 # The short X.Y version
@@ -104,6 +104,7 @@ html_theme_options = {
 #    'github_banner': 'true',
 #    'github_button': 'true',
 #    'description': 'Extract information from tables'
+    'logo_only': 'true'
 }
 
 html_context = {
@@ -118,6 +119,7 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = ['css/custom.css']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -129,6 +131,7 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+html_logo = 'logo.png'
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
