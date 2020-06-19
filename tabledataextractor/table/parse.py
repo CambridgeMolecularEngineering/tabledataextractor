@@ -19,7 +19,7 @@ class CellParser:
     """
     def __init__(self, pattern):
 
-        log.info('Initialization of CellParser with regex pattern: "{}"'.format(pattern))
+        log.debug('Initialization of CellParser with regex pattern: "{}"'.format(pattern))
         assert isinstance(pattern, str)
         self.pattern = pattern
 

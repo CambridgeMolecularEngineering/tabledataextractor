@@ -27,7 +27,7 @@ class History:
         self._header_extended_up = False
         self._header_extended_down = False
         self._table_transposed = False
-        log.info("History() object created.")
+        log.debug("History() object created.")
 
     @property
     def title_row_removed(self):

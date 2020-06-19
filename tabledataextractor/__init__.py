@@ -10,7 +10,7 @@ jm2111@cam.ac.uk
 import logging
 
 __title__ = 'TableDataExtractor'
-__version__ = '1.5.7'
+__version__ = '1.5.8'
 __author__ = 'Juraj Mavračić'
 __email__ = 'jm2111@cam.ac.uk'
 __license__ = 'proprietary'  # ?
@@ -27,6 +27,7 @@ __copyright__ = 'Copyright 2018 Juraj Mavracic'
 logging.basicConfig(level=logging.WARNING, format='%(levelname)-10s in %(filename)-20s--> %(message)s', handlers=[logging.FileHandler("log.txt", mode='w')])
 
 log = logging.getLogger(__name__)
+
 
 from tabledataextractor.table.table import Table, TrivialTable
 

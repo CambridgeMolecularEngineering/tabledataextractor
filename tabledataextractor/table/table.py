@@ -94,7 +94,7 @@ class Table:
 
         # clean-up the input array
         self._pre_cleaned_table = pre_clean(self.raw_table)
-        log.info("Table shape changed from {} to {}.".format(np.shape(self.raw_table),
+        log.debug("Table shape changed from {} to {}.".format(np.shape(self.raw_table),
                                                              np.shape(self.pre_cleaned_table)))
 
         if self.configs['use_spanning_cells']:
@@ -119,12 +119,12 @@ class Table:
             log.critical(msg)
             raise MIPSError(msg)
         else:
-            log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
+            log.debug("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
 
         if self.configs['use_header_extension']:
             self._cc1 = header_extension_up(self, self._cc1)
             self._cc2 = header_extension_down(self, self._cc1, self._cc2, self._cc4)
-            log.info("Header extension, new cc1 = {}, new cc2 = {}".format(self._cc1, self._cc2))
+            log.debug("Header extension, new cc1 = {}, new cc2 = {}".format(self._cc1, self._cc2))
 
         # check if critical cell `CC3` can be found
         try:
@@ -416,14 +416,14 @@ class Table:
         if not np.array_equal(self._pre_cleaned_table, footnote.pre_cleaned_table):
             self._pre_cleaned_table = np.copy(footnote.pre_cleaned_table)
             self.history._footnotes_copied = True
-            log.info("METHOD. Footnotes copied into cells.")
+            log.debug("METHOD. Footnotes copied into cells.")
 
     def print(self):
         """
         Prints the `raw table` (input), `cleaned table` (processed by `TableDataExtractor`) and `labels`
         (regions of the table) nicely.
         """
-        log.info("Printing table: {}".format(self._file_path))
+        log.debug("Printing table: {}".format(self._file_path))
         print_table(self.raw_table)
         print_table(self._pre_cleaned_table)
         print_table(self.labels)
@@ -449,7 +449,7 @@ class Table:
 
     def __str__(self):
         """As the user wants to see it"""
-        log.info("Printing table: {}".format(self._file_path))
+        log.debug("Printing table: {}".format(self._file_path))
         t = list_as_PrettyTable(self.category_table)
         return str(t)
 
@@ -457,7 +457,7 @@ class Table:
         """As the developer wants to see it"""
         intro = "Table({}, table_number={}, transposed={})".format(self._file_path, self._table_number,
                                                                    self.history.table_transposed)
-        log.info("Repr. table: {}".format(self._file_path))
+        log.debug("Repr. table: {}".format(self._file_path))
         array_width = np.shape(self._pre_cleaned_table)[1]
         input_string = as_string(self.raw_table)
         results_string = as_string(
@@ -503,7 +503,7 @@ class TrivialTable(Table):
 
         # define critical cells cc1 and cc2 (no MIPS algorithm is used in TrivialTable)
         self._cc1, self._cc2 = (0, 0), (self.configs['col_header'], self.configs['row_header'])
-        log.info("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
+        log.debug("Table Cell CC1 = {}; Table Cell CC2 = {}".format(self._cc1, self._cc2))
 
         self._pre_cleaned_table = self.raw_table
         if self.configs['clean_row_header']:

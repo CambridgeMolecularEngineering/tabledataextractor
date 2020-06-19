@@ -16,7 +16,7 @@ from tabledataextractor.table.parse import StringParser, CellParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 
 def empty_string(string, regex=r'^([\s\-\–\—\"]+)?$'):
@@ -84,7 +84,7 @@ def pre_clean(array):
     for row_index, row in enumerate(array_empty):
         if False not in row:
             empty_rows.append(row_index)
-    log.info("Empty rows {} deleted.".format(empty_rows))
+    log.debug("Empty rows {} deleted.".format(empty_rows))
     pre_cleaned_table = np.delete(pre_cleaned_table, empty_rows, axis=0)
 
     # find empty columns and delete them
@@ -92,7 +92,7 @@ def pre_clean(array):
     for column_index, column in enumerate(array_empty.T):
         if False not in column:
             empty_columns.append(column_index)
-    log.info("Empty columns {} deleted.".format(empty_columns))
+    log.debug("Empty columns {} deleted.".format(empty_columns))
     pre_cleaned_table = np.delete(pre_cleaned_table, empty_columns, axis=1)
 
     # delete duplicate rows that extend over the whole table
@@ -102,7 +102,7 @@ def pre_clean(array):
     for row_index in range(0, len(pre_cleaned_table)):
         if row_index not in indices:
             removed_rows.append(row_index)
-    log.info("Duplicate rows {} removed.".format(removed_rows))
+    log.debug("Duplicate rows {} removed.".format(removed_rows))
     # deletion:
     pre_cleaned_table = pre_cleaned_table[np.sort(indices)]
 
@@ -113,7 +113,7 @@ def pre_clean(array):
     for column_index in range(0, len(pre_cleaned_table.T)):
         if column_index not in indices:
             removed_columns.append(column_index)
-    log.info("Duplicate columns {} removed.".format(removed_columns))
+    log.debug("Duplicate columns {} removed.".format(removed_columns))
     # deletion:
     pre_cleaned_table = pre_cleaned_table[:, np.sort(indices)]
 
@@ -425,7 +425,7 @@ def find_cc1_cc2(table_object, cc4, array):
     # provision for using the uppermost row possible for cc1, if titles are turned of
     if not table_object.configs['use_title_row']:
         if cc1[0] != 0:
-            log.info("METHOD. Title row removed, cc1 was shifted from {} to {}".format(cc1, (0, cc1[1])))
+            log.debug("METHOD. Title row removed, cc1 was shifted from {} to {}".format(cc1, (0, cc1[1])))
             cc1 = (0, cc1[1])
             table_object.history._title_row_removed = True
     else:
@@ -628,7 +628,7 @@ def prefix_duplicate_labels(table_object, array):
     # MAIN ALGORITHM
     # 1. first, check the MIPS, to see what header we would have gotten without the prefixing
     # note, cc4 couldn't have changed
-    log.info("Prefixing. Attempt to run main MIPS algorithm.")
+    log.debug("Prefixing. Attempt to run main MIPS algorithm.")
     try:
         cc1, cc2 = find_cc1_cc2(table_object, find_cc4(table_object), array)
     except (MIPSError, TypeError):
@@ -645,7 +645,7 @@ def prefix_duplicate_labels(table_object, array):
         # only perform prefixing if not below of header region (above is allowed!)
         # to allow prefixing even below the old header region cannot be right
         if row_index <= cc2[0]:
-            log.info("Column header prefixing, row_index= {}".format(row_index))
+            log.debug("Column header prefixing, row_index= {}".format(row_index))
             log.debug("Prefixed row= {}".format(new_row))
             # Prefixing by adding new row:
             prefixed = True
@@ -657,7 +657,7 @@ def prefix_duplicate_labels(table_object, array):
         # only perform prefixing if not to the right of header region (to the left is allowed!)
         # to allow prefixing even below the old header region cannot be right
         if column_index <= cc2[1]:
-            log.info("Row header prefixing, column_index= {}".format(column_index))
+            log.debug("Row header prefixing, column_index= {}".format(column_index))
             log.debug("Prefixed column= {}".format(new_column))
             # Prefixing by adding a new column:
             prefixed = True
@@ -670,7 +670,7 @@ def prefix_duplicate_labels(table_object, array):
         try:
             cc1_new, cc2_new = find_cc1_cc2(table_object, find_cc4(table_object), prefixed_table)
         except (MIPSError, TypeError):
-            log.info("Prefixing was not performed because it destroyed the table")
+            log.debug("Prefixing was not performed because it destroyed the table")
             return array
         # return prefixed_table only if the prefixing has not made the header to start lower,
         # it can end lower (and this is desired and what we want - not to include the data region into the header),
@@ -681,7 +681,7 @@ def prefix_duplicate_labels(table_object, array):
             # lower row/column that was included before
             if cc2_new[0] <= cc2[0] and cc2_new[1] <= cc2[1]:
                 table_object.history._prefixing_performed = True
-                log.info("METHOD. Prefixing was performed.")
+                log.debug("METHOD. Prefixing was performed.")
                 if len(prefixed_table.T) > len(array.T):
                     table_object.history._prefixed_rows = True
                 return prefixed_table
@@ -718,14 +718,14 @@ def duplicate_spanning_cells(table_object, array):
         return True
 
     # running MIPS to find the data region
-    log.info("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
+    log.debug("Spanning cells. Attempt to run MIPS algorithm, to find potential title row.")
     try:
         cc1, cc2 = find_cc1_cc2(table_object, find_cc4(table_object), table_object.pre_cleaned_table)
     except (MIPSError, TypeError):
         log.error("Spanning cells update was not performed due to failure of MIPS algorithm.")
         return array
 
-    log.info("Spanning cells. Attempt to run main spanning cell algorithm.")
+    log.debug("Spanning cells. Attempt to run main spanning cell algorithm.")
     temp = array.copy()
     top_fill = None
     left_fill = None
@@ -765,7 +765,7 @@ def duplicate_spanning_cells(table_object, array):
         table_object.history._prefixed_rows = False
         diff_row_length = len(temp2) - len(temp)
         diff_col_length = len(temp2.T) - len(temp.T)
-    log.info("Spanning cells. Attempt to run main MIPS algorithm.")
+    log.debug("Spanning cells. Attempt to run main MIPS algorithm.")
     # disable title row temporarily
     old_title_row_setting = table_object.configs['use_title_row']
     table_object.configs['use_title_row'] = False
@@ -790,7 +790,7 @@ def duplicate_spanning_cells(table_object, array):
     # log
     if not np.array_equal(updated, array):
         table_object.history._spanning_cells_extended = True
-        log.info("METHOD. Spanning cells extended.")
+        log.debug("METHOD. Spanning cells extended.")
 
     return updated
 
@@ -850,7 +850,7 @@ def header_extension_up(table_object, cc1):
     # log
     if not cc1_new == cc1:
         table_object.history._header_extended_up = True
-        log.info("METHOD. Header extended upwards.")
+        log.debug("METHOD. Header extended upwards.")
 
     return cc1_new
 
