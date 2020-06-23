@@ -18,7 +18,6 @@ import numpy as np
 import os
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class TableCC4(Table):

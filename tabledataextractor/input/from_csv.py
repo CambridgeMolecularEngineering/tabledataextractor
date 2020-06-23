@@ -8,7 +8,6 @@ import logging
 import csv
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
 
 
 def read(file_path):

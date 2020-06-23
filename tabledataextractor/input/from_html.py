@@ -17,7 +17,6 @@ import logging
 from tabledataextractor.exceptions import InputError
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
 
 
 def makearray(html_table):

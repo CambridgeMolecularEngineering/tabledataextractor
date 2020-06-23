@@ -22,7 +22,6 @@ from tabledataextractor.table.algorithms import find_cc1_cc2, find_cc3, find_cc4
 from tabledataextractor.table.footnotes import find_footnotes
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
 
 
 class Table:

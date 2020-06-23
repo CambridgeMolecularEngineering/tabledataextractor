@@ -10,7 +10,6 @@ This should be checked for testing on a sample dataset, to justify the choice of
 import logging
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class History:

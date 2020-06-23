@@ -11,7 +11,6 @@ import logging
 from tabledataextractor import TrivialTable
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class TestTrivialTable(unittest.TestCase):

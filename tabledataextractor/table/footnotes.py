@@ -12,7 +12,6 @@ import re
 from .parse import CellParser
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class Footnote:

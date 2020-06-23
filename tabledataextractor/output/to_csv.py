@@ -8,7 +8,6 @@ import csv
 import os
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
 
 
 def write_to_csv(table, file_path):

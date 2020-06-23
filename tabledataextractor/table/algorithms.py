@@ -16,7 +16,6 @@ from tabledataextractor.table.parse import StringParser, CellParser
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 def empty_string(string, regex=r'^([\s\-\–\—\"]+)?$'):

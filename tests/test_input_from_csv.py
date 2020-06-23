@@ -14,7 +14,6 @@ import os
 from tabledataextractor import Table
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class TestInputCsv(unittest.TestCase):

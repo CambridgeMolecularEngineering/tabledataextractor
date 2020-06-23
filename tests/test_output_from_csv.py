@@ -16,7 +16,6 @@ from tabledataextractor.output.to_csv import write_to_csv
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class TestOutputCsv(unittest.TestCase):

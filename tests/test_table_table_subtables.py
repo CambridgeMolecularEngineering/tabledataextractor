@@ -11,7 +11,6 @@ import logging
 from tabledataextractor import Table
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class TestSubtables(unittest.TestCase):
