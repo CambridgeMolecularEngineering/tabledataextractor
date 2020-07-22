@@ -1,6 +1,18 @@
 Acknowledgements
 ======================
 
+| **TableDataExtractor**
+| Molecular Engineering Group
+| Cavendish Laboratory,
+| University of Cambridge
+
+This project was financially supported by the Engineering and Physical Sciences Research Council (EPSRC, EP/L015552/1),
+and conducted at the University of Cambridge, as part of a PhD, which was supervised by Stephen R. Elliott and Jacqueline M. Cole.
+
+The Molecular Engineering Group at the University of Cambridge is financially supported by the Engineering and Physical Sciences Research Council (EPSRC, EP/L015552/1), Science and Technology Facilities Council (STFC) and the Royal Academy of Engineering (RCSRF1819\7\10).
+
+
+
 Some algorithms used and modified in *TableDataExtractor* have been originally developed by Embley et al.
 This is the MIPS (*Minimum Indexing Point Search*) algorithm that is used to find the row/column headers
 and the data region, as well as algorithms for prefixing header cells:
