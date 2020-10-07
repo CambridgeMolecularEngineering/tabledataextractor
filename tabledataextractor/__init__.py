@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 TableDataExtractor
-Extracts and indexes data from tables.
+Extracts and standardizes data from tables.
 Algorithm from David W. Embley et. Al., DOI: 10.1007/s10032-016-0259-1
 jm2111@cam.ac.uk
 ~~~~~~~~~~~~~~~~~
@@ -13,7 +13,7 @@ __title__ = 'TableDataExtractor'
 __version__ = '1.5.9'
 __author__ = 'Juraj Mavračić'
 __email__ = 'jm2111@cam.ac.uk'
-__license__ = 'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License'
+__license__ = 'MIT License'
 __copyright__ = 'Copyright 2019 Juraj Mavracic'
 
 # global logging set-up, change the logging level here for development
