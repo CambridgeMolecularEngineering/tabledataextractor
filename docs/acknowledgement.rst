@@ -8,6 +8,9 @@ Acknowledgements
 
 This software was developed by Juraj Mavračić supported by a grant from the UK Engineering and Physical Sciences Research Council (EPSRC) EP/L015552/1 for the Centre for Doctoral Training (CDT) in Computational Methods for Materials Science.
 
+It forms part of a PhD project supervised by Jacqueline M. Cole and Stephen R. Elliott. The PhD was completed in the Molecular Engineering Group at the University of Cambridge, which is financially supported by the Engineering and Physical Sciences Research Council (EPSRC, EP/L015552/1), Science and Technology Facilities Council (STFC) and the Royal Academy of Engineering (RCSRF1819710).
+
+
 Some algorithms used and modified in *TableDataExtractor* have been originally developed by Embley et al.
 This is the MIPS (*Minimum Indexing Point Search*) algorithm that is used to find the row/column headers
 and the data region, as well as algorithms for prefixing header cells:
