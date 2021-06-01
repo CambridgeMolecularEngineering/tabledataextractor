@@ -26,7 +26,7 @@ setup(name='TableDataExtractor',
             'sympy',
             'beautifulsoup4==4.6.3',
             'requests==2.21.0',
-            'urllib3==1.24.2',
+            'urllib3==1.26.5',
             'selenium==3.141.0',
             'prettytable==0.7.2',
             'pandas==0.23.4'])
