@@ -17,7 +17,7 @@ __license__ = 'MIT License'
 __copyright__ = 'Copyright 2019 Juraj Mavracic'
 
 # global logging set-up, change the logging level here for development
-logging.basicConfig(level=logging.INFO, format='%(levelname)-10s in %(filename)-20s--> %(message)s', handlers=[logging.FileHandler("tde_log.txt", mode='w')])
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)-10s in %(filename)-20s--> %(message)s', handlers=[logging.FileHandler("tde_log.txt", mode='w')])
 
 from tabledataextractor.table.table import Table, TrivialTable
 
