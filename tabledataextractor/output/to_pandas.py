@@ -26,13 +26,21 @@ def find_multiindex_level(row_number, column_number, df):
     Finds the `Pandas` `MultiIndex level` in a given `Pandas` `DataFrame`, for a particular data value.
     """
     result_index = []
-    if hasattr(df.index, 'labels'):
+    if hasattr(df.index, 'codes'):
+        for i, codes in enumerate(df.index.codes):
+            result_index.append(df.index.levels[i][codes[row_number]])
+    # Backwards compatibility
+    elif hasattr(df.index, 'labels'):
         for i, labels in enumerate(df.index.labels):
             result_index.append(df.index.levels[i][labels[row_number]])
     else:
         result_index.append(df.index[row_number])
     result_column = []
-    if hasattr(df.columns, 'labels'):
+    if hasattr(df.columns, 'codes'):
+        for i, codes in enumerate(df.columns.codes):
+            result_column.append(df.columns.levels[i][codes[column_number]])
+    # Backwards compatibility
+    elif hasattr(df.columns, 'labels'):
         for i, labels in enumerate(df.columns.labels):
             result_column.append(df.columns.levels[i][labels[column_number]])
     else:
