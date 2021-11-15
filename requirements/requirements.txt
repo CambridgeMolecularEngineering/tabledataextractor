@@ -2,7 +2,7 @@ django>2.1.6
 numpy>=1.16
 sympy
 beautifulsoup4
-requests==2.21.0
+requests>=2.21.0
 selenium==3.141.0
 prettytable==0.7.2
 pandas>=0.23.4

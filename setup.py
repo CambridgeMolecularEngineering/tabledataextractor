@@ -13,12 +13,13 @@ setup(name='TableDataExtractor',
       test_suite='unittest',
       install_requires=[
             'django>2.1.6',
-            'numpy>=1.16',
+            'numpy==1.16; python_version < "3.7.0"',
+            'numpy>=1.16; python_version >= "3.7.0"',
             'sympy',
             'beautifulsoup4==4.6.3',
             'requests>=2.21.0',
             'urllib3>=1.24.2',
             'selenium==3.141.0',
             'prettytable==0.7.2',
-            'pandas>=0.23.4'])
-
+            'pandas==0.23.4; python_version < "3.7.0"',
+            'pandas>=0.23.4; python_version >= "3.7.0"', ])
