@@ -1,6 +1,7 @@
 language: python
 python:
   - 3.6
+  - 3.9
 services:
   - xvfb
 before_install:
