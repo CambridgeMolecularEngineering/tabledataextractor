@@ -9,6 +9,7 @@ setup(name='tabledataextractor',
       description='Extracts data from tables',
       packages=find_packages(exclude=['tests']),
       long_description=open('README.md', 'r', encoding='utf-8').read(),
+      long_description_content_type='text/markdown',
       zip_safe=False,
       test_suite='unittest',
       install_requires=[
