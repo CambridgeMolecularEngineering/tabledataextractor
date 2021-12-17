@@ -294,14 +294,14 @@ def find_cc1_cc2(table_object, cc4, array):
         # one more row and column index than in the published pseudocode is needed,
         # since the a:b notation in python doesn't include b
         # contrary to the published pseudocode, the correct range is [r2:r_max,c1:c2] and not [r2+1:c2,c1+1:r_max]
-        if r2 == r_max and c1 == c2:
-            section = table[r2, c1]
-        elif r2 == r_max and c1 != c2:
-            section = table[r2, c1: c2 + 1]
-        elif r2 != r_max and c1 != c2:
-            section = table[r2: r_max + 1, c1: c2 + 1]
-        elif r2 != r_max and c1 == c2:
-            section = table[r2: r_max + 1, c1]
+        if r2 + 1 == r_max and c1 == c2:
+            section = table[r2 + 1, c1]
+        elif r2 + 1 == r_max and c1 != c2:
+            section = table[r2 + 1, c1: c2 + 1]
+        elif r2 + 1 != r_max and c1 != c2:
+            section = table[r2 + 1: r_max + 1, c1: c2 + 1]
+        elif r2 + 1 != r_max and c1 == c2:
+            section = table[r2 + 1: r_max + 1, c1]
         else:
             log.critical(
                 "Not defined section 2 for cc1, r2+1= {}, c2= {}, c1+1= {}, r_max= {}".format(r2 + 1, c2, c1 + 1,
@@ -857,8 +857,8 @@ def header_extension_up(table_object, cc1):
 def header_extension_down(table_object, cc1, cc2, cc4):
     """
     Extends the header downwards, if no prefixing was done and if the appropriate stub header is empty.
-    For row-header expansion downwards, only the first cell of the stub header has to be empty.
-    For column-header expansion to the right, the whole stub header column above has to be empty.
+    For column-header expansion downwards, only the first cell of the stub header has to be empty.
+    For row-header expansion to the right, the whole stub header column above has to be empty.
 
     :param table_object: Input Table object
     :type table_object: ~tabledataextractor.table.table.Table
@@ -884,6 +884,9 @@ def header_extension_down(table_object, cc1, cc2, cc4):
             cc2_new = (row_index - 1, cc2_new[1])
             if cc2_new != cc2:
                 extended = True
+
+        if extended:
+            table_object.history._header_extended_down = True
 
         # Check if row header can be shortened now, check duplicate rows accordingly, changes cc2 col
         if extended:

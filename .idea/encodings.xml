@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" addBOMForNewFiles="with NO BOM">
+  <component name="Encoding">
     <file url="file://$PROJECT_DIR$/development_jm2111/data/J_Mat_Sci_2012_2.csv" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/development_jm2111/tde_log.txt" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/tests/data/table_example13.csv" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/log.txt" charset="windows-1252" />
   </component>
