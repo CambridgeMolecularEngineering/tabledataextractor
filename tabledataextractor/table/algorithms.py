@@ -130,7 +130,7 @@ def clean_unicode(array):
     :return: cleaned array
     """
     temp = np.copy(array)
-    temp = np.core.defchararray.replace(temp, '\xa0', ' ')
+    temp = np.char.replace(temp, '\xa0', ' ')
     return temp
 
 
