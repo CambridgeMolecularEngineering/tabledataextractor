@@ -1,5 +1,5 @@
 django>2.1.6
-numpy>=1.16
+numpy>=1.16,<2.0.0
 sympy
 beautifulsoup4
 requests>=2.21.0

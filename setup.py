@@ -15,7 +15,7 @@ setup(name='tabledataextractor',
       install_requires=[
             'django>2.1.6',
             'numpy==1.16; python_version < "3.7.0"',
-            'numpy>=1.16; python_version >= "3.7.0"',
+            'numpy>=1.16,<2.0.0; python_version >= "3.7.0"',
             'sympy',
             'beautifulsoup4>=4.6.3',
             'requests>=2.21.0',
