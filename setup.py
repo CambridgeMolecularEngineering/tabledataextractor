@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='tabledataextractor',
-      version='1.5.10',
+      version='1.5.11',
       url='https://www.tabledataextractor.com',
       license='MIT License',
       author='Juraj Mavračić',
